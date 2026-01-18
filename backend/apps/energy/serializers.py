@@ -13,7 +13,7 @@ class EnergyEventSerializer(serializers.Serializer):
 
 
 class EnergyEventCreateSerializer(serializers.Serializer):
-    event_type = serializers.ChoiceField(choices=["load", "recovery"])
+    activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
     subjective_coef = serializers.FloatField()
