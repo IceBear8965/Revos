@@ -1,5 +1,6 @@
 from django.db import transaction
 
+from ..domain.errors import ActivityTypeNotFound
 from ..models import ActivityType, EnergyEvent, EnergyProfile
 
 MIN_ENERGY = 0.05
@@ -24,7 +25,10 @@ def apply_energy_event(
 ) -> EnergyEvent:
     profile, _ = EnergyProfile.objects.get_or_create(user=user)
 
-    activity = ActivityType.objects.get(code=activity_type)
+    try:
+        activity = ActivityType.objects.get(code=activity_type)
+    except ActivityType.DoesNotExist:
+        raise ActivityTypeNotFound()
 
     event_type = activity.category
     base_coef = BASE_LOAD_COEF if event_type == EnergyEvent.LOAD else BASE_RECOVERY_COEF
@@ -42,6 +46,7 @@ def apply_energy_event(
         event_type=event_type,
         activity_type=activity.code,
         activity_coef=activity.activity_coef,
+        subjective_coef=subjective_coef,
         started_at=started_at,
         ended_at=ended_at,
         duration_sec=duration_sec,

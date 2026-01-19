@@ -17,6 +17,12 @@ class EnergyDomainError(Exception):
         }
 
 
+class ActivityTypeNotFound(EnergyDomainError):
+    status_code = HTTP_404_NOT_FOUND
+    error_code = "activity_type_not_found"
+    message = "This Activity Type doesn't exist"
+
+
 class LastEventNotFound(EnergyDomainError):
     status_code = HTTP_404_NOT_FOUND
     error_code = "last_event_not_found"
@@ -27,9 +33,3 @@ class EventIsNotLast(EnergyDomainError):
     status_code = HTTP_403_FORBIDDEN
     error_code = "event_is_not_last"
     message = "You can edit only the last energy event"
-
-
-class ActivityTypeNotFound(EnergyDomainError):
-    status_code = HTTP_404_NOT_FOUND
-    error_code = "activity_type_not_found"
-    message = "Activity type doesn't exist"

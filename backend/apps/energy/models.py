@@ -1,4 +1,3 @@
-# apps/energy/models.py
 from django.conf import settings
 from django.db import models
 
@@ -40,6 +39,7 @@ class EnergyEvent(models.Model):
 
     activity_type = models.CharField(max_length=32)
     activity_coef = models.FloatField()
+    subjective_coef = models.FloatField(default=1.0)
 
     started_at = models.DateTimeField()
     ended_at = models.DateTimeField()
