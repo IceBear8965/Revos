@@ -180,12 +180,15 @@ def generate_dashboard(*, user) -> dict:
 
     last_event = None
     if last_event_obj:
+        user_timezone = pytz.timezone(user.timezone)
+        started_at_local = last_event_obj.started_at.astimezone(user_timezone).isoformat()
+        ended_at_local = last_event_obj.ended_at.astimezone(user_timezone).isoformat()
         last_event = {
             "id": last_event_obj.id,
             "event_type": last_event_obj.event_type,
             "activity_type": last_event_obj.activity_type,
-            "started_at": last_event_obj.started_at,
-            "ended_at": last_event_obj.ended_at,
+            "started_at": started_at_local,
+            "ended_at": ended_at_local,
             "energy_delta": last_event_obj.energy_delta,
         }
 
