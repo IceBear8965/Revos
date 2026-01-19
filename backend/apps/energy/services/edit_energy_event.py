@@ -10,7 +10,7 @@ def edit_energy_event(
     *,
     user,
     event_id,
-    event_type,
+    activity_type,
     started_at,
     ended_at,
     subjective_coef,
@@ -31,7 +31,7 @@ def edit_energy_event(
 
     return apply_energy_event(
         user=user,
-        event_type=event_type,
+        activity_type=activity_type,
         started_at=started_at,
         ended_at=ended_at,
         subjective_coef=subjective_coef,

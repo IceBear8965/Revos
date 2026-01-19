@@ -17,6 +17,12 @@ class EnergyDomainError(Exception):
         }
 
 
+class ActivityTypeNotFound(EnergyDomainError):
+    status_code = HTTP_404_NOT_FOUND
+    error_code = "activity_type_not_found"
+    message = "This Activity Type doesn't exist"
+
+
 class LastEventNotFound(EnergyDomainError):
     status_code = HTTP_404_NOT_FOUND
     error_code = "last_event_not_found"
