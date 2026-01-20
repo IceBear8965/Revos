@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 
 from .domain.errors import ActivityTypeNotFound, EnergyDomainError, EventIsNotLast, LastEventNotFound
 from .serializers import (
+    BaseStatisticsSerizlizer,
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
     EnergyEventEditSerializer,
@@ -20,6 +21,8 @@ from .services.apply_energy_event import apply_energy_event
 from .services.dashboard import generate_dashboard
 from .services.edit_energy_event import edit_energy_event
 from .services.events_list import generate_events_list
+from .services.statistics.activities_summary import generate_activities_summary
+from .services.statistics.energy_overview import generate_energy_overview
 
 
 class EnergyEventCreateView(APIView):
@@ -113,3 +116,14 @@ class EventsListView(APIView):
         serializer = EventsListSerializer(instance=events_list)
         events_list = serializer.data
         return Response(events_list, status=HTTP_200_OK)
+
+
+class BaseStatisticsView(APIView):
+    def get(self, request):
+        user = request.user
+        energy_overview = generate_energy_overview(user=user)
+        activities_summary = generate_activities_summary(user=user)
+        statistics = {"energy_overview": energy_overview, "activities_summary": activities_summary}
+        serializer = BaseStatisticsSerizlizer(instance=statistics)
+        statistics = serializer.data
+        return Response(statistics, status=HTTP_200_OK)
