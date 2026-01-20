@@ -1,6 +1,6 @@
 import pytz
 from django.utils import timezone
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -14,19 +14,12 @@ from .serializers import (
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
     EnergyEventEditSerializer,
-    EnergyEventSerializer,
-    serializers,
+    EventsListSerializer,
 )
 from .services.apply_energy_event import apply_energy_event
 from .services.dashboard import generate_dashboard
 from .services.edit_energy_event import edit_energy_event
-
-
-class EventsView(APIView):
-    def post(self, request):
-        serializer = EnergyEventSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response({"status": "validated"})
+from .services.events_list import generate_events_list
 
 
 class EnergyEventCreateView(APIView):
@@ -110,3 +103,13 @@ class EnergyDashboardView(APIView):
         serializer = EnergyDashboardSerializer(instance=dashboard)
         dashboard = serializer.data
         return Response(dashboard, status=HTTP_200_OK)
+
+
+# TODO: ADD PAGINATION
+class EventsListView(APIView):
+    def get(self, request):
+        user = request.user
+        events_list = generate_events_list(user=user)
+        serializer = EventsListSerializer(instance=events_list)
+        events_list = serializer.data
+        return Response(events_list, status=HTTP_200_OK)

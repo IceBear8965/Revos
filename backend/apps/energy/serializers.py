@@ -1,17 +1,6 @@
 from rest_framework import serializers
 
 
-class EnergyEventSerializer(serializers.Serializer):
-    event_type = serializers.ChoiceField(choices=["load", "recovery"])
-    started_at = serializers.DateTimeField()
-    ended_at = serializers.DateTimeField()
-
-    def validate(self, data):
-        if data["ended_at"] <= data["started_at"]:
-            raise serializers.ValidationError("ended_at must be after started_at")
-        return data
-
-
 class EnergyEventCreateSerializer(serializers.Serializer):
     activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
     started_at = serializers.DateTimeField()
@@ -43,3 +32,16 @@ class EnergyDashboardSerializer(serializers.Serializer):
     message = serializers.JSONField()
     recommendation = serializers.CharField()
     last_event = serializers.JSONField()
+
+
+class EventItemSerializer(serializers.Serializer):
+    event_id = serializers.IntegerField()
+    event_type = serializers.ChoiceField(choices=["load", "recovery"])
+    activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
+    started_at = serializers.DateTimeField()
+    ended_at = serializers.DateTimeField()
+    energy_delta = serializers.FloatField()
+
+
+class EventsListSerializer(serializers.Serializer):
+    results = EventItemSerializer(many=True)
