@@ -34,4 +34,4 @@ def generate_energy_overview(*, user):
             energy = None
         output.append({"date": day.isoformat(), "energy": energy})
 
-    return {"energy_overview": output}
+    return output
