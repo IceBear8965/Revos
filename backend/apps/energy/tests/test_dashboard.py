@@ -144,7 +144,9 @@ class DashboardContentTests(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(energy=case["energy"], context=getattr(case["last_event"], "event_type", None)):
+            with self.subTest(
+                energy=case["energy"], context=getattr(case["last_event"], "event_type", None)
+            ):
                 # ARRANGE
                 user = create_user_with_energy(
                     email=f"user_{case['energy']}_{getattr(case['last_event'], 'event_type', 'first')}@example.com",
@@ -153,7 +155,9 @@ class DashboardContentTests(TestCase):
                 last_event = case["last_event"]
 
                 # ACT
-                message, recommendation = generate_dashboard_content(user=user, last_event=last_event)
+                message, recommendation = generate_dashboard_content(
+                    user=user, last_event=last_event
+                )
 
                 # ASSERT
                 self.assertEqual(message["title"], case["expected"]["title"])

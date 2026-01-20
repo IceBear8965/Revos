@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("energy", "0005_rename_base_coef_activitytype_activity_coef_and_more"),
     ]

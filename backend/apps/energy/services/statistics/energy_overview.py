@@ -11,12 +11,15 @@ def generate_energy_overview(*, user):
     today = datetime.now(user_timezone).date()
     week_start = today - timedelta(6)
 
-    week_start_dt = datetime.combine(week_start, datetime.min.time()).astimezone(user_timezone)
-    today_end_dt = datetime.combine(today, datetime.max.time()).astimezone(user_timezone)
+    week_start_local = user_timezone.localize(datetime.combine(week_start, datetime.min.time()))
+    today_local = user_timezone.localize(datetime.combine(today, datetime.max.time()))
 
-    energy_events = EnergyEvent.objects.filter(user=user, started_at__range=(week_start_dt, today_end_dt)).order_by(
-        "started_at"
-    )
+    week_start_utc = week_start_local.astimezone(pytz.UTC)
+    today_utc = today_local.astimezone(pytz.UTC)
+
+    energy_events = EnergyEvent.objects.filter(
+        user=user, started_at__range=(week_start_utc, today_utc)
+    ).order_by("started_at")
 
     events_by_date = defaultdict(list)
     for e in energy_events:

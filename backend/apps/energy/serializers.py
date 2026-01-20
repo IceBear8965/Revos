@@ -2,27 +2,35 @@ from rest_framework import serializers
 
 
 class EnergyEventCreateSerializer(serializers.Serializer):
-    activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
+    activity_type = serializers.ChoiceField(
+        choices=["work", "study", "society", "sleep", "rest", "sport"]
+    )
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
     subjective_coef = serializers.FloatField()
 
     def validate(self, data):
         if data["started_at"] > data["ended_at"]:
-            raise serializers.ValidationError({"ended_at": "ended_at must be greater than started_at"})
+            raise serializers.ValidationError(
+                {"ended_at": "ended_at must be greater than started_at"}
+            )
         return data
 
 
 class EnergyEventEditSerializer(serializers.Serializer):
     event_id = serializers.IntegerField()
-    activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
+    activity_type = serializers.ChoiceField(
+        choices=["work", "study", "society", "sleep", "rest", "sport"]
+    )
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
     subjective_coef = serializers.FloatField()
 
     def validate(self, data):
         if data["started_at"] > data["ended_at"]:
-            raise serializers.ValidationError({"ended_at": "ended_at must be greater than started_at"})
+            raise serializers.ValidationError(
+                {"ended_at": "ended_at must be greater than started_at"}
+            )
         return data
 
 
@@ -37,7 +45,9 @@ class EnergyDashboardSerializer(serializers.Serializer):
 class EventItemSerializer(serializers.Serializer):
     event_id = serializers.IntegerField()
     event_type = serializers.ChoiceField(choices=["load", "recovery"])
-    activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
+    activity_type = serializers.ChoiceField(
+        choices=["work", "study", "society", "sleep", "rest", "sport"]
+    )
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
     energy_delta = serializers.FloatField()
@@ -53,8 +63,10 @@ class EnergyOverviewSerializer(serializers.Serializer):
 
 
 class ActivitiesSummarySerializer(serializers.Serializer):
-    activity_type = serializers.ChoiceField(choices=["work", "study", "society", "sleep", "rest", "sport"])
-    total_energy_delta = serializers.FloatField()
+    activity_type = serializers.ChoiceField(
+        choices=["work", "study", "society", "sleep", "rest", "sport"]
+    )
+    avg_energy_delta = serializers.FloatField()
     event_count = serializers.IntegerField()
 
 

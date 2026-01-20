@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("energy", "0002_activitytype_energyevent_activity_type_and_more"),
     ]

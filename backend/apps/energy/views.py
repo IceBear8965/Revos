@@ -9,7 +9,12 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
-from .domain.errors import ActivityTypeNotFound, EnergyDomainError, EventIsNotLast, LastEventNotFound
+from .domain.errors import (
+    ActivityTypeNotFound,
+    EnergyDomainError,
+    EventIsNotLast,
+    LastEventNotFound,
+)
 from .serializers import (
     BaseStatisticsSerizlizer,
     EnergyDashboardSerializer,

@@ -1,6 +1,12 @@
 from django.urls import path
 
-from .views import BaseStatisticsView, EnergyDashboardView, EnergyEventCreateView, EnergyEventEditView, EventsListView
+from .views import (
+    BaseStatisticsView,
+    EnergyDashboardView,
+    EnergyEventCreateView,
+    EnergyEventEditView,
+    EventsListView,
+)
 
 urlpatterns = [
     path("create_event/", EnergyEventCreateView.as_view(), name="create-energy-event"),

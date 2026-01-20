@@ -11,7 +11,9 @@ def generate_events_list(*, user) -> dict:
 
     week_ago = timezone.now() - timedelta(days=7)
 
-    energy_objects = EnergyEvent.objects.filter(user=user, started_at__gte=week_ago).order_by("-started_at")
+    energy_objects = EnergyEvent.objects.filter(user=user, started_at__gte=week_ago).order_by(
+        "-started_at"
+    )
 
     output = []
 
