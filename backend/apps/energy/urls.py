@@ -6,6 +6,7 @@ from .views import (
     EnergyEventCreateView,
     EnergyEventEditView,
     EventsListView,
+    PersonalActivityOrderView,
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path("dashboard/", EnergyDashboardView.as_view(), name="dashboard"),
     path("events_list/", EventsListView.as_view(), name="events_list"),
     path("statistics/", BaseStatisticsView.as_view(), name="statistics"),
+    path("change_loads_order/", PersonalActivityOrderView.as_view(), name="loads-order"),
 ]

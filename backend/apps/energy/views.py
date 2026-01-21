@@ -12,15 +12,15 @@ from rest_framework.views import APIView
 from .domain.errors import (
     ActivityTypeNotFound,
     EnergyDomainError,
-    EventIsNotLast,
-    LastEventNotFound,
 )
+from .models import PersonalActivityProfile
 from .serializers import (
     BaseStatisticsSerizlizer,
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
     EnergyEventEditSerializer,
     EventsListSerializer,
+    PersonalActivityOrderSerializer,
 )
 from .services.apply_energy_event import apply_energy_event
 from .services.dashboard import generate_dashboard
@@ -132,3 +132,19 @@ class BaseStatisticsView(APIView):
         serializer = BaseStatisticsSerizlizer(instance=statistics)
         statistics = serializer.data
         return Response(statistics, status=HTTP_200_OK)
+
+
+class PersonalActivityOrderView(APIView):
+    def post(self, request):
+        serializer = PersonalActivityOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        profile, _ = PersonalActivityProfile.objects.get_or_create(user=request.user)
+
+        profile.load_order = serializer.validated_data["load_order"]
+        profile.save(update_fields=["load_order"])
+
+        return Response(
+            {"status": "ok", "load_order": profile.load_order},
+            status=HTTP_200_OK,
+        )
