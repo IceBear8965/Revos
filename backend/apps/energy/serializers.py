@@ -57,12 +57,17 @@ class EventsListSerializer(serializers.Serializer):
     results = EventItemSerializer(many=True)
 
 
-class EnergyOverviewSerializer(serializers.Serializer):
+class EnergyOverviewActivitiesSerializer(serializers.Serializer):
     date = serializers.DateTimeField()
     energy = serializers.FloatField()
 
 
-class ActivitiesSummarySerializer(serializers.Serializer):
+class EnergyOverviewSerializer(serializers.Serializer):
+    period = serializers.DictField()
+    activities = EnergyOverviewActivitiesSerializer(many=True)
+
+
+class ActivitiesSummaryDataSerializer(serializers.Serializer):
     activity_type = serializers.ChoiceField(
         choices=["work", "study", "society", "sleep", "rest", "sport"]
     )
@@ -70,6 +75,12 @@ class ActivitiesSummarySerializer(serializers.Serializer):
     event_count = serializers.IntegerField()
 
 
+class ActivitiesSummarySerializer(serializers.Serializer):
+    period = serializers.DictField()
+    scale = serializers.DictField()
+    activities = ActivitiesSummaryDataSerializer(many=True)
+
+
 class BaseStatisticsSerizlizer(serializers.Serializer):
-    energy_overview = EnergyOverviewSerializer(many=True)
-    activities_summary = ActivitiesSummarySerializer(many=True)
+    energy_overview = EnergyOverviewSerializer()
+    activities_summary = ActivitiesSummarySerializer()

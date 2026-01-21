@@ -26,15 +26,24 @@ def generate_energy_overview(*, user):
         local_date = e.started_at.astimezone(user_timezone).date()
         events_by_date[local_date].append(e)
 
-    output = []
+    activities = []
     for i in range(7):
         day = week_start + timedelta(days=i)
         day_events = events_by_date.get(day, [])
         if day_events:
             last_event = day_events[-1]
-            energy = last_event.energy_after
+            energy = round(last_event.energy_after, 4)
         else:
             energy = None
-        output.append({"date": day.isoformat(), "energy": energy})
+        activities.append({"date": day.isoformat(), "energy": energy})
+
+    output = {
+        "period": {
+            "type": "week",
+            "from": week_start_local.date().isoformat(),
+            "to": today_local.date().isoformat(),
+        },
+        "activities": activities,
+    }
 
     return output
