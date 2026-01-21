@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from .constants import ACTIVITY_TYPE_CHOICES, EVENT_TYPE_CHOICES
+
 User = settings.AUTH_USER_MODEL
 
 
@@ -15,31 +17,16 @@ class EnergyProfile(models.Model):
         return f"{self.user} – {self.current_energy:.2f}"
 
 
-LOAD = "load"
-RECOVERY = "recovery"
-
-EVENT_TYPE_CHOICES = [
-    (LOAD, "Load"),
-    (RECOVERY, "Recovery"),
-]
-
-
 class EnergyEvent(models.Model):
-    LOAD = "load"
-    RECOVERY = "recovery"
-
-    EVENT_TYPE_CHOICES = [
-        (LOAD, "Load"),
-        (RECOVERY, "Recovery"),
-    ]
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="energy_events")
 
     event_type = models.CharField(max_length=10, choices=EVENT_TYPE_CHOICES)
-
     activity_type = models.CharField(max_length=32)
+
+    base_coef = models.FloatField()
     activity_coef = models.FloatField()
-    subjective_coef = models.FloatField(default=1.0)
+    personal_coef = models.FloatField()
+    subjective_coef = models.FloatField()
 
     started_at = models.DateTimeField()
     ended_at = models.DateTimeField()
@@ -56,25 +43,21 @@ class EnergyEvent(models.Model):
 
 
 class ActivityType(models.Model):
-    WORK = "work"
-    STUDY = "study"
-    SOCIETY = "society"
-    SLEEP = "sleep"
-    REST = "rest"
-    SPORT = "sport"
-
-    ACTIVITY_TYPE_CHOICES = [
-        (WORK, "Work"),
-        (STUDY, "Study"),
-        (SOCIETY, "Society"),
-        (SLEEP, "Sleep"),
-        (REST, "Rest"),
-        (SPORT, "Sport"),
-    ]
-
     code = models.CharField(max_length=32, choices=ACTIVITY_TYPE_CHOICES, unique=True)
     category = models.CharField(max_length=10, choices=EVENT_TYPE_CHOICES)
     activity_coef = models.FloatField(default=1.0)
 
     def __str__(self):
         return f"{self.code} ({self.category})"
+
+
+class PersonalActivityProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="personal_activity_profile"
+    )
+
+    # порядок load-активностей, например ["work", "study", "sport", "society"]
+    load_order = models.JSONField(default=list)
+
+    def __str__(self):
+        return f"{self.user.email} personal activity profile"
