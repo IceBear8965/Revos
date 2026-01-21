@@ -56,7 +56,6 @@ class PersonalActivityProfile(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="personal_activity_profile"
     )
 
-    # порядок load-активностей, например ["work", "study", "sport", "society"]
     load_order = models.JSONField(default=list)
 
     def __str__(self):

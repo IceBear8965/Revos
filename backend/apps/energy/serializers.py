@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .constants import ACTIVITY_CODES
+from .constants import ACTIVITY_CODES, LOAD_ACTIVITIES
 
 
 class EnergyEventCreateSerializer(serializers.Serializer):
@@ -78,3 +78,16 @@ class ActivitiesSummarySerializer(serializers.Serializer):
 class BaseStatisticsSerizlizer(serializers.Serializer):
     energy_overview = EnergyOverviewSerializer()
     activities_summary = ActivitiesSummarySerializer()
+
+
+class PersonalActivityOrderSerializer(serializers.Serializer):
+    load_order = serializers.ListField(child=serializers.ChoiceField(choices=LOAD_ACTIVITIES))
+
+    def validate_load_order(self, value):
+        if len(value) != len(set(value)):
+            raise serializers.ValidationError("Duplicate activity types are not allowed")
+
+        if set(value) != set(LOAD_ACTIVITIES):
+            raise serializers.ValidationError(f"load_order must contain exactly: {LOAD_ACTIVITIES}")
+
+        return value

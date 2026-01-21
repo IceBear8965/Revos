@@ -16,6 +16,19 @@ EVENT_TYPE_CHOICES = [
 # --- Коды активностей ---
 ACTIVITY_CODES = ["work", "study", "society", "sleep", "rest", "sport", "walk"]
 
+LOAD_ACTIVITIES = [
+    "work",
+    "study",
+    "society",
+    "sport",
+]
+
+RECOVERY_ACTIVITIES = [
+    "sleep",
+    "rest",
+    "walking",
+]
+
 # --- Для serializer ---
 ACTIVITY_TYPE_CHOICES = [(code, code.capitalize()) for code in ACTIVITY_CODES]
 
