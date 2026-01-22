@@ -56,8 +56,15 @@ class ChangeNicknameView(APIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.data
 
+        previous_nickname = user.nickname
         user.nickname = validated_data["nickname"]
         user.save(update_fields=["nickname"])
+
+        log_event(
+            action="nickname_changed",
+            user_id=user.id,
+            extra={"previous_nickname": previous_nickname, "current_nickname": user.nickname},
+        )
         return Response({"updated_nickname": user.nickname}, status=HTTP_202_ACCEPTED)
 
 
@@ -68,6 +75,13 @@ class ChangeTimezoneView(APIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.data
 
+        previous_timezone = user.timezone
         user.timezone = validated_data["timezone"]
         user.save(update_fields=["timezone"])
+
+        log_event(
+            action="timezone_changed",
+            user_id=user.id,
+            extra={"previous_timezone": previous_timezone, "current_timezone": user.timezone},
+        )
         return Response({"updated_timezone": user.timezone}, status=HTTP_202_ACCEPTED)
