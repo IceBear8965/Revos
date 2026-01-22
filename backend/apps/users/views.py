@@ -1,12 +1,18 @@
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_202_ACCEPTED
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.common.loggers import log_event
 
-from .serializers import RegisterUserSerializer
+from .serializers import (
+    ChangeNicknameSerializer,
+    ChangeTimezoneSerializer,
+    MeSerializer,
+    RegisterUserSerializer,
+)
+from .services.generate_user_info import generate_user_info
 
 
 class RegisterUserView(APIView):
@@ -32,3 +38,36 @@ class RegisterUserView(APIView):
             },
             status=HTTP_201_CREATED,
         )
+
+
+class MeView(APIView):
+    def get(self, request):
+        user = request.user
+        user_info = generate_user_info(user=user)
+        serialiszer = MeSerializer(instance=user_info)
+        validated_data = serialiszer.data
+        return Response(validated_data, status=HTTP_200_OK)
+
+
+class ChangeNicknameView(APIView):
+    def patch(self, request):
+        user = request.user
+        serializer = ChangeNicknameSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.data
+
+        user.nickname = validated_data["nickname"]
+        user.save(update_fields=["nickname"])
+        return Response({"updated_nickname": user.nickname}, status=HTTP_202_ACCEPTED)
+
+
+class ChangeTimezoneView(APIView):
+    def patch(self, request):
+        user = request.user
+        serializer = ChangeTimezoneSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.data
+
+        user.timezone = validated_data["timezone"]
+        user.save(update_fields=["timezone"])
+        return Response({"updated_timezone": user.timezone}, status=HTTP_202_ACCEPTED)
