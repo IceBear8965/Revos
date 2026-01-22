@@ -9,6 +9,8 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
+from apps.common.loggers import log_event
+
 from .domain.errors import (
     ActivityTypeNotFound,
     EnergyDomainError,
@@ -143,6 +145,12 @@ class PersonalActivityOrderView(APIView):
 
         profile.load_order = serializer.validated_data["load_order"]
         profile.save(update_fields=["load_order"])
+
+        log_event(
+            action="personal_coef_updated",
+            user_id=request.user.id,
+            extra={"new_load_order": profile.load_order},
+        )
 
         return Response(
             {"status": "ok", "load_order": profile.load_order},
