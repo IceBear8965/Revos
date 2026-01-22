@@ -148,3 +148,26 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 AUTH_USER_MODEL = "users.User"
+
+# Logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "format": '{"time": "{asctime}", "level": "{levelname}", "name": "{name}", "message": "{message}"}',
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "json"},
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "logs/activity.log",
+            "formatter": "json",
+        },
+    },
+    "loggers": {
+        "activity": {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+    },
+}
