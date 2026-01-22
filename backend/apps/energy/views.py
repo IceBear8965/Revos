@@ -137,7 +137,7 @@ class BaseStatisticsView(APIView):
 
 
 class PersonalActivityOrderView(APIView):
-    def post(self, request):
+    def patch(self, request):
         serializer = PersonalActivityOrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

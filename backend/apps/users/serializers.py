@@ -52,3 +52,34 @@ class RegisterUserSerializer(serializers.Serializer):
             )
 
             return user
+
+
+class MeSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    email = serializers.EmailField()
+    nickname = serializers.CharField()
+    timezone = serializers.CharField()
+    load_order = serializers.JSONField()
+
+
+class ChangeNicknameSerializer(serializers.Serializer):
+    nickname = serializers.CharField()
+
+    def validate(self, data):
+        if data.get("nickname") == "":
+            raise serializers.ValidationError({"nickname": "nickname field can't be empty"})
+        if len(data.get("nickname")) > 32:
+            raise serializers.ValidationError(
+                {"nickname": "nickname must be not longer than 32 symbols"}
+            )
+
+        return data
+
+
+class ChangeTimezoneSerializer(serializers.Serializer):
+    timezone = serializers.CharField(max_length=48)
+
+    def validate(self, data):
+        if data.get("timezone") not in pytz.all_timezones:
+            raise serializers.ValidationError({"timezone": "enter correct timezone"})
+        return data
