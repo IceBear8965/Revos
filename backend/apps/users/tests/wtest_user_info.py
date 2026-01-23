@@ -12,7 +12,7 @@ class UserInfoTest(APITestCase):
 
     def test_user_info_api_normal(self):
         user = User.objects.create(
-            email="test_user@example.com", nickname="Me_TestUser", timezone="Europe/Berlin"
+            email="test@example.com", nickname="TestUser", timezone="Europe/Berlin"
         )
         access = RefreshToken.for_user(user).access_token
 
