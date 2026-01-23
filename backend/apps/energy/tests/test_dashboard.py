@@ -3,30 +3,28 @@ from django.test import TestCase
 
 from apps.energy.services.dashboard import generate_dashboard_content
 
+from ..models import EnergyProfile, PersonalActivityProfile
+
 User = get_user_model()
 
 
 def create_user_with_energy(email: str, energy: float):
-    """
-    Helper: создаёт пользователя и обновляет его EnergyProfile.
-    EnergyProfile уже создается сигналом при создании пользователя,
-    поэтому мы просто меняем current_energy.
-    """
     user = User.objects.create_user(email=email, password="123456")
-    profile = user.energy_profile
-    profile.current_energy = energy
-    profile.save()
-    profile.refresh_from_db()
-    user.energy_profile.refresh_from_db()
+
+    EnergyProfile.objects.create(
+        user=user,
+        current_energy=energy,
+    )
+
+    PersonalActivityProfile.objects.create(
+        user=user,
+        load_order=["study", "work", "society", "sport"],
+    )
+
     return user
 
 
 class DashboardContentTests(TestCase):
-    """
-    Параметризованные тесты для generate_dashboard_content.
-    Проверяем title, content и recommendation для разных energy states и контекстов.
-    """
-
     def test_dashboard_messages(self):
         test_cases = [
             # LOW ENERGY

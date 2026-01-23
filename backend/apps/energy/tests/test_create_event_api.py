@@ -49,6 +49,10 @@ class CreateEventAPITest(APITestCase):
             "subjective_coef": "0.8",
         }
 
+    def asser_energy_fields(self, data):
+        for field in ("energy_before", "energy_delta", "energy_after"):
+            self.assertIn(field, data)
+
     def test_create_event_load_normal(self):
         user, access = create_user()
 
