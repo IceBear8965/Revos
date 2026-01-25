@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_202_ACCEPTED
@@ -15,6 +16,20 @@ from .serializers import (
 from .services.generate_user_info import generate_user_info
 
 
+@extend_schema(
+    request=RegisterUserSerializer,
+    responses={
+        201: {
+            "type": "object",
+            "properties": {
+                "refresh": {"type": "string", "description": "JWT refresh token"},
+                "access": {"type": "string", "description": "JWT access token"},
+            },
+        }
+    },
+    description="Register a new user and return JWT tokens",
+    summary="User registration",
+)
 class RegisterUserView(APIView):
     permission_classes = [AllowAny]
 
@@ -40,6 +55,39 @@ class RegisterUserView(APIView):
         )
 
 
+@extend_schema(
+    request=MeSerializer,
+    responses={
+        201: {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Logged in user ID",
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Logged in user email",
+                },
+                "nickname": {"type": "string", "description": "Logged in user nickname"},
+                "timezone": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Logged in user timezone",
+                },
+                "load_order": {
+                    "type": "object",
+                    "format": "dict",
+                    "description": "Logged in user load order",
+                },
+            },
+        }
+    },
+    description="Return info about current user",
+    summary="User info",
+)
 class MeView(APIView):
     def get(self, request):
         user = request.user
@@ -49,6 +97,19 @@ class MeView(APIView):
         return Response(validated_data, status=HTTP_200_OK)
 
 
+@extend_schema(
+    request=ChangeNicknameSerializer,
+    responses={
+        202: {
+            "type": "object",
+            "properties": {
+                "updated_nickname": {"type": "string", "description": "Updated user nickname"}
+            },
+        }
+    },
+    description="Change user nickname and return changed nickname",
+    summary="Change user nickname",
+)
 class ChangeNicknameView(APIView):
     def patch(self, request):
         user = request.user
@@ -68,6 +129,19 @@ class ChangeNicknameView(APIView):
         return Response({"updated_nickname": user.nickname}, status=HTTP_202_ACCEPTED)
 
 
+@extend_schema(
+    request=ChangeTimezoneSerializer,
+    responses={
+        202: {
+            "type": "object",
+            "properties": {
+                "updated_timezone": {"type": "string", "description": "Updated user timezone"}
+            },
+        }
+    },
+    description="Change user timezone and return new timezone",
+    summary="Change user timezone",
+)
 class ChangeTimezoneView(APIView):
     def patch(self, request):
         user = request.user

@@ -75,7 +75,7 @@ class ActivitiesSummarySerializer(serializers.Serializer):
     activities = ActivitiesSummaryDataSerializer(many=True)
 
 
-class BaseStatisticsSerizlizer(serializers.Serializer):
+class BaseStatisticsSerializer(serializers.Serializer):
     energy_overview = EnergyOverviewSerializer()
     activities_summary = ActivitiesSummarySerializer()
 
