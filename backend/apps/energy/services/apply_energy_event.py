@@ -1,5 +1,7 @@
 from django.db import transaction
 
+from apps.common.loggers import log_event
+
 from ..constants import BASE_LOAD_COEF, BASE_RECOVERY_COEF, LOAD, MAX_ENERGY, MIN_ENERGY, RECOVERY
 from ..domain.errors import ActivityTypeNotFound
 from ..models import ActivityType, EnergyEvent, EnergyProfile, PersonalActivityProfile
@@ -59,6 +61,20 @@ def apply_energy_event(
         energy_before=energy_before,
         energy_delta=energy_delta,
         energy_after=energy_after,
+    )
+
+    log_event(
+        action="energy_event_created",
+        user_id=user.id,
+        extra={
+            "activity_type": activity.code,
+            "event_type": event_type,
+            "duration_sec": duration_sec,
+            "energy_before": energy_before,
+            "energy_after": energy_after,
+            "personal_coef": personal_coef,
+            "subjective_coef": subjective_coef,
+        },
     )
 
     profile.current_energy = energy_after
