@@ -103,13 +103,13 @@ python backend/manage.py runserver
 Swagger UI is available at:
 
 ```
-http://localhost:8000/api/docs/
+http://127.0.0.1:8000/api/docs/
 ```
 
 OpenAPI schema:
 
 ```
-http://localhost:8000/api/schema/
+http://127.0.0.1:8000/api/schema/
 ```
 
 All endpoints are documented with request/response schemas.
