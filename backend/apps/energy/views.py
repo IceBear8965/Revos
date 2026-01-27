@@ -371,7 +371,7 @@ class BaseStatisticsView(APIView):
     responses={
         200: {
             "load_order": {
-                "type": "object",
+                "type": "array",
                 "description": "Sequnce of user's personal coef",
             }
         }
