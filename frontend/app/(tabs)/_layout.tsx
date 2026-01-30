@@ -1,15 +1,32 @@
-import { Tabs } from "expo-router";
+import { Tabs } from "expo-router"
+import { FloatingTabBar } from "@/components/FloatingTabBar"
 
 export default function TabsLayout() {
     return (
-        <Tabs
-            screenOptions={{
-                tabBarActiveTintColor: "#ffd33d",
-            }}
-        >
-            <Tabs.Screen name="statistics" options={{ title: "Statistics" }} />
-            <Tabs.Screen name="index" options={{ title: "Dashboard" }} />
-            <Tabs.Screen name="list" options={{ title: "List" }} />
+        <Tabs initialRouteName="index" tabBar={(props) => <FloatingTabBar {...props} />}>
+            <Tabs.Screen
+                name="stats"
+                options={{
+                    title: "Stats",
+                    headerShown: false,
+                }}
+            />
+
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: "Home",
+                    headerShown: false,
+                }}
+            />
+
+            <Tabs.Screen
+                name="list"
+                options={{
+                    title: "List",
+                    headerShown: false,
+                }}
+            />
         </Tabs>
-    );
+    )
 }
