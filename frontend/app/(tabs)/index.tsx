@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext"
-import { Text, View, Image, TouchableWithoutFeedback } from "react-native"
+import { Text, View, Image, TouchableWithoutFeedback, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { createStyles } from "@/styles/index"
 import Feather from "@expo/vector-icons/Feather"
@@ -46,6 +46,14 @@ export default function Index() {
                                 <Feather name="arrow-down" size={30} color={colors.accentRed} />
                             </View>
                         </View>
+                    </View>
+                    <View style={styles.controlsContainer}>
+                        <TouchableOpacity style={styles.loadButton}>
+                            <Text style={styles.loadButtonText}>Load</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.recoveryButton}>
+                            <Text style={styles.recoveryButtonText}>Recovery</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>

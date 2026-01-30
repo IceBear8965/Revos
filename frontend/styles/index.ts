@@ -42,8 +42,9 @@ export const createStyles = (colors: AppColors) => {
         },
 
         messageCard: {
-            flex: 3,
-            padding: 20,
+            flex: 2,
+            paddingHorizontal: 20,
+            paddingVertical: 15,
             backgroundColor: colors.card,
             borderRadius: 30,
         },
@@ -51,7 +52,7 @@ export const createStyles = (colors: AppColors) => {
             color: colors.textPrimary,
             fontSize: 24,
             fontWeight: 600,
-            marginBottom: 10,
+            marginBottom: 5,
         },
         messageContent: {
             color: colors.textPrimary,
@@ -60,7 +61,7 @@ export const createStyles = (colors: AppColors) => {
         },
 
         recommendationCard: {
-            flex: 2,
+            flex: 1,
             backgroundColor: colors.card,
             borderRadius: 30,
             justifyContent: "center",
@@ -73,8 +74,9 @@ export const createStyles = (colors: AppColors) => {
         },
 
         lastEventCard: {
-            flex: 3,
-            padding: 20,
+            flex: 2,
+            paddingHorizontal: 20,
+            paddingVertical: 15,
             backgroundColor: colors.card,
             borderRadius: 30,
 
@@ -90,7 +92,7 @@ export const createStyles = (colors: AppColors) => {
             fontSize: 24,
             fontWeight: 600,
 
-            marginBottom: 10,
+            marginBottom: 5,
         },
         lastEventDateTime: {},
         lastEventDate: {
@@ -109,6 +111,40 @@ export const createStyles = (colors: AppColors) => {
         },
         arrowsContainer: {
             flexDirection: "row",
+        },
+
+        controlsContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            columnGap: 10,
+            paddingHorizontal: 20,
+        },
+        loadButton: {
+            width: "40%",
+            paddingVertical: 15,
+            backgroundColor: colors.accentRed,
+            borderRadius: 20,
+
+            alignItems: "center",
+        },
+        loadButtonText: {
+            color: colors.textPrimary,
+            fontSize: 20,
+            fontWeight: 600,
+        },
+
+        recoveryButton: {
+            width: "40%",
+            paddingVertical: 15,
+            backgroundColor: colors.accentGreen,
+            borderRadius: 20,
+
+            alignItems: "center",
+        },
+        recoveryButtonText: {
+            color: colors.textPrimary,
+            fontSize: 20,
+            fontWeight: 600,
         },
     })
 }
