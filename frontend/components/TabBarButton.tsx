@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated"
 import Feather from "@expo/vector-icons/Feather"
 import AntDesign from "@expo/vector-icons/AntDesign"
+import { useTabBar } from "@/context/TabBarContext"
 
 type TabRouteName = "index" | "stats" | "list"
 
@@ -26,12 +27,14 @@ interface TabBarButtonProps {
 
 export const TabBarButton = ({ onPress, isFocused, routeName, label }: TabBarButtonProps) => {
     const { colors } = useTheme()
+    const { setIconReady } = useTabBar()
 
     const scale = useSharedValue(0)
 
     // Animate icon when focused/unfocused
     useEffect(() => {
         scale.value = withSpring(isFocused ? 1 : 0, { duration: 350 })
+        setIconReady()
     }, [isFocused])
 
     const animatedIconStyle = useAnimatedStyle(() => ({

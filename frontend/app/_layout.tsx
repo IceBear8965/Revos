@@ -1,8 +1,8 @@
 import { Stack } from "expo-router"
-import { useEffect } from "react"
+import { useEffect, useContext } from "react"
 import { AuthProvider, useAuth } from "@/context/AuthContext"
 import { ThemeProvider, useTheme } from "@/context/ThemeContext"
-import { AnimationProvider } from "@/context/AnimationsContext"
+import { TabBarProvider, useTabBar } from "@/context/TabBarContext"
 import * as SplashScreen from "expo-splash-screen"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
@@ -12,9 +12,11 @@ export default function RootLayout() {
     return (
         <SafeAreaProvider>
             <ThemeProvider>
-                <AuthProvider>
-                    <RootNavigator />
-                </AuthProvider>
+                <TabBarProvider>
+                    <AuthProvider>
+                        <RootNavigator />
+                    </AuthProvider>
+                </TabBarProvider>
             </ThemeProvider>
         </SafeAreaProvider>
     )
@@ -23,12 +25,13 @@ export default function RootLayout() {
 const RootNavigator = () => {
     const { isAuth, isLoading } = useAuth()
     const { isThemeReady } = useTheme()
+    const { isTabBarReady } = useTabBar()
 
     useEffect(() => {
-        if (!isLoading && isThemeReady) {
+        if (!isLoading && isThemeReady && isTabBarReady) {
             SplashScreen.hideAsync()
         }
-    }, [isLoading, isThemeReady])
+    }, [isLoading, isThemeReady, isTabBarReady])
 
     if (isLoading || !isThemeReady) {
         return null
