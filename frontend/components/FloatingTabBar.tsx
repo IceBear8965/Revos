@@ -4,9 +4,11 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { useTheme } from "@/context/ThemeContext"
 import { TabBarButton } from "./TabBarButton"
+import { useTabBar } from "@/context/TabBarContext"
 
 export const FloatingTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const { colors } = useTheme()
+    const { setBubbleReady } = useTabBar()
 
     const [layout, setLayout] = useState({ width: 0, height: 0 })
 
@@ -15,7 +17,6 @@ export const FloatingTabBar = ({ state, descriptors, navigation }: BottomTabBarP
 
     // Bubble position and opacity
     const bubbleX = useSharedValue(0)
-    const bubbleOpacity = useSharedValue(0)
 
     const onLayout = (e: LayoutChangeEvent) => {
         setLayout({
@@ -36,12 +37,11 @@ export const FloatingTabBar = ({ state, descriptors, navigation }: BottomTabBarP
 
         // Instantly place bubble under active tab
         bubbleX.value = getTranslateX(state.index)
-        bubbleOpacity.value = 1
+        setBubbleReady()
     }, [layout.width])
 
     const animatedBubbleStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: bubbleX.value }],
-        opacity: bubbleOpacity.value,
     }))
 
     const styles = StyleSheet.create({
