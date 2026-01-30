@@ -8,7 +8,7 @@ export const createStyles = (colors: AppColors) => {
             paddingBottom: 90,
         },
         screenTop: {
-            flex: 5,
+            flex: 4,
             backgroundColor: colors.foreground,
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
@@ -36,7 +36,7 @@ export const createStyles = (colors: AppColors) => {
         },
 
         screenBottom: {
-            flex: 5,
+            flex: 6,
             marginHorizontal: 15,
             rowGap: 15,
         },
@@ -61,11 +61,11 @@ export const createStyles = (colors: AppColors) => {
         },
 
         recommendationCard: {
-            flex: 1,
+            flex: 2,
             backgroundColor: colors.card,
             borderRadius: 30,
-            justifyContent: "center",
             paddingHorizontal: 20,
+            paddingVertical: 15,
         },
         recommendationText: {
             fontSize: 16,
