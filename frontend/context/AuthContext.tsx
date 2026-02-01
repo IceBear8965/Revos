@@ -8,7 +8,6 @@ interface AuthContextType {
     isLoading: boolean
     signIn: (email: string, password: string) => Promise<void>
     signOut: () => Promise<void>
-    refresh: (refreshToken: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,7 +16,6 @@ const AuthContext = createContext<AuthContextType>({
     isLoading: true,
     signIn: async () => {},
     signOut: async () => {},
-    refresh: async () => {},
 })
 
 export const useAuth = () => {
@@ -73,10 +71,8 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         setIsAuth(false)
     }
 
-    const refresh = async (refreshToken: string) => {}
-
     return (
-        <AuthContext value={{ accessToken, isAuth, isLoading, signIn, signOut, refresh }}>
+        <AuthContext value={{ accessToken, isAuth, isLoading, signIn, signOut }}>
             {children}
         </AuthContext>
     )

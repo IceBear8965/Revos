@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native"
 
 export const createStyles = (colors: AppColors) => {
     return StyleSheet.create({
-        screen: {
+        dashboard: {
             flex: 1,
             paddingBottom: 90,
         },
@@ -33,6 +33,11 @@ export const createStyles = (colors: AppColors) => {
         userIcon: {
             width: 45,
             height: 45,
+        },
+        characterContainer: {
+            flex: 1,
+            justifyContent: "flex-end",
+            alignItems: "center",
         },
 
         screenBottom: {
