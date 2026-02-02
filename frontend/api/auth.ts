@@ -1,6 +1,5 @@
-const axios = require("axios").default
-
-const instance = axios.create({ baseURL: "http://10.0.2.2:8000/api" })
+import { baseURL } from "./axios"
+import axios from "axios"
 
 interface SignInResponse {
     access: string
@@ -8,21 +7,19 @@ interface SignInResponse {
 }
 
 export const signInRequest = async (email: string, password: string): Promise<SignInResponse> => {
-    const response = await instance({
+    const response = await axios({
         method: "post",
-        url: "user/",
+        url: `${baseURL}user/`,
         data: { email: email, password: password },
-        headers: { "Content-Type": "application/json" },
     })
     return response.data
 }
 
 export const refreshRequest = async (refreshToken: string): Promise<string> => {
-    const response = await instance({
+    const response = await axios({
         method: "post",
-        url: "user/refresh/",
+        url: `${baseURL}user/refresh/`,
         data: { refresh: refreshToken },
-        headers: { "Content-Type": "application/json" },
     })
     return response.data
 }
