@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect, useRef, PropsWithChildren, useContext } from "react"
-import { signInRequest, refreshRequest } from "@/api/auth"
-import { setRefresh, getRefresh, deleteRefresh } from "@/utils/tokens"
+
 import { apiClient } from "@/api/axios"
-import { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios"
+import { signInRequest, refreshRequest } from "@/api/auth"
+import { getRefresh, setRefresh, deleteRefresh } from "@/utils/tokens"
 
 interface AuthContextType {
     isAuth: boolean
@@ -11,116 +11,97 @@ interface AuthContextType {
     signOut: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType>({
-    isAuth: false,
-    isLoading: true,
-    signIn: async () => {},
-    signOut: async () => {},
-})
+const AuthContext = createContext<AuthContextType | null>(null)
 
 export const useAuth = () => {
-    const value = useContext(AuthContext)
-    if (!value) {
-        throw new Error("useAuth must be wrapped in a <AuthProvider />")
-    }
-    return value
+    const ctx = useContext(AuthContext)
+    if (!ctx) throw new Error("useAuth must be used within AuthProvider")
+    return ctx
 }
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
     const accessTokenRef = useRef<string | null>(null)
     const [isAuth, setIsAuth] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const refreshPromiseRef = useRef<Promise<string> | null>(null)
 
-    const saveAccess = (token: string | null) => (accessTokenRef.current = token)
+    const saveAccess = (token: string | null) => {
+        accessTokenRef.current = token
+    }
 
-    // Start up auth
+    // Initialise Auth
     useEffect(() => {
-        const initAuth = async () => {
-            setIsLoading(true)
-            const refresh = await getRefresh()
-            if (refresh) {
-                try {
-                    const access = await refreshRequest(refresh)
-                    saveAccess(access)
-                    setIsAuth(true)
-                } catch (error) {
+        const init = async () => {
+            try {
+                const refresh = await getRefresh()
+                if (!refresh) {
                     setIsAuth(false)
+                    return
                 }
-            } else {
-                setIsAuth(false)
+
+                const newAccess = await refreshRequest(refresh)
+                saveAccess(newAccess)
+                setIsAuth(true)
+            } catch {
+                await signOut()
+            } finally {
+                setIsLoading(false)
             }
-            setIsLoading(false)
         }
-        initAuth()
+        init()
     }, [])
 
-    // This is being used to initialize axios interceptors and make context aware of them. Setting up interceptors is being needed inside of context because they must have access to context state.
+    // Interceptors
     useEffect(() => {
-        // Request interceptor
-        const requestInterceptor = apiClient.interceptors.request.use(
-            (config: AxiosRequestConfig) => {
-                const token = accessTokenRef.current
-                if (token) config.headers!["Authorization"] = `Bearer ${token}`
-                return config
-            },
-            (error: AxiosError) => Promise.reject(error)
-        )
+        const reqInterceptor = apiClient.interceptors.request.use((config) => {
+            const token = accessTokenRef.current
+            if (token) {
+                config.headers["Authorization"] = `Bearer ${token}`
+            }
+            return config
+        })
 
-        // Response interceptor
-        const responseInterceptor = apiClient.interceptors.response.use(
-            (response: AxiosResponse) => response,
-            async (error: AxiosError) => {
-                const originalRequest = error.config
-                if (
-                    !originalRequest ||
-                    (error.response?.status !== 401 && error.response?.status !== 403)
-                )
+        const resInterceptor = apiClient.interceptors.response.use(
+            (response) => response,
+            async (error) => {
+                const originalRequest: any = error.config
+
+                if (!error.response || error.response.status !== 401) {
                     return Promise.reject(error)
-
-                // Singleton refresh
-                if (!refreshPromiseRef.current) {
-                    const refresh = await getRefresh()
-                    if (!refresh) {
-                        await signOut()
-                        return Promise.reject(error)
-                    }
-                    refreshPromiseRef.current = refreshRequest(refresh)
-                        .then((newAccess) => {
-                            saveAccess(newAccess)
-                            return newAccess
-                        })
-                        .finally(() => {
-                            refreshPromiseRef.current = null
-                        })
                 }
 
                 try {
-                    const newAccess = await refreshPromiseRef.current
-                    originalRequest.headers!["Authorization"] = `Bearer ${newAccess}`
-                    return apiClient(originalRequest)
-                } catch (refreshError) {
+                    const refresh = await getRefresh()
+                    if (!refresh) throw new Error("No refresh token")
+
+                    const newAccess = await refreshRequest(refresh)
+                    saveAccess(newAccess)
+
+                    originalRequest.headers["Authorization"] = `Bearer ${newAccess}`
+                    const resp = await apiClient(originalRequest)
+                    const data = resp.data ?? JSON.parse(resp.request?._response ?? resp._response)
+                    console.log(data)
+                    return data
+                } catch (err) {
                     await signOut()
-                    return Promise.reject(refreshError)
+                    return Promise.reject(err)
                 }
             }
         )
 
         return () => {
-            apiClient.interceptors.request.eject(requestInterceptor)
-            apiClient.interceptors.response.eject(responseInterceptor)
+            apiClient.interceptors.request.eject(reqInterceptor)
+            apiClient.interceptors.response.eject(resInterceptor)
         }
     }, [])
 
+    // ----- signIn / signOut -----
     const signIn = async (email: string, password: string) => {
+        setIsLoading(true)
         try {
             const data = await signInRequest(email, password)
             saveAccess(data.access)
             await setRefresh(data.refresh)
             setIsAuth(true)
-        } catch (error) {
-            console.log("Login Error", error)
-            setIsAuth(false)
         } finally {
             setIsLoading(false)
         }
@@ -128,8 +109,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     const signOut = async () => {
         saveAccess(null)
-        setIsAuth(false)
         await deleteRefresh()
+        setIsAuth(false)
     }
 
     return (

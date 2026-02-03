@@ -1,9 +1,9 @@
-import { useState, useContext } from "react"
-import { AuthContext } from "@/context/AuthContext"
+import { useState } from "react"
+import { useAuth } from "@/context/AuthContext"
 import { View, Text, TextInput, StyleSheet, Button } from "react-native"
 
 export default function () {
-    const { accessToken, isAuth, signIn, signOut } = useContext(AuthContext)
+    const { isAuth, signIn, signOut } = useAuth()
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
 

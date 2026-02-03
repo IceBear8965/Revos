@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
-import { Text, View, Image, TouchableWithoutFeedback, TouchableOpacity } from "react-native"
+import { Text, View, Image, TouchableWithoutFeedback, Button, TouchableOpacity } from "react-native"
 import Feather from "@expo/vector-icons/Feather"
 import { Character } from "@/components/Character"
 import { createStyles } from "@/styles/dashboard"
 import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
 import { useTheme } from "@/context/ThemeContext"
+import { getDashboardData } from "@/api/dashboard.api"
 
 export const Dashboard = () => {
+    const [data, setData] = useState()
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
@@ -20,6 +22,7 @@ export const Dashboard = () => {
             reduceMotion: ReduceMotion.Never,
         })
     }, [current_energy])
+
     return (
         <View style={styles.dashboard}>
             <View style={styles.screenTop}>
@@ -74,6 +77,16 @@ export const Dashboard = () => {
                         <Text style={styles.recoveryButtonText}>Recovery</Text>
                     </TouchableOpacity>
                 </View>
+                <Button
+                    title="Refetch"
+                    onPress={() => {
+                        const fetch = async () => {
+                            const data = await getDashboardData()
+                        }
+
+                        fetch()
+                    }}
+                />
             </View>
         </View>
     )
