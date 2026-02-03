@@ -67,6 +67,7 @@ export const createStyles = (colors: AppColors) => {
 
         recommendationCard: {
             flex: 2,
+            justifyContent: "center",
             backgroundColor: colors.card,
             borderRadius: 30,
             paddingHorizontal: 20,
@@ -93,6 +94,7 @@ export const createStyles = (colors: AppColors) => {
             flex: 4,
         },
         lastEventType: {
+            textTransform: "capitalize",
             color: colors.textPrimary,
             fontSize: 24,
             fontWeight: 600,
