@@ -1,3 +1,4 @@
-const LOAD_TYPES = ["work", "study", "sport", "society"]
+const LOAD_ACTIVITIES = ["work", "study", "sport", "society"]
+const RECOVERY_ACTIVITIES = ["sleep", "rest", "walking"]
 
-export { LOAD_TYPES }
+export { LOAD_ACTIVITIES, RECOVERY_ACTIVITIES }

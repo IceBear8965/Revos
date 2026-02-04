@@ -74,50 +74,9 @@ export const createStyles = (colors: AppColors) => {
             paddingVertical: 15,
         },
         recommendationText: {
-            fontSize: 16,
-            fontWeight: 400,
-            color: colors.textPrimary,
-        },
-
-        lastEventCard: {
-            flex: 2,
-            paddingHorizontal: 20,
-            paddingVertical: 15,
-            backgroundColor: colors.card,
-            borderRadius: 30,
-
-            flexDirection: "row",
-            justifyContent: "space-between",
-        },
-
-        lastEventLeft: {
-            flex: 4,
-        },
-        lastEventType: {
-            textTransform: "capitalize",
-            color: colors.textPrimary,
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: 600,
-
-            marginBottom: 5,
-        },
-        lastEventDateTime: {},
-        lastEventDate: {
             color: colors.textPrimary,
-            fontSize: 16,
-            fontWeight: 400,
-        },
-        lastEventTime: {
-            color: colors.textPrimary,
-            fontSize: 16,
-            fontWeight: 400,
-        },
-
-        lastEventRight: {
-            justifyContent: "center",
-        },
-        arrowsContainer: {
-            flexDirection: "row",
         },
 
         controlsContainer: {
