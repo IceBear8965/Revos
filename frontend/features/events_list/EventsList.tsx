@@ -1,32 +1,30 @@
 import { useState } from "react"
 import { useTheme } from "@/context/ThemeContext"
-import { View } from "react-native"
+import { View, Text, FlatList } from "react-native"
 import { createStyles } from "./eventsList.styles"
 import { useEffect } from "react"
 import { useEventsList } from "./hooks/useEventsList"
-import { EventsListType } from "./types"
+import { EventType } from "@/shared/types"
+import { EventCard } from "@/shared/components/EventCard"
 
 export const EventsList = () => {
-    const [data, setData] = useState<EventsListType | undefined>(undefined)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
-    const [error, setError] = useState<Error | null>(null)
+    const { data, isLoading, error } = useEventsList()
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
-    const fetchEventsList = async () => {
-        setIsLoading(true)
-        try {
-            const data = await useEventsList()
-        } catch (error) {
-            if (error instanceof Error) setError(error)
-            else setError(new Error("Unknown error"))
-        } finally {
-            setIsLoading(false)
-        }
+    const renderItem = ({ item }: { item: EventType }) => {
+        return <EventCard event={item} />
     }
 
-    useEffect(() => {
-        const data = useEventsList()
-    }, [])
-    return <View style={styles.eventsList}></View>
+    if (isLoading) return <Text>Loading...</Text>
+
+    if (error) {
+        return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
+    }
+
+    return (
+        <View style={styles.eventsList}>
+            <FlatList data={data?.results} renderItem={renderItem} />
+        </View>
+    )
 }

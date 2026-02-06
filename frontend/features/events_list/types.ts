@@ -1,14 +1,7 @@
-interface EventsListElementType {
-    eventId: number
-    eventType: "load" | "recovery"
-    activityType: string
-    startedAt: Date
-    endedAt: Date
-    energyDelta: number
-}
+import { EventType } from "@/shared/types"
 
 interface EventsListType {
-    results: EventsListElementType[]
+    results: EventType[]
 }
 
-export { EventsListElementType, EventsListType }
+export { EventsListType }

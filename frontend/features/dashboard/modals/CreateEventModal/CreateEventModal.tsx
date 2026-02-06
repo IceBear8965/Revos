@@ -8,16 +8,14 @@ import BottomSheet, {
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTheme } from "@/context/ThemeContext"
 import { CreateEventModalType } from "./types"
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker"
 import { ActivitiTypePicker } from "../components/ActivityTypePicker/ActivityTypePicker"
 import { ModalTimePicker } from "../components/ModalTimePicker/ModalTimePicker"
 import { createStyles } from "./styles"
 import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { useCreateEvent } from "../../hooks/useCreateEvent"
-import { useDashboard } from "../../hooks/useDashboard"
 
 export const CreateEventModal = ({
-    setData,
+    refetch,
     event_type,
     lastEvent,
     modalVisible,
@@ -36,6 +34,8 @@ export const CreateEventModal = ({
         ),
         []
     )
+
+    const { refetch: createEventPost, isLoading, error } = useCreateEvent()
 
     useEffect(() => {
         if (modalVisible) {
@@ -85,10 +85,8 @@ export const CreateEventModal = ({
                 subjectiveCoef: subjectiveCoef,
             }
             try {
-                await useCreateEvent(requestBody)
-
-                const updatedDashboard = await useDashboard()
-                setData(updatedDashboard)
+                await createEventPost(requestBody)
+                await refetch()
                 closeModal()
             } catch (error) {
                 console.log(error)
@@ -96,6 +94,10 @@ export const CreateEventModal = ({
             }
         }
     }
+
+    if (isLoading) return <Text>Loading...</Text>
+
+    if (error) return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
 
     return (
         <BottomSheet

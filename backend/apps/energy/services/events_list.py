@@ -24,14 +24,16 @@ def generate_events_list(*, user) -> dict:
         started_at = energy_object.started_at
         ended_at = energy_object.ended_at
         energy_delta = energy_object.energy_delta
+        subjective_coef = energy_object.subjective_coef
 
         output_dict = {
-            "event_id": id,
+            "id": id,
             "event_type": event_type,
             "activity_type": activity_type,
             "started_at": started_at.astimezone(user_timezone).isoformat(),
             "ended_at": ended_at.astimezone(user_timezone).isoformat(),
             "energy_delta": energy_delta,
+            "subjective_coef": subjective_coef,
         }
 
         output.append(output_dict)

@@ -3,11 +3,7 @@ import { formatEventDateTime } from "@/utils/formatDate"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
 import { ArrowsRenderer } from "./ArrowsRenderer"
-import { EventType } from "../types"
-
-interface EventCardProps {
-    event: EventType
-}
+import { EventCardProps } from "../types"
 
 export const EventCard = ({ event }: EventCardProps) => {
     const { colors } = useTheme()
