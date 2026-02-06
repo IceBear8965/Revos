@@ -1,4 +1,4 @@
-import { Dashboard } from "@/components/Dashboard"
+import { Dashboard } from "@/features/dashboard/Dashboard"
 import { useTheme } from "@/context/ThemeContext"
 import { SafeAreaView } from "react-native-safe-area-context"
 

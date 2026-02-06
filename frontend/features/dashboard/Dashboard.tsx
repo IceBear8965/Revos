@@ -8,17 +8,16 @@ import {
     TouchableWithoutFeedback,
     Pressable,
 } from "react-native"
-import { Character } from "@/components/Character"
-import { createStyles } from "@/styles/dashboard"
+import { Character } from "@/features/dashboard/components/Character"
+import { createStyles } from "./dashboard.styles"
 import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
 import { useTheme } from "@/context/ThemeContext"
-import { useDashboard } from "@/hooks/useDashboard"
-import { DashboardType } from "@/api/types.api"
-import { EventCard } from "./EventCard"
-import { CreateEventModal } from "./CreateEventModal"
-import { Picker } from "@react-native-picker/picker"
+import { useDashboard } from "./hooks/useDashboard"
+import { DashboardType } from "./types"
+import { EventCard } from "@/shared/components/EventCard"
 
-type EventType = "load" | "recovery"
+import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
+type EventOptionsType = "load" | "recovery"
 
 export const Dashboard = () => {
     const [data, setData] = useState<DashboardType | undefined>(undefined)
@@ -27,12 +26,12 @@ export const Dashboard = () => {
     const [isRefreshing, setIsRefreshing] = useState(false)
 
     const [modalVisible, setModalVisible] = useState(false)
-    const [eventType, setEventType] = useState<EventType>("load")
+    const [eventType, setEventType] = useState<EventOptionsType>("load")
 
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
-    const currentEnergy = data?.current_energy
+    const currentEnergy = data?.currentEnergy
     const energyLevel = useSharedValue(0)
 
     useEffect(() => {
@@ -46,12 +45,13 @@ export const Dashboard = () => {
     }, [currentEnergy])
 
     const fetchDashboard = async () => {
+        setIsLoading(true)
         try {
             const result = await useDashboard()
             if (result) setData(result)
             setError(null)
-        } catch (err) {
-            if (err instanceof Error) setError(err)
+        } catch (error) {
+            if (error instanceof Error) setError(error)
             else setError(new Error("Unknown error"))
         }
     }
@@ -67,7 +67,7 @@ export const Dashboard = () => {
         setIsRefreshing(false)
     }
 
-    const openModal = (type: EventType) => {
+    const openModal = (type: EventOptionsType) => {
         setEventType(type)
         setModalVisible(true)
     }
@@ -81,13 +81,7 @@ export const Dashboard = () => {
     }
 
     return (
-        <>
-            <CreateEventModal
-                event_type={eventType}
-                modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
-            />
-
+        <View style={{ flex: 1 }}>
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}
                 style={styles.dashboard}
@@ -126,7 +120,17 @@ export const Dashboard = () => {
                         <Text style={styles.recommendationText}>{data?.recommendation}</Text>
                     </View>
 
-                    {data?.last_event && <EventCard event={data.last_event} />}
+                    {data?.lastEvent ? (
+                        <EventCard event={data.lastEvent} />
+                    ) : (
+                        <View
+                            style={{
+                                flex: 3,
+                                backgroundColor: colors.card,
+                                borderRadius: 30,
+                            }}
+                        ></View>
+                    )}
 
                     <View style={styles.controlsContainer}>
                         <Pressable style={styles.loadButton} onPress={() => openModal("load")}>
@@ -142,6 +146,14 @@ export const Dashboard = () => {
                     </View>
                 </View>
             </ScrollView>
-        </>
+
+            <CreateEventModal
+                setData={setData}
+                event_type={eventType}
+                lastEvent={data?.lastEvent}
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+            />
+        </View>
     )
 }

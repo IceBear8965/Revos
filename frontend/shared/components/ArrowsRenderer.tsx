@@ -1,15 +1,10 @@
-import { View, StyleSheet } from "react-native"
+import { View } from "react-native"
 import Feather from "@expo/vector-icons/Feather"
 import { useTheme } from "@/context/ThemeContext"
-import { AppColors } from "@/theme/colors"
-
-interface ArrowsRendererProps {
-    energyDelta: number
-}
+import { ArrowsRendererProps } from "./types"
 
 export const ArrowsRenderer = ({ energyDelta }: ArrowsRendererProps) => {
     const { colors } = useTheme()
-    const styles = createStyles(colors)
 
     const absDelta = Math.abs(energyDelta)
 
@@ -28,17 +23,10 @@ export const ArrowsRenderer = ({ energyDelta }: ArrowsRendererProps) => {
     }
 
     return (
-        <View style={styles.arrowsContainer}>
+        <View style={{ flexDirection: "row" }}>
             {Array.from({ length: arrowsCount }).map((_, index) => (
                 <Feather key={index} name={arrowName} size={30} color={arrowColor} />
             ))}
         </View>
     )
 }
-
-const createStyles = (colors: AppColors) =>
-    StyleSheet.create({
-        arrowsContainer: {
-            flexDirection: "row",
-        },
-    })

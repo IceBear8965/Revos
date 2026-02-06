@@ -1,5 +1,5 @@
 import { tokenStore } from "@/utils/TokenStore"
-import { LoginResponse, RefreshResponse, PendingRequest, RequestOptions } from "./types.api"
+import { LoginResponse, RefreshResponse, PendingRequest, RequestOptions } from "./types"
 
 class HttpClient {
     private baseURL = "http://10.0.2.2:8000/api/"

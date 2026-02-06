@@ -1,8 +1,8 @@
 import { httpClient } from "./HttpClient"
-import { DashboardType } from "./types.api"
+import { DashboardDTO } from "./types"
 
 export const getDashboardData = async () => {
-    const data = await httpClient.get<DashboardType>("energy/dashboard/")
+    const data = await httpClient.get<DashboardDTO>("energy/dashboard/")
     if (data) {
         return data
     } else {

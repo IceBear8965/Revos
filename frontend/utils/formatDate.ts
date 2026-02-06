@@ -1,18 +1,15 @@
-export const formatEventDateTime = (start: string, end: string) => {
-    const startDate = new Date(start)
-    const endDate = new Date(end)
-
+export const formatEventDateTime = (startDate: Date, endDate: Date) => {
     return {
-        date: startDate.toLocaleDateString("ru-RU", {
+        date: startDate.toLocaleDateString([], {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
         }),
-        startTime: startDate.toLocaleTimeString("ru-RU", {
+        startTime: startDate.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
         }),
-        endTime: endDate.toLocaleTimeString("ru-RU", {
+        endTime: endDate.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
         }),

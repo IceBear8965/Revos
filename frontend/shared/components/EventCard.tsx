@@ -1,21 +1,12 @@
 import { View, Text, StyleSheet } from "react-native"
-import Feather from "@expo/vector-icons/Feather"
 import { formatEventDateTime } from "@/utils/formatDate"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
 import { ArrowsRenderer } from "./ArrowsRenderer"
-
-interface Event {
-    id: number
-    activity_type: string
-    event_type: string
-    energy_delta: number
-    started_at: string
-    ended_at: string
-}
+import { EventType } from "../types"
 
 interface EventCardProps {
-    event: Event
+    event: EventType
 }
 
 export const EventCard = ({ event }: EventCardProps) => {
@@ -24,12 +15,12 @@ export const EventCard = ({ event }: EventCardProps) => {
 
     if (!event) return null
 
-    const { date, startTime, endTime } = formatEventDateTime(event.started_at, event.ended_at)
+    const { date, startTime, endTime } = formatEventDateTime(event.startedAt, event.endedAt)
 
     return (
         <View style={styles.eventCard}>
             <View style={styles.eventCardLeft}>
-                <Text style={styles.eventType}>{event.activity_type}</Text>
+                <Text style={styles.eventType}>{event.activityType}</Text>
                 <View style={styles.eventDateTime}>
                     <Text style={styles.eventDate}>{date}</Text>
                     <Text style={styles.eventTime}>
@@ -38,7 +29,7 @@ export const EventCard = ({ event }: EventCardProps) => {
                 </View>
             </View>
             <View style={styles.eventRight}>
-                <ArrowsRenderer energyDelta={event.energy_delta} />
+                <ArrowsRenderer energyDelta={event.energyDelta} />
             </View>
         </View>
     )
