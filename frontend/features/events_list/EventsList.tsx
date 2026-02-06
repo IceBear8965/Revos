@@ -1,8 +1,6 @@
-import { useState } from "react"
 import { useTheme } from "@/context/ThemeContext"
 import { View, Text, FlatList } from "react-native"
 import { createStyles } from "./eventsList.styles"
-import { useEffect } from "react"
 import { useEventsList } from "./hooks/useEventsList"
 import { EventType } from "@/shared/types"
 import { EventCard } from "@/shared/components/EventCard"
@@ -23,8 +21,19 @@ export const EventsList = () => {
     }
 
     return (
-        <View style={styles.eventsList}>
-            <FlatList data={data?.results} renderItem={renderItem} />
+        <View style={styles.eventsListContainer}>
+            <FlatList
+                data={data?.results}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={{
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                }}
+                ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                showsVerticalScrollIndicator={true}
+                ListFooterComponent={<View style={{ height: 10 }} />}
+            />
         </View>
     )
 }

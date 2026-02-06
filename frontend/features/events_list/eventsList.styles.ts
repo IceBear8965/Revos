@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native"
 
 export const createStyles = (colors: AppColors) => {
     return StyleSheet.create({
-        eventsList: {
+        eventsListContainer: {
             backgroundColor: colors.background,
             paddingBottom: 90,
         },

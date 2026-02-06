@@ -95,7 +95,7 @@ export const CreateEventModal = ({
         }
     }
 
-    if (isLoading) return <Text>Loading...</Text>
+    if (isLoading) return <Text>Saving...</Text>
 
     if (error) return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
 
