@@ -190,6 +190,7 @@ def generate_dashboard(*, user) -> dict:
             "started_at": started_at_local,
             "ended_at": ended_at_local,
             "energy_delta": last_event_obj.energy_delta,
+            "subjective_coef": last_event_obj.subjective_coef,
         }
 
     return {

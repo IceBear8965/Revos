@@ -1,85 +1,69 @@
 import { createContext, useState, useEffect, PropsWithChildren, useContext } from "react"
-import { signInRequest, refreshRequest } from "@/api/auth"
-import { setRefresh, getRefresh } from "@/utils/tokens"
+import { httpClient } from "@/api/HttpClient"
+import { tokenStore } from "@/utils/TokenStore"
 
 interface AuthContextType {
-    accessToken: string | null
     isAuth: boolean
     isLoading: boolean
     signIn: (email: string, password: string) => Promise<void>
     signOut: () => Promise<void>
-    refresh: (refreshToken: string) => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType>({
-    accessToken: null,
-    isAuth: false,
-    isLoading: true,
-    signIn: async () => {},
-    signOut: async () => {},
-    refresh: async () => {},
-})
+const AuthContext = createContext<AuthContextType | null>(null)
 
 export const useAuth = () => {
-    const value = useContext(AuthContext)
-    if (!value) {
-        throw new Error("useAuth must be wrapped in a <AuthProvider />")
-    }
-
-    return value
+    const ctx = useContext(AuthContext)
+    if (!ctx) throw new Error("useAuth must be used within AuthProvider")
+    return ctx
 }
 
-const AuthProvider = ({ children }: PropsWithChildren) => {
-    const [accessToken, setAccessToken] = useState<string | null>(null)
-    const [isAuth, setIsAuth] = useState<boolean>(false)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+export const AuthProvider = ({ children }: PropsWithChildren) => {
+    const [isAuth, setIsAuth] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
+    // Initialise Auth
     useEffect(() => {
-        const initAuth = async () => {
-            setIsLoading(true)
-            const refresh = await getRefresh()
-
-            if (refresh) {
-                try {
-                    const access = await refreshRequest(refresh)
-                    setAccessToken(access)
+        const init = async () => {
+            try {
+                const accessToken = await httpClient.refreshAccess()
+                if (accessToken) {
                     setIsAuth(true)
-                } catch (error) {
-                    setIsAuth(false)
+                } else {
+                    await signOut()
                 }
-            } else {
-                setIsAuth(false)
+            } catch {
+                await signOut()
+            } finally {
+                setIsLoading(false)
             }
-            setIsLoading(false)
         }
-
-        initAuth()
+        init()
     }, [])
 
+    // ----- signIn / signOut -----
     const signIn = async (email: string, password: string) => {
         try {
-            const data = await signInRequest(email, password)
-            setAccessToken(data["access"])
-            await setRefresh(data["refresh"])
-            setIsAuth(true)
+            const data = await httpClient.login(email, password)
+            if (data) {
+                setIsAuth(true)
+            }
         } catch (error) {
-            console.log("Login Error", error)
-        } finally {
-            setIsLoading(false)
+            console.log(`HTTP ${error}`)
         }
     }
 
     const signOut = async () => {
-        setIsAuth(false)
+        try {
+            tokenStore.clearTokens()
+            setIsAuth(false)
+        } catch (error) {
+            console.log("Can't sign out")
+        }
     }
 
-    const refresh = async (refreshToken: string) => {}
-
     return (
-        <AuthContext value={{ accessToken, isAuth, isLoading, signIn, signOut, refresh }}>
+        <AuthContext.Provider value={{ isAuth, isLoading, signIn, signOut }}>
             {children}
-        </AuthContext>
+        </AuthContext.Provider>
     )
 }
-
-export { AuthContext, AuthProvider }

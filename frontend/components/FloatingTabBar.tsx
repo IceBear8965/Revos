@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { View, StyleSheet, LayoutChangeEvent } from "react-native"
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"

@@ -3,12 +3,12 @@ import { StyleSheet } from "react-native"
 
 export const createStyles = (colors: AppColors) => {
     return StyleSheet.create({
-        screen: {
+        dashboard: {
             flex: 1,
             paddingBottom: 90,
         },
         screenTop: {
-            flex: 5,
+            flex: 4,
             backgroundColor: colors.foreground,
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
@@ -34,9 +34,14 @@ export const createStyles = (colors: AppColors) => {
             width: 45,
             height: 45,
         },
+        characterContainer: {
+            flex: 1,
+            justifyContent: "flex-end",
+            alignItems: "center",
+        },
 
         screenBottom: {
-            flex: 5,
+            flex: 6,
             marginHorizontal: 15,
             rowGap: 15,
         },
@@ -61,56 +66,17 @@ export const createStyles = (colors: AppColors) => {
         },
 
         recommendationCard: {
-            flex: 1,
+            flex: 2,
+            justifyContent: "center",
             backgroundColor: colors.card,
             borderRadius: 30,
-            justifyContent: "center",
-            paddingHorizontal: 20,
-        },
-        recommendationText: {
-            fontSize: 16,
-            fontWeight: 400,
-            color: colors.textPrimary,
-        },
-
-        lastEventCard: {
-            flex: 2,
             paddingHorizontal: 20,
             paddingVertical: 15,
-            backgroundColor: colors.card,
-            borderRadius: 30,
-
-            flexDirection: "row",
-            justifyContent: "space-between",
         },
-
-        lastEventLeft: {
-            flex: 4,
-        },
-        lastEventType: {
-            color: colors.textPrimary,
-            fontSize: 24,
+        recommendationText: {
+            fontSize: 18,
             fontWeight: 600,
-
-            marginBottom: 5,
-        },
-        lastEventDateTime: {},
-        lastEventDate: {
             color: colors.textPrimary,
-            fontSize: 16,
-            fontWeight: 400,
-        },
-        lastEventTime: {
-            color: colors.textPrimary,
-            fontSize: 16,
-            fontWeight: 400,
-        },
-
-        lastEventRight: {
-            justifyContent: "center",
-        },
-        arrowsContainer: {
-            flexDirection: "row",
         },
 
         controlsContainer: {
