@@ -2,7 +2,7 @@ import React from "react"
 import { DashboardType } from "../../types"
 
 interface CreateEventModalType {
-    setData: React.Dispatch<React.SetStateAction<DashboardType | undefined>>
+    refetch: () => void
     event_type: "load" | "recovery"
     lastEvent?: DashboardType["lastEvent"] | null
     modalVisible: boolean

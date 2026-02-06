@@ -13,16 +13,13 @@ import { createStyles } from "./dashboard.styles"
 import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
 import { useTheme } from "@/context/ThemeContext"
 import { useDashboard } from "./hooks/useDashboard"
-import { DashboardType } from "./types"
 import { EventCard } from "@/shared/components/EventCard"
 
 import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
 type EventOptionsType = "load" | "recovery"
 
 export const Dashboard = () => {
-    const [data, setData] = useState<DashboardType | undefined>(undefined)
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState<Error | null>(null)
+    const { data, isLoading, error, refetch } = useDashboard()
     const [isRefreshing, setIsRefreshing] = useState(false)
 
     const [modalVisible, setModalVisible] = useState(false)
@@ -44,26 +41,9 @@ export const Dashboard = () => {
         })
     }, [currentEnergy])
 
-    const fetchDashboard = async () => {
-        setIsLoading(true)
-        try {
-            const result = await useDashboard()
-            if (result) setData(result)
-            setError(null)
-        } catch (error) {
-            if (error instanceof Error) setError(error)
-            else setError(new Error("Unknown error"))
-        }
-    }
-
-    useEffect(() => {
-        setIsLoading(true)
-        fetchDashboard().finally(() => setIsLoading(false))
-    }, [])
-
     const onRefresh = async () => {
         setIsRefreshing(true)
-        await fetchDashboard()
+        refetch()
         setIsRefreshing(false)
     }
 
@@ -148,7 +128,7 @@ export const Dashboard = () => {
             </ScrollView>
 
             <CreateEventModal
-                setData={setData}
+                refetch={refetch}
                 event_type={eventType}
                 lastEvent={data?.lastEvent}
                 modalVisible={modalVisible}

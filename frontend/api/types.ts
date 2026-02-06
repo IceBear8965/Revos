@@ -26,7 +26,7 @@ interface LastEventDTO {
     started_at: string // ISO8601
     ended_at: string // ISO8601
     energy_delta: number
-    subjective_coef?: number
+    subjective_coef: number
 }
 
 interface DashboardDTO {
@@ -49,8 +49,8 @@ interface CreateEventPayload {
 
 interface EventDTO {
     id: number
+    event_type: "load" | "recovery"
     activity_type: string
-    event_type: string
     started_at: string
     ended_at: string
     energy_before: number
@@ -60,12 +60,13 @@ interface EventDTO {
 }
 
 interface EventsListElementDTO {
-    event_id: number
+    id: number
     event_type: "load" | "recovery"
     activity_type: string
     started_at: string
     ended_at: string
     energy_delta: number
+    subjective_coef: number
 }
 
 interface EventsListDTO {

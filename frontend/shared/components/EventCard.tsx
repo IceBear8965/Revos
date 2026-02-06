@@ -3,11 +3,7 @@ import { formatEventDateTime } from "@/utils/formatDate"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
 import { ArrowsRenderer } from "./ArrowsRenderer"
-import { EventType } from "../types"
-
-interface EventCardProps {
-    event: EventType
-}
+import { EventCardProps } from "../types"
 
 export const EventCard = ({ event }: EventCardProps) => {
     const { colors } = useTheme()
@@ -15,17 +11,24 @@ export const EventCard = ({ event }: EventCardProps) => {
 
     if (!event) return null
 
-    const { date, startTime, endTime } = formatEventDateTime(event.startedAt, event.endedAt)
+    const { startDate, endDate, startTime, endTime } = formatEventDateTime(
+        event.startedAt,
+        event.endedAt
+    )
 
     return (
         <View style={styles.eventCard}>
             <View style={styles.eventCardLeft}>
                 <Text style={styles.eventType}>{event.activityType}</Text>
-                <View style={styles.eventDateTime}>
-                    <Text style={styles.eventDate}>{date}</Text>
-                    <Text style={styles.eventTime}>
-                        {startTime}–{endTime}
-                    </Text>
+                <View>
+                    <View>
+                        <Text style={styles.eventDate}>
+                            {startDate} — {startTime}
+                        </Text>
+                        <Text style={styles.eventDate}>
+                            {endDate} — {endTime}
+                        </Text>
+                    </View>
                 </View>
             </View>
             <View style={styles.eventRight}>
@@ -59,16 +62,10 @@ const createStyles = (colors: AppColors) => {
 
             marginBottom: 5,
         },
-        eventDateTime: {},
         eventDate: {
             color: colors.textPrimary,
-            fontSize: 16,
-            fontWeight: 400,
-        },
-        eventTime: {
-            color: colors.textPrimary,
-            fontSize: 16,
-            fontWeight: 400,
+            fontSize: 18,
+            fontWeight: 500,
         },
 
         eventRight: {

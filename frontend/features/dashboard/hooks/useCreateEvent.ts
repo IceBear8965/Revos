@@ -1,27 +1,37 @@
-import { CreateEventProps, CreateEventResponse } from "../types"
-import { CreateEventPayload, EventDTO } from "@/api/types"
+import { useState, useCallback } from "react"
+import { CreateEventProps } from "../types"
 import { createEvent } from "@/api/createEvent"
+import { UseAsyncPost } from "@/shared/types"
 
-export const useCreateEvent = async (params: CreateEventProps): Promise<CreateEventResponse> => {
-    const payload: CreateEventPayload = {
-        activity_type: params.activityType,
-        started_at: params.startedAt.toISOString(),
-        ended_at: params.endedAt.toISOString(),
-        subjective_coef: params.subjectiveCoef,
-    }
+export const useCreateEvent = (): UseAsyncPost<void, CreateEventProps> => {
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<Error | null>(null)
 
-    const data: EventDTO = await createEvent(payload)
-    if (!data) throw new Error("Failed to create event")
+    const createEnergyEvent = useCallback(async (body: CreateEventProps): Promise<void> => {
+        setIsLoading(true)
+        setError(null)
+
+        const requestBody = {
+            activity_type: body.activityType,
+            started_at: body.startedAt.toISOString(),
+            ended_at: body.endedAt.toISOString(),
+            subjective_coef: body.subjectiveCoef,
+        }
+
+        try {
+            await createEvent(requestBody)
+        } catch (err) {
+            setError(err instanceof Error ? err : new Error("Unknown error"))
+            throw err
+        } finally {
+            setIsLoading(false)
+        }
+    }, [])
 
     return {
-        id: data.id,
-        activityType: data.activity_type,
-        eventType: data.event_type as "load" | "recovery",
-        startedAt: new Date(data.started_at),
-        endedAt: new Date(data.ended_at),
-        energyBefore: data.energy_before,
-        energyDelta: data.energy_delta,
-        energyAfter: data.energy_after,
-        subjectiveCoef: data.subjective_coef,
+        data: null,
+        isLoading,
+        error,
+        refetch: createEnergyEvent,
     }
 }
