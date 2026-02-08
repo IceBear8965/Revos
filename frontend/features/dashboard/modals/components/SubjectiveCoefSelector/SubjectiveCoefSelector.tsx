@@ -17,14 +17,14 @@ export const SubjectiveCoefSelector = ({
     }, [])
 
     const choicesLoad = [
-        { icon: "emoticon-sad-outline", value: 1.2 },
+        { icon: "emoticon-sad-outline", value: 1.1 },
         { icon: "emoticon-neutral-outline", value: 1.0 },
         { icon: "emoticon-happy-outline", value: 0.8 },
     ]
     const choicesRecovery = [
         { icon: "emoticon-sad-outline", value: 0.8 },
         { icon: "emoticon-neutral-outline", value: 1.0 },
-        { icon: "emoticon-happy-outline", value: 1.2 },
+        { icon: "emoticon-happy-outline", value: 1.1 },
     ]
     const choices = eventType === "load" ? choicesLoad : choicesRecovery
 

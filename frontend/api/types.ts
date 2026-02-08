@@ -1,3 +1,5 @@
+import { ActivityTypeKey } from "@/shared/constants"
+
 interface PendingRequest<T> {
     execute: () => Promise<T>
     resolve: (value: T) => void
@@ -22,7 +24,7 @@ interface RefreshResponse {
 interface LastEventDTO {
     id: number
     event_type: "load" | "recovery"
-    activity_type: string
+    activity_type: ActivityTypeKey
     started_at: string // ISO8601
     ended_at: string // ISO8601
     energy_delta: number
@@ -41,7 +43,7 @@ interface DashboardDTO {
 }
 
 interface CreateEventPayload {
-    activity_type: string
+    activity_type: ActivityTypeKey
     started_at: string
     ended_at: string
     subjective_coef: number
@@ -50,7 +52,7 @@ interface CreateEventPayload {
 interface EventDTO {
     id: number
     event_type: "load" | "recovery"
-    activity_type: string
+    activity_type: ActivityTypeKey
     started_at: string
     ended_at: string
     energy_before: number
@@ -62,7 +64,7 @@ interface EventDTO {
 interface EventsListElementDTO {
     id: number
     event_type: "load" | "recovery"
-    activity_type: string
+    activity_type: ActivityTypeKey
     started_at: string
     ended_at: string
     energy_delta: number
@@ -71,6 +73,38 @@ interface EventsListElementDTO {
 
 interface EventsListDTO {
     results: EventsListElementDTO[]
+}
+
+interface EnergyOverviewElementDTO {
+    date: string // ISO8601
+    energy: number | null
+}
+interface ActivitiesSummaryElementDTO {
+    activity_type: ActivityTypeKey
+    avg_energy_delta: number
+    event_count: number
+}
+interface StatisticsDTO {
+    energy_overview: {
+        period: {
+            type: "week" | "month"
+            from: string // Date
+            to: string // Date
+        }
+        activities: EnergyOverviewElementDTO[]
+    }
+    activities_summary: {
+        period: {
+            type: "week" | "month"
+            from: string // Date
+            to: string // Date
+        }
+        scale: {
+            min: number
+            max: number
+        }
+        activities: ActivitiesSummaryElementDTO[]
+    }
 }
 
 export {
@@ -84,4 +118,5 @@ export {
     EventDTO,
     EventsListElementDTO,
     EventsListDTO,
+    StatisticsDTO,
 }

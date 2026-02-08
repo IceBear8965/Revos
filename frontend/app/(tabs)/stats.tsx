@@ -1,15 +1,12 @@
-import { Text, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { Statistics } from "@/features/statistics/Statistics"
+import { useTheme } from "@/context/ThemeContext"
 
 export default function Index() {
+    const { colors } = useTheme()
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-        >
-            <Text>Statistics</Text>
-        </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+            <Statistics />
+        </SafeAreaView>
     )
 }
