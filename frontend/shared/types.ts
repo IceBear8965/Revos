@@ -16,7 +16,7 @@ interface UseAsyncGet<T> {
     data: T | null
     isLoading: boolean
     error: Error | null
-    refetch: () => void
+    refetch: () => Promise<void>
 }
 
 interface UseAsyncPost<T, P> {

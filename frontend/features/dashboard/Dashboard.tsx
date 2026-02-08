@@ -16,11 +16,12 @@ import { useDashboard } from "./hooks/useDashboard"
 import { EventCard } from "@/shared/components/EventCard"
 
 import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
+import { Error } from "@/shared/components/Error"
+import { Loader } from "@/shared/components/Loader"
 type EventOptionsType = "load" | "recovery"
 
 export const Dashboard = () => {
     const { data, isLoading, error, refetch } = useDashboard()
-    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const [modalVisible, setModalVisible] = useState(false)
     const [eventType, setEventType] = useState<EventOptionsType>("load")
@@ -42,9 +43,7 @@ export const Dashboard = () => {
     }, [currentEnergy])
 
     const onRefresh = async () => {
-        setIsRefreshing(true)
-        refetch()
-        setIsRefreshing(false)
+        await refetch()
     }
 
     const openModal = (type: EventOptionsType) => {
@@ -53,11 +52,11 @@ export const Dashboard = () => {
     }
 
     if (isLoading) {
-        return <Text>Loading...</Text>
+        return <Loader />
     }
 
     if (error) {
-        return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
+        return <Error error={error} />
     }
 
     return (
@@ -67,7 +66,7 @@ export const Dashboard = () => {
                 style={styles.dashboard}
                 refreshControl={
                     <RefreshControl
-                        refreshing={isRefreshing}
+                        refreshing={isLoading}
                         onRefresh={onRefresh}
                         tintColor={colors.foreground}
                         colors={[colors.foreground]}

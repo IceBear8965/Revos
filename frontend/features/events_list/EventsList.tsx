@@ -1,24 +1,34 @@
+import { useState } from "react"
 import { useTheme } from "@/context/ThemeContext"
-import { View, Text, FlatList } from "react-native"
+import { View, Text, FlatList, RefreshControl } from "react-native"
 import { createStyles } from "./eventsList.styles"
 import { useEventsList } from "./hooks/useEventsList"
 import { EventType } from "@/shared/types"
 import { EventCard } from "@/shared/components/EventCard"
+import { Error } from "@/shared/components/Error"
+import { Loader } from "@/shared/components/Loader"
 
 export const EventsList = () => {
-    const { data, isLoading, error } = useEventsList()
+    const { data, isLoading, error, refetch } = useEventsList()
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
-    const renderItem = ({ item }: { item: EventType }) => {
-        return <EventCard event={item} />
+    const [isRefreshing, setIsRefreshing] = useState(false)
+
+    const onRefresh = async () => {
+        setIsRefreshing(true)
+        try {
+            await refetch()
+        } finally {
+            setIsRefreshing(false)
+        }
     }
 
-    if (isLoading) return <Text>Loading...</Text>
+    const renderItem = ({ item }: { item: EventType }) => <EventCard event={item} />
 
-    if (error) {
-        return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
-    }
+    if (isLoading) return <Loader message="Collecting your history" />
+
+    if (error) return <Error error={error} />
 
     return (
         <View style={styles.eventsListContainer}>
@@ -31,8 +41,16 @@ export const EventsList = () => {
                     paddingVertical: 10,
                 }}
                 ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
-                showsVerticalScrollIndicator={true}
                 ListFooterComponent={<View style={{ height: 10 }} />}
+                showsVerticalScrollIndicator={true}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.foreground}
+                        colors={[colors.foreground]}
+                    />
+                }
             />
         </View>
     )

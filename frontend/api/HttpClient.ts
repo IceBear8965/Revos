@@ -11,6 +11,9 @@ class HttpClient {
             method: "POST",
             body: { email: email, password: password },
         })
+        if (!data) {
+            throw new Error("Login failed")
+        }
         tokenStore.setAccess(data.access)
         await tokenStore.setRefresh(data.refresh)
         return data
@@ -37,6 +40,7 @@ class HttpClient {
             method: options.method ?? "GET",
             headers: {
                 "Content-Type": "application/json",
+                Accept: "application/json",
                 ...options.headers,
             },
             body: options.body ? JSON.stringify(options.body) : undefined,
@@ -58,6 +62,7 @@ class HttpClient {
             method: options.method ?? "GET",
             headers: {
                 "Content-Type": "application/json",
+                Accept: "application/json",
                 Authorization: `Bearer ${accessToken}`,
                 ...options.headers,
             },
@@ -69,7 +74,22 @@ class HttpClient {
         }
 
         if (response.status !== 401 && response.status !== 403) {
-            throw new Error("Request failed")
+            const rawText = await response.text()
+
+            let message = `HTTP ${response.status}`
+
+            if (rawText.startsWith("<!DOCTYPE html") || rawText.startsWith("<html")) {
+                throw new Error("404: endpoint not found")
+            }
+
+            try {
+                const json = JSON.parse(rawText)
+                message = json.detail ?? JSON.stringify(json)
+            } catch {
+                if (rawText) message = rawText
+            }
+
+            throw new Error(message)
         }
 
         if (this.isRefreshing) {
