@@ -5,12 +5,31 @@ import { CredentialsStep } from "./components/credentials_step/CredentialsStep"
 import { LoadsOrderStep } from "./components/loads_order_step/LoadsOrderStep"
 import { CurrentStateStep } from "./components/current_state_step/CurrentStateStep"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { getTimeZone } from "react-native-localize"
 import { useTheme } from "@/context/ThemeContext"
+import { PayloadType } from "./types"
 
 export const Registration = () => {
+    const [payload, setPayload] = useState<PayloadType>({
+        email: "",
+        password: "",
+        nickname: "",
+        timezone: getTimeZone() ? getTimeZone() : "UTC",
+        loadOrder: ["work", "study", "sport", "society"],
+        initialEnergyState: "normal",
+    })
     const [step, setStep] = useState<number>(0)
     const nextStep = () => setStep(Math.min(step + 1, 2))
     const prevStep = () => setStep(Math.max(step - 1, 0))
+
+    const setLoadOrder = (loadOrder: Array<string>) => {
+        setPayload({
+            ...payload,
+            loadOrder: loadOrder,
+        })
+    }
+
+    useEffect(() => console.log(payload), [payload])
 
     const { colors } = useTheme()
 
@@ -35,8 +54,12 @@ export const Registration = () => {
             <Animated.View
                 style={[{ flex: 1, flexDirection: "row", width: SCREEN_WIDTH * 3 }, animatedStyle]}
             >
-                <LoadsOrderStep prevStep={prevStep} nextStep={nextStep} />
                 <CredentialsStep nextStep={nextStep} />
+                <LoadsOrderStep
+                    prevStep={prevStep}
+                    nextStep={nextStep}
+                    setLoadOrder={setLoadOrder}
+                />
                 <CurrentStateStep />
             </Animated.View>
         </SafeAreaView>

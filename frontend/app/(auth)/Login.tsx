@@ -5,6 +5,7 @@ import { Link } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
+import { Logo } from "@/shared/components/Logo"
 
 export default function Index() {
     const { signIn } = useAuth()
@@ -25,10 +26,7 @@ export default function Index() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
             <View style={styles.loginContainer}>
-                <Image
-                    style={styles.loginImage}
-                    source={require("@/assets/images/logo-no-bg.png")}
-                />
+                <Logo />
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
@@ -62,10 +60,6 @@ const createStyles = (colors: AppColors) => {
             alignItems: "center",
 
             paddingBottom: 120,
-        },
-        loginImage: {
-            width: 200,
-            height: 200,
         },
         inputContainer: {
             rowGap: 15,
