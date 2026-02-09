@@ -19,9 +19,29 @@ export const Registration = () => {
         initialEnergyState: "normal",
     })
     const [step, setStep] = useState<number>(0)
-    const nextStep = () => setStep(Math.min(step + 1, 2))
+    const nextStep = () => {
+        setStep(Math.min(step + 1, 2))
+    }
     const prevStep = () => setStep(Math.max(step - 1, 0))
 
+    const setNickname = (nickname: string) => {
+        setPayload({
+            ...payload,
+            nickname: nickname,
+        })
+    }
+    const setEmail = (email: string) => {
+        setPayload({
+            ...payload,
+            email: email,
+        })
+    }
+    const setPassword = (password: string) => {
+        setPayload({
+            ...payload,
+            password: password,
+        })
+    }
     const setLoadOrder = (loadOrder: Array<string>) => {
         setPayload({
             ...payload,
@@ -54,7 +74,15 @@ export const Registration = () => {
             <Animated.View
                 style={[{ flex: 1, flexDirection: "row", width: SCREEN_WIDTH * 3 }, animatedStyle]}
             >
-                <CredentialsStep nextStep={nextStep} />
+                <CredentialsStep
+                    nickname={payload.nickname}
+                    email={payload.email}
+                    password={payload.password}
+                    setNickname={setNickname}
+                    setEmail={setEmail}
+                    setPassword={setPassword}
+                    nextStep={nextStep}
+                />
                 <LoadsOrderStep
                     prevStep={prevStep}
                     nextStep={nextStep}
