@@ -1,18 +1,24 @@
 import { useTheme } from "@/context/ThemeContext"
 import { View, Text, Pressable, StyleSheet } from "react-native"
-import { useWindowDimensions } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { LoadOrderList } from "@/shared/components/LoadOrderList"
 import { Logo } from "@/shared/components/Logo"
 import { AppColors } from "@/theme/colors"
+import { LoadOrderElementType } from "../../types"
 
 interface LoadsOrderStepProps {
+    loadOrder: LoadOrderElementType[]
     prevStep: () => void
     nextStep: () => void
-    setLoadOrder: (loadOrder: Array<string>) => void
+    setLoadOrder: (loadOrder: LoadOrderElementType[]) => void
 }
 
-export const LoadsOrderStep = ({ prevStep, nextStep, setLoadOrder }: LoadsOrderStepProps) => {
+export const LoadsOrderStep = ({
+    loadOrder,
+    prevStep,
+    nextStep,
+    setLoadOrder,
+}: LoadsOrderStepProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
@@ -29,7 +35,7 @@ export const LoadsOrderStep = ({ prevStep, nextStep, setLoadOrder }: LoadsOrderS
                 </View>
 
                 <GestureHandlerRootView style={styles.listWrapper}>
-                    <LoadOrderList setLoadOrder={setLoadOrder} />
+                    <LoadOrderList loadOrder={loadOrder} setLoadOrder={setLoadOrder} />
                 </GestureHandlerRootView>
 
                 <View style={styles.controlsContainer}>
@@ -85,10 +91,8 @@ const createStyles = (colors: AppColors) => {
 
         controlsContainer: {
             flexDirection: "row",
-            flex: 1,
             justifyContent: "space-between",
             width: "60%",
-            minHeight: 40,
         },
         controlsButton: {
             backgroundColor: colors.foreground,

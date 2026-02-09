@@ -1,12 +1,21 @@
-type initialEnergyType = "very_tired" | "normal" | "full"
+interface InitialEnergyType {
+    icon: "emoticon-sad-outline" | "emoticon-neutral-outline" | "emoticon-happy-outline"
+    state: "very_tired" | "normal" | "full"
+}
 
 interface PayloadType {
     email: string
     password: string
     nickname: string
     timezone: string
-    loadOrder: Array<string>
-    initialEnergyState: initialEnergyType
+    loadOrder: LoadOrderElementType[]
+    initialEnergyState: InitialEnergyType
 }
 
-export { initialEnergyType, PayloadType }
+interface LoadOrderElementType {
+    id: number
+    label: string
+    icon: string
+}
+
+export { InitialEnergyType, PayloadType, LoadOrderElementType }

@@ -1,31 +1,23 @@
-import { useEffect, useState } from "react"
 import { View, Text, Pressable, StyleSheet } from "react-native"
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist"
 import { FontAwesome6 } from "@expo/vector-icons"
-import { LOAD_ACTIVITIES } from "../constants"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
-
-const initialData = LOAD_ACTIVITIES.map((el, i) => {
-    return {
-        id: i,
-        icon: el.icon,
-        label: el.activity,
-    }
-})
+import { LoadOrderElementType } from "@/features/register/types"
 
 interface DraggableListProps {
-    setLoadOrder: (loadOrder: Array<string>) => void
+    loadOrder: LoadOrderElementType[]
+    setLoadOrder: (loadOrder: LoadOrderElementType[]) => void
 }
 
-export const LoadOrderList = ({ setLoadOrder }: DraggableListProps) => {
+export const LoadOrderList = ({ loadOrder, setLoadOrder }: DraggableListProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
-    const renderItem = ({ item, drag, isActive }: RenderItemParams<(typeof initialData)[0]>) => (
+    const renderItem = ({ item, drag, isActive }: RenderItemParams<(typeof loadOrder)[0]>) => (
         <Pressable
             onLongPress={drag}
-            delayLongPress={150}
+            delayLongPress={100}
             disabled={isActive}
             style={styles.draggbleElement}
         >
@@ -37,10 +29,10 @@ export const LoadOrderList = ({ setLoadOrder }: DraggableListProps) => {
     )
     return (
         <DraggableFlatList
-            data={initialData}
-            keyExtractor={(item) => item.label}
+            data={loadOrder}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={renderItem}
-            onDragEnd={({ data }) => setLoadOrder(data.map((el) => el.label))}
+            onDragEnd={({ data }) => setLoadOrder(data)}
             activationDistance={20}
             style={{ flexGrow: 0 }}
             contentContainerStyle={{ paddingVertical: 8 }}

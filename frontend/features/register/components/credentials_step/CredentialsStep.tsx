@@ -116,10 +116,8 @@ const createStyles = (colors: AppColors) => {
 
         controlsContainer: {
             flexDirection: "row",
-            flex: 1,
             justifyContent: "flex-end",
             width: "60%",
-            minHeight: 40,
         },
         controlsButton: {
             backgroundColor: colors.foreground,

@@ -8,6 +8,18 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { getTimeZone } from "react-native-localize"
 import { useTheme } from "@/context/ThemeContext"
 import { PayloadType } from "./types"
+import { LOAD_ACTIVITIES } from "@/shared/constants"
+import { InitialEnergyType, LoadOrderElementType } from "./types"
+
+const initialLoadOrder = LOAD_ACTIVITIES.map((el, i) => {
+    return {
+        id: i,
+        icon: el.icon,
+        label: el.activity,
+    }
+})
+
+const initialEnergyState: InitialEnergyType = { icon: "emoticon-neutral-outline", state: "normal" }
 
 export const Registration = () => {
     const [payload, setPayload] = useState<PayloadType>({
@@ -15,8 +27,8 @@ export const Registration = () => {
         password: "",
         nickname: "",
         timezone: getTimeZone() ? getTimeZone() : "UTC",
-        loadOrder: ["work", "study", "sport", "society"],
-        initialEnergyState: "normal",
+        loadOrder: initialLoadOrder,
+        initialEnergyState: initialEnergyState,
     })
     const [step, setStep] = useState<number>(0)
     const nextStep = () => {
@@ -42,14 +54,22 @@ export const Registration = () => {
             password: password,
         })
     }
-    const setLoadOrder = (loadOrder: Array<string>) => {
+    const setLoadOrder = (loadOrder: LoadOrderElementType[]) => {
         setPayload({
             ...payload,
             loadOrder: loadOrder,
         })
     }
+    const setInitialState = (currentState: InitialEnergyType) => {
+        setPayload({
+            ...payload,
+            initialEnergyState: currentState,
+        })
+    }
 
-    useEffect(() => console.log(payload), [payload])
+    const register = () => {
+        console.log(payload)
+    }
 
     const { colors } = useTheme()
 
@@ -84,11 +104,17 @@ export const Registration = () => {
                     nextStep={nextStep}
                 />
                 <LoadsOrderStep
+                    loadOrder={payload.loadOrder}
                     prevStep={prevStep}
                     nextStep={nextStep}
                     setLoadOrder={setLoadOrder}
                 />
-                <CurrentStateStep />
+                <CurrentStateStep
+                    initialState={payload.initialEnergyState}
+                    setInitialState={setInitialState}
+                    prevStep={prevStep}
+                    register={register}
+                />
             </Animated.View>
         </SafeAreaView>
     )
