@@ -1,12 +1,34 @@
 import React from "react"
-import { DashboardType } from "../../types"
+import { LastEvent } from "../../types"
+import { ActivityTypeKey } from "@/shared/constants"
+
+interface CreateEventProps {
+    activityType: ActivityTypeKey
+    startedAt: Date
+    endedAt: Date
+    subjectiveCoef: number
+}
+
+interface CreateEventResponse {
+    id: number
+    eventType: "load" | "recovery"
+    activityType: ActivityTypeKey
+    startedAt: Date
+    endedAt: Date
+    energyBefore: number
+    energyDelta: number
+    energyAfter: number
+    subjectiveCoef: number
+}
 
 interface CreateEventModalType {
-    refetch: () => void
+    refetch: () => Promise<void>
     event_type: "load" | "recovery"
-    lastEvent?: DashboardType["lastEvent"] | null
+    lastEvent?: LastEvent | null
     modalVisible: boolean
     setModalVisible: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export { CreateEventModalType }
+interface EditEventModalType {}
+
+export { CreateEventProps, CreateEventResponse, CreateEventModalType, EditEventModalType }

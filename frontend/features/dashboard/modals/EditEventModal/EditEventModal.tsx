@@ -7,21 +7,20 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTheme } from "@/context/ThemeContext"
-import { CreateEventProps, CreateEventModalType } from "./types"
+import { EditEventProps, EditEventModalType } from "./types"
 import { ActivitiTypePicker } from "../components/ActivityTypePicker/ActivityTypePicker"
 import { ModalTimePicker } from "../components/ModalTimePicker/ModalTimePicker"
 import { createStyles } from "./styles"
 import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
-import { useCreateEvent } from "../../hooks/useCreateEvent"
 import { ActivityTypeKey } from "@/shared/constants"
+import { useEditEvent } from "../../hooks/useEditEvent"
 
-export const CreateEventModal = ({
+export const EditEventModal = ({
     refetch,
-    event_type,
     lastEvent,
     modalVisible,
     setModalVisible,
-}: CreateEventModalType) => {
+}: EditEventModalType) => {
     const sheetRef = useRef<BottomSheet>(null)
     const snapPoints = useMemo(() => ["50%"], [])
     const renderBackdrop = useCallback(
@@ -36,7 +35,7 @@ export const CreateEventModal = ({
         []
     )
 
-    const { refetch: createEventPost, isLoading, error } = useCreateEvent()
+    const { refetch: editEventPost, isLoading, error } = useEditEvent()
 
     useEffect(() => {
         if (modalVisible) {
@@ -78,15 +77,16 @@ export const CreateEventModal = ({
     }, [modalVisible])
 
     const createEvent = async () => {
-        if (dropDownValue) {
-            const requestBody: CreateEventProps = {
+        if (dropDownValue && lastEvent) {
+            const requestBody: EditEventProps = {
+                id: lastEvent?.id,
                 activityType: dropDownValue,
                 startedAt: startedAt,
                 endedAt: endedAt,
                 subjectiveCoef: subjectiveCoef,
             }
             try {
-                await createEventPost(requestBody)
+                await editEventPost(requestBody)
                 await refetch()
                 closeModal()
             } catch (error) {
@@ -100,56 +100,57 @@ export const CreateEventModal = ({
 
     if (error) return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
 
-    return (
-        <BottomSheet
-            ref={sheetRef}
-            index={-1}
-            snapPoints={snapPoints}
-            backdropComponent={renderBackdrop}
-            enablePanDownToClose={true}
-            onClose={closeModal}
-            backgroundStyle={{ backgroundColor: colors.background }}
-            handleIndicatorStyle={{ backgroundColor: colors.textPrimary }}
-            handleStyle={{
-                backgroundColor: colors.foreground,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-            }}
-        >
-            <BottomSheetView>
-                <SafeAreaView style={styles.modalContainer} edges={["bottom"]}>
-                    <View style={styles.header}>
-                        <Text style={styles.headerTitle}>New Event</Text>
-                        <Pressable style={styles.saveButton} onPress={createEvent}>
-                            <Text style={styles.saveButtonText}>Save</Text>
-                        </Pressable>
-                    </View>
-                    <View style={styles.modalContentContainer}>
-                        <View style={styles.modalContent}>
-                            <ActivitiTypePicker
-                                event_type={event_type}
-                                isDropDownOpen={isDropDownOpen}
-                                dropDownValue={dropDownValue}
-                                setIsDropDownOpen={setIsDropDownOpen}
-                                setDropDownValue={setDropDownValue}
-                                closeModal={closeModal}
-                            />
-                            <ModalTimePicker
-                                startedAt={startedAt}
-                                endedAt={endedAt}
-                                setStartedAt={setStartedAt}
-                                setEndedAt={setEndedAt}
-                                resetSignal={resetSignal}
-                            />
-                            <SubjectiveCoefSelector
-                                eventType={event_type}
-                                subjectiveCoef={subjectiveCoef}
-                                onChange={setSubjectiveCoef}
-                            />
+    if (lastEvent) {
+        return (
+            <BottomSheet
+                ref={sheetRef}
+                index={-1}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                enablePanDownToClose={true}
+                onClose={closeModal}
+                backgroundStyle={{ backgroundColor: colors.background }}
+                handleIndicatorStyle={{ backgroundColor: colors.textPrimary }}
+                handleStyle={{
+                    backgroundColor: colors.foreground,
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                }}
+            >
+                <BottomSheetView>
+                    <SafeAreaView style={styles.modalContainer} edges={["bottom"]}>
+                        <View style={styles.header}>
+                            <Text style={styles.headerTitle}>New Event</Text>
+                            <Pressable style={styles.saveButton} onPress={createEvent}>
+                                <Text style={styles.saveButtonText}>Save</Text>
+                            </Pressable>
                         </View>
-                    </View>
-                </SafeAreaView>
-            </BottomSheetView>
-        </BottomSheet>
-    )
+                        <View style={styles.modalContentContainer}>
+                            <View style={styles.modalContent}>
+                                <ActivitiTypePicker
+                                    isDropDownOpen={isDropDownOpen}
+                                    dropDownValue={dropDownValue}
+                                    setIsDropDownOpen={setIsDropDownOpen}
+                                    setDropDownValue={setDropDownValue}
+                                    closeModal={closeModal}
+                                />
+                                <ModalTimePicker
+                                    startedAt={startedAt}
+                                    endedAt={endedAt}
+                                    setStartedAt={setStartedAt}
+                                    setEndedAt={setEndedAt}
+                                    resetSignal={resetSignal}
+                                />
+                                <SubjectiveCoefSelector
+                                    eventType={lastEvent?.eventType}
+                                    subjectiveCoef={subjectiveCoef}
+                                    onChange={setSubjectiveCoef}
+                                />
+                            </View>
+                        </View>
+                    </SafeAreaView>
+                </BottomSheetView>
+            </BottomSheet>
+        )
+    }
 }

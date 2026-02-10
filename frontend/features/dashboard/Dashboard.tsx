@@ -16,15 +16,18 @@ import { useDashboard } from "./hooks/useDashboard"
 import { EventCard } from "@/shared/components/EventCard"
 
 import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
+import { EditEventModal } from "./modals/EditEventModal/EditEventModal"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
-type EventOptionsType = "load" | "recovery"
+import { EventOptionsType } from "@/shared/types"
 
 export const Dashboard = () => {
     const { data, isLoading, error, refetch } = useDashboard()
 
-    const [modalVisible, setModalVisible] = useState(false)
+    const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
     const [eventType, setEventType] = useState<EventOptionsType>("load")
+
+    const [editModalVisible, setEditModalVisible] = useState<boolean>(false)
 
     const { colors } = useTheme()
     const styles = createStyles(colors)
@@ -46,9 +49,9 @@ export const Dashboard = () => {
         await refetch()
     }
 
-    const openModal = (type: EventOptionsType) => {
+    const openCreateModal = (type: EventOptionsType) => {
         setEventType(type)
-        setModalVisible(true)
+        setCreateModalVisible(true)
     }
 
     if (isLoading) {
@@ -100,7 +103,9 @@ export const Dashboard = () => {
                     </View>
 
                     {data?.lastEvent ? (
-                        <EventCard event={data.lastEvent} />
+                        <Pressable onPress={() => setEditModalVisible(true)}>
+                            <EventCard event={data.lastEvent} />
+                        </Pressable>
                     ) : (
                         <View
                             style={{
@@ -112,13 +117,16 @@ export const Dashboard = () => {
                     )}
 
                     <View style={styles.controlsContainer}>
-                        <Pressable style={styles.loadButton} onPress={() => openModal("load")}>
+                        <Pressable
+                            style={styles.loadButton}
+                            onPress={() => openCreateModal("load")}
+                        >
                             <Text style={styles.loadButtonText}>Load</Text>
                         </Pressable>
 
                         <Pressable
                             style={styles.recoveryButton}
-                            onPress={() => openModal("recovery")}
+                            onPress={() => openCreateModal("recovery")}
                         >
                             <Text style={styles.recoveryButtonText}>Recovery</Text>
                         </Pressable>
@@ -130,8 +138,15 @@ export const Dashboard = () => {
                 refetch={refetch}
                 event_type={eventType}
                 lastEvent={data?.lastEvent}
-                modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
+                modalVisible={createModalVisible}
+                setModalVisible={setCreateModalVisible}
+            />
+
+            <EditEventModal
+                refetch={refetch}
+                lastEvent={data?.lastEvent}
+                modalVisible={editModalVisible}
+                setModalVisible={setEditModalVisible}
             />
         </View>
     )

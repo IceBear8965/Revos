@@ -6,7 +6,7 @@ import { UseAsyncGet } from "@/shared/types"
 
 export const useDashboard = (): UseAsyncGet<DashboardType> => {
     const [data, setData] = useState<DashboardType | null>(null)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<Error | null>(null)
 
     const fetchDashboard = useCallback(async () => {

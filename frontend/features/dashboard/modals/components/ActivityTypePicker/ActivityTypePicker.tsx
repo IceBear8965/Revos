@@ -3,7 +3,7 @@ import DropDownPicker from "react-native-dropdown-picker"
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./styles"
 import { LOAD_ACTIVITIES, RECOVERY_ACTIVITIES } from "@/shared/constants"
-import { ModalTopProps } from "./types"
+import { ActivityTypePickerProps } from "./types"
 import { capitalize } from "@/shared/utils/capitalizeFirstLater"
 
 export const ActivitiTypePicker = ({
@@ -12,13 +12,20 @@ export const ActivitiTypePicker = ({
     dropDownValue,
     setIsDropDownOpen,
     setDropDownValue,
-}: ModalTopProps) => {
+}: ActivityTypePickerProps) => {
     const { colors } = useTheme()
 
     const styles = createStyles(colors)
 
-    const chooseValues =
-        event_type === "load" ? LOAD_ACTIVITIES.map((el) => el.activity) : RECOVERY_ACTIVITIES
+    let chooseValues = []
+    if (event_type) {
+        chooseValues =
+            event_type === "load" ? LOAD_ACTIVITIES.map((el) => el.activity) : RECOVERY_ACTIVITIES
+    } else {
+        const loads = LOAD_ACTIVITIES.map((el) => el.activity)
+        chooseValues = [...loads, ...RECOVERY_ACTIVITIES]
+    }
+
     const items = chooseValues.map((item) => {
         const capitalized = capitalize(item)
         return { label: capitalized, value: item }
@@ -53,6 +60,20 @@ export const ActivitiTypePicker = ({
                     items={items}
                     setOpen={setIsDropDownOpen}
                     setValue={setDropDownValue}
+                    listMode="MODAL"
+                    modalProps={{
+                        animationType: "slide",
+                    }}
+                    modalContentContainerStyle={{
+                        backgroundColor: colors.background,
+                        paddingHorizontal: 30,
+                        paddingTop: 60,
+                    }}
+                    modalHeaderStyle={{
+                        borderBottomWidth: 0,
+                    }}
+                    modalTitle="Choose Activity Type"
+                    closeIconStyle={{ tintColor: colors.textPrimary }}
                 />
             </View>
         </View>

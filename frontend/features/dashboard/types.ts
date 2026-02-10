@@ -18,23 +18,4 @@ interface DashboardType {
     lastEvent: LastEvent | null
 }
 
-interface CreateEventProps {
-    activityType: ActivityTypeKey
-    startedAt: Date
-    endedAt: Date
-    subjectiveCoef: number
-}
-
-interface CreateEventResponse {
-    id: number
-    eventType: "load" | "recovery"
-    activityType: ActivityTypeKey
-    startedAt: Date
-    endedAt: Date
-    energyBefore: number
-    energyDelta: number
-    energyAfter: number
-    subjectiveCoef: number
-}
-
-export { LastEvent, DashboardType, CreateEventProps, CreateEventResponse }
+export { LastEvent, DashboardType }

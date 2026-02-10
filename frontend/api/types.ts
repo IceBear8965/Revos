@@ -129,6 +129,17 @@ interface EditEventPayloadDTO {
     subjective_coef: number
 }
 
+interface EditEventResponseDTO {
+    id: number
+    activity_type: ActivityTypeKey
+    event_type: "load" | "recovery"
+    started_at: string
+    ended_at: string
+    energy_before: number
+    energy_delta: number
+    energy_after: number
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -144,4 +155,5 @@ export {
     RegisterPayloadDTO,
     RegisterResponse,
     EditEventPayloadDTO,
+    EditEventResponseDTO,
 }

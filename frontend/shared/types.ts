@@ -28,6 +28,6 @@ interface UseAsyncPost<T, P> {
     refetch: (body: P) => Promise<void>
 }
 
-type activityType = "work" | "study" | "sport" | "society" | "sleep" | "rest" | "walking"
+type EventOptionsType = "load" | "recovery"
 
-export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, activityType }
+export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, EventOptionsType }

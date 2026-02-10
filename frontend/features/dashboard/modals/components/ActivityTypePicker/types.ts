@@ -1,8 +1,8 @@
 import { ActivityTypeKey } from "@/shared/constants"
 import { Dispatch, SetStateAction } from "react"
 
-interface ModalTopProps {
-    event_type: "load" | "recovery"
+interface ActivityTypePickerProps {
+    event_type?: "load" | "recovery"
     isDropDownOpen: boolean
     dropDownValue: string | null
     setIsDropDownOpen: Dispatch<SetStateAction<boolean>>
@@ -10,4 +10,4 @@ interface ModalTopProps {
     closeModal: () => void
 }
 
-export { ModalTopProps }
+export { ActivityTypePickerProps }

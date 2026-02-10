@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react"
-import { CreateEventProps } from "../types"
+import { CreateEventProps } from "../modals/CreateEventModal/types"
 import { createEvent } from "@/api/createEvent"
 import { UseAsyncPost } from "@/shared/types"
 import { CreateEventPayload } from "@/api/types"
@@ -21,9 +21,9 @@ export const useCreateEvent = (): UseAsyncPost<void, CreateEventProps> => {
 
         try {
             await createEvent(requestBody)
-        } catch (err) {
-            setError(err instanceof Error ? err : new Error("Unknown error"))
-            throw err
+        } catch (error) {
+            setError(error instanceof Error ? error : new Error("Unknown error"))
+            throw error
         } finally {
             setIsLoading(false)
         }
