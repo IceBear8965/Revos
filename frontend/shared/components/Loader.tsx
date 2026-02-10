@@ -1,8 +1,7 @@
 import { View, Text, StyleSheet } from "react-native"
-import { Character } from "@/features/dashboard/components/Character"
-import { useSharedValue } from "react-native-reanimated"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
+import { Logo } from "./Logo"
 
 interface LoaderProps {
     message?: string
@@ -13,7 +12,7 @@ export const Loader = ({ message = "Analizing your energy" }: LoaderProps) => {
     const styles = createStyles(colors)
     return (
         <View style={styles.loaderContainer}>
-            <Character energyLevel={useSharedValue(1)} />
+            <Logo />
             <Text style={styles.loaderText}>{message}</Text>
         </View>
     )
