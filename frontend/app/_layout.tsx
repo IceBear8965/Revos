@@ -26,9 +26,9 @@ export default function RootLayout() {
 }
 
 const RootNavigator = () => {
-    const { isAuth, isLoading } = useAuth()
+    const { isAuth, isLoading, signOut } = useAuth()
     const { isThemeReady } = useTheme()
-    const { isTabBarReady } = useTabBar()
+    // signOut()
 
     useEffect(() => {
         if (!isLoading && isThemeReady) {

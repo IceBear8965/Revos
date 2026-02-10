@@ -1,4 +1,3 @@
-import { InitialEnergyType, LoadOrderElementType } from "@/features/register/types"
 import { ActivityTypeKey } from "@/shared/constants"
 
 interface PendingRequest<T> {
@@ -122,6 +121,14 @@ interface RegisterResponse {
     refresh: string
 }
 
+interface EditEventPayloadDTO {
+    id: number
+    activity_type: ActivityTypeKey
+    started_at: string // ISO8601
+    ended_at: string // ISO8601
+    subjective_coef: number
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -136,4 +143,5 @@ export {
     StatisticsDTO,
     RegisterPayloadDTO,
     RegisterResponse,
+    EditEventPayloadDTO,
 }

@@ -18,7 +18,7 @@ class EnergyEventCreateSerializer(serializers.Serializer):
 
 
 class EnergyEventEditSerializer(serializers.Serializer):
-    event_id = serializers.IntegerField()
+    id = serializers.IntegerField()
     activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()

@@ -65,14 +65,12 @@ export const Statistics = () => {
                                 }}
                                 domain={{ y: [0, 1] }}
                             >
-                                {({ points }) => (
-                                    <Line
+                                {({ points, chartBounds }) => (
+                                    <Bar
                                         points={points.energy}
+                                        chartBounds={chartBounds}
                                         color={colors.accentGreen}
-                                        strokeWidth={4}
-                                        strokeCap="round"
-                                        connectMissingData={false}
-                                        curveType="linear"
+                                        roundedCorners={{ topLeft: 10, topRight: 10 }}
                                     />
                                 )}
                             </CartesianChart>
