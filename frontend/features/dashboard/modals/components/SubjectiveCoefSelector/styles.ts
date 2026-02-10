@@ -13,7 +13,7 @@ export const createStyles = (colors: AppColors) => {
             alignItems: "center",
         },
         selectorButton: {
-            padding: 6,
+            padding: 8,
             borderRadius: 20,
         },
     })

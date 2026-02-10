@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { View, Text, TextInput, StyleSheet, Image, Pressable, Alert } from "react-native"
+import { Link } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/colors"
+import { Logo } from "@/shared/components/Logo"
 
-export default function () {
+export default function Index() {
     const { signIn } = useAuth()
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
@@ -24,10 +26,7 @@ export default function () {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
             <View style={styles.loginContainer}>
-                <Image
-                    style={styles.loginImage}
-                    source={require("@/assets/images/logo-no-bg.png")}
-                />
+                <Logo />
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
@@ -45,6 +44,9 @@ export default function () {
                 <Pressable style={styles.loginPressable} onPress={onLogin}>
                     <Text style={styles.loginPressableText}>Log In</Text>
                 </Pressable>
+                <Link style={styles.signUpText} href="/(auth)/register">
+                    Don't have an account yet? Sign Up
+                </Link>
             </View>
         </SafeAreaView>
     )
@@ -58,10 +60,6 @@ const createStyles = (colors: AppColors) => {
             alignItems: "center",
 
             paddingBottom: 120,
-        },
-        loginImage: {
-            width: 200,
-            height: 200,
         },
         inputContainer: {
             rowGap: 15,
@@ -82,10 +80,16 @@ const createStyles = (colors: AppColors) => {
             paddingVertical: 10,
             backgroundColor: colors.accentGreen,
             borderRadius: 10,
+            marginBottom: 10,
         },
         loginPressableText: {
             color: colors.textPrimary,
             fontSize: 20,
+            fontWeight: 400,
+        },
+        signUpText: {
+            color: colors.accentGreen,
+            fontSize: 15,
             fontWeight: 400,
         },
     })

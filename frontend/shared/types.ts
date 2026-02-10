@@ -1,7 +1,9 @@
+import { ActivityTypeKey } from "./constants"
+
 interface EventType {
     id: number
     eventType: string
-    activityType: string
+    activityType: ActivityTypeKey
     startedAt: Date
     endedAt: Date
     energyDelta: number
@@ -26,4 +28,6 @@ interface UseAsyncPost<T, P> {
     refetch: (body: P) => Promise<void>
 }
 
-export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost }
+type activityType = "work" | "study" | "sport" | "society" | "sleep" | "rest" | "walking"
+
+export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, activityType }

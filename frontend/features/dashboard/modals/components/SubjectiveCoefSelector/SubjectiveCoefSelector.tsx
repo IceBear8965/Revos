@@ -1,5 +1,5 @@
 import { GestureResponderEvent, Pressable, View } from "react-native"
-import { SubjectiveCoefSelectorProps } from "./types"
+import { Choices, SubjectiveCoefSelectorProps } from "./types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./styles"
@@ -16,12 +16,12 @@ export const SubjectiveCoefSelector = ({
         onChange(1.0)
     }, [])
 
-    const choicesLoad = [
+    const choicesLoad: Choices[] = [
         { icon: "emoticon-sad-outline", value: 1.1 },
         { icon: "emoticon-neutral-outline", value: 1.0 },
         { icon: "emoticon-happy-outline", value: 0.8 },
     ]
-    const choicesRecovery = [
+    const choicesRecovery: Choices[] = [
         { icon: "emoticon-sad-outline", value: 0.8 },
         { icon: "emoticon-neutral-outline", value: 1.0 },
         { icon: "emoticon-happy-outline", value: 1.1 },

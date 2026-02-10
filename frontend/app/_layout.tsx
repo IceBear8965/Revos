@@ -31,10 +31,10 @@ const RootNavigator = () => {
     const { isTabBarReady } = useTabBar()
 
     useEffect(() => {
-        if (!isLoading && isThemeReady && isTabBarReady) {
+        if (!isLoading && isThemeReady) {
             SplashScreen.hideAsync()
         }
-    }, [isLoading, isThemeReady, isTabBarReady])
+    }, [isLoading, isThemeReady])
 
     if (isLoading || !isThemeReady) {
         return null
@@ -47,7 +47,8 @@ const RootNavigator = () => {
             </Stack.Protected>
 
             <Stack.Protected guard={!isAuth}>
-                <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
             </Stack.Protected>
         </Stack>
     )

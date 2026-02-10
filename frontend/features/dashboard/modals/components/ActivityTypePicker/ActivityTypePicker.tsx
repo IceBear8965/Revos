@@ -2,7 +2,7 @@ import { View, Pressable } from "react-native"
 import DropDownPicker from "react-native-dropdown-picker"
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./styles"
-import { LOAD_ACTIVITIES, RECOVERY_ACTIVITIES } from "@/utils/constants"
+import { LOAD_ACTIVITIES, RECOVERY_ACTIVITIES } from "@/shared/constants"
 import { ModalTopProps } from "./types"
 import { capitalize } from "@/shared/utils/capitalizeFirstLater"
 
@@ -17,7 +17,8 @@ export const ActivitiTypePicker = ({
 
     const styles = createStyles(colors)
 
-    const chooseValues = event_type === "load" ? LOAD_ACTIVITIES : RECOVERY_ACTIVITIES
+    const chooseValues =
+        event_type === "load" ? LOAD_ACTIVITIES.map((el) => el.activity) : RECOVERY_ACTIVITIES
     const items = chooseValues.map((item) => {
         const capitalized = capitalize(item)
         return { label: capitalized, value: item }
