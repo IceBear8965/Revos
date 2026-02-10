@@ -60,20 +60,6 @@ export const ActivitiTypePicker = ({
                     items={items}
                     setOpen={setIsDropDownOpen}
                     setValue={setDropDownValue}
-                    listMode="MODAL"
-                    modalProps={{
-                        animationType: "slide",
-                    }}
-                    modalContentContainerStyle={{
-                        backgroundColor: colors.background,
-                        paddingHorizontal: 30,
-                        paddingTop: 60,
-                    }}
-                    modalHeaderStyle={{
-                        borderBottomWidth: 0,
-                    }}
-                    modalTitle="Choose Activity Type"
-                    closeIconStyle={{ tintColor: colors.textPrimary }}
                 />
             </View>
         </View>
