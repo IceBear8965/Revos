@@ -1,10 +1,45 @@
 import { tokenStore } from "@/utils/TokenStore"
-import { LoginResponse, RefreshResponse, PendingRequest, RequestOptions } from "./types"
+import {
+    LoginResponse,
+    RefreshResponse,
+    PendingRequest,
+    RequestOptions,
+    RegisterResponse,
+} from "./types"
+import { RegisterPayloadDTO } from "./types"
 
 class HttpClient {
+    // private baseURL = "http://10.199.29.245:8000/api/"
     private baseURL = "http://10.0.2.2:8000/api/"
     private isRefreshing: boolean = false
     private pendingRequests: PendingRequest<any>[] = []
+
+    async register({
+        nickname,
+        email,
+        password,
+        timezone,
+        load_order,
+        initial_energy_state,
+    }: RegisterPayloadDTO): Promise<RegisterResponse> {
+        const response = await this.fetchPublic<RegisterResponse>("user/register/", {
+            method: "POST",
+            body: {
+                email: email,
+                nickname: nickname,
+                password: password,
+                timezone: timezone,
+                load_order: load_order,
+                initial_energy_state: initial_energy_state,
+            },
+        })
+        if (!response) {
+            throw new Error("Register failed")
+        }
+        tokenStore.setAccess(response.access)
+        await tokenStore.setRefresh(response.refresh)
+        return response
+    }
 
     async login(email: string, password: string): Promise<LoginResponse> {
         const data = await this.fetchPublic<LoginResponse>("user/", {

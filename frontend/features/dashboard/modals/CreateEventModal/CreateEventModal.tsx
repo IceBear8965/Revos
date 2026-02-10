@@ -13,6 +13,8 @@ import { ModalTimePicker } from "../components/ModalTimePicker/ModalTimePicker"
 import { createStyles } from "./styles"
 import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { useCreateEvent } from "../../hooks/useCreateEvent"
+import { CreateEventProps } from "../../types"
+import { ActivityTypeKey } from "@/shared/constants"
 
 export const CreateEventModal = ({
     refetch,
@@ -47,7 +49,7 @@ export const CreateEventModal = ({
 
     // Activity Type picker
     const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false) // DropDownPicker option to open
-    const [dropDownValue, setDropDownValue] = useState<string | null>(null) // DropDownPicker value
+    const [dropDownValue, setDropDownValue] = useState<ActivityTypeKey | null>(null) // DropDownPicker value
 
     // Date-time picker
     const [startedAt, setStartedAt] = useState<Date>(new Date())
@@ -78,7 +80,7 @@ export const CreateEventModal = ({
 
     const createEvent = async () => {
         if (dropDownValue) {
-            const requestBody = {
+            const requestBody: CreateEventProps = {
                 activityType: dropDownValue,
                 startedAt: startedAt,
                 endedAt: endedAt,

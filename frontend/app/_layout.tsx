@@ -31,10 +31,10 @@ const RootNavigator = () => {
     const { isTabBarReady } = useTabBar()
 
     useEffect(() => {
-        if (!isLoading && isThemeReady && isTabBarReady) {
+        if (!isLoading && isThemeReady) {
             SplashScreen.hideAsync()
         }
-    }, [isLoading, isThemeReady, isTabBarReady])
+    }, [isLoading, isThemeReady])
 
     if (isLoading || !isThemeReady) {
         return null

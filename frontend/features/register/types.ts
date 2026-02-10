@@ -3,7 +3,13 @@ interface InitialEnergyType {
     state: "very_tired" | "normal" | "full"
 }
 
-interface PayloadType {
+interface LoadOrderElementType {
+    id: number
+    label: string
+    icon: string
+}
+
+interface RegisterPayloadType {
     email: string
     password: string
     nickname: string
@@ -12,10 +18,9 @@ interface PayloadType {
     initialEnergyState: InitialEnergyType
 }
 
-interface LoadOrderElementType {
-    id: number
-    label: string
-    icon: string
+interface RegisterResponseType {
+    access: string
+    refresh: string
 }
 
-export { InitialEnergyType, PayloadType, LoadOrderElementType }
+export { InitialEnergyType, LoadOrderElementType, RegisterPayloadType, RegisterResponseType }

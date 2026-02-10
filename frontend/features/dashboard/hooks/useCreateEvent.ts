@@ -2,6 +2,7 @@ import { useState, useCallback } from "react"
 import { CreateEventProps } from "../types"
 import { createEvent } from "@/api/createEvent"
 import { UseAsyncPost } from "@/shared/types"
+import { CreateEventPayload } from "@/api/types"
 
 export const useCreateEvent = (): UseAsyncPost<void, CreateEventProps> => {
     const [isLoading, setIsLoading] = useState(false)
@@ -11,7 +12,7 @@ export const useCreateEvent = (): UseAsyncPost<void, CreateEventProps> => {
         setIsLoading(true)
         setError(null)
 
-        const requestBody = {
+        const requestBody: CreateEventPayload = {
             activity_type: body.activityType,
             started_at: body.startedAt.toISOString(),
             ended_at: body.endedAt.toISOString(),

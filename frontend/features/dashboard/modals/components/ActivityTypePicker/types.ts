@@ -1,3 +1,4 @@
+import { ActivityTypeKey } from "@/shared/constants"
 import { Dispatch, SetStateAction } from "react"
 
 interface ModalTopProps {
@@ -5,7 +6,7 @@ interface ModalTopProps {
     isDropDownOpen: boolean
     dropDownValue: string | null
     setIsDropDownOpen: Dispatch<SetStateAction<boolean>>
-    setDropDownValue: Dispatch<SetStateAction<string | null>>
+    setDropDownValue: Dispatch<SetStateAction<ActivityTypeKey | null>>
     closeModal: () => void
 }
 

@@ -1,7 +1,9 @@
+import { ActivityTypeKey } from "@/shared/constants"
+
 interface LastEvent {
     id: number
     eventType: "load" | "recovery"
-    activityType: string
+    activityType: ActivityTypeKey
     startedAt: Date
     endedAt: Date
     energyDelta: number
@@ -17,7 +19,7 @@ interface DashboardType {
 }
 
 interface CreateEventProps {
-    activityType: string
+    activityType: ActivityTypeKey
     startedAt: Date
     endedAt: Date
     subjectiveCoef: number
@@ -26,7 +28,7 @@ interface CreateEventProps {
 interface CreateEventResponse {
     id: number
     eventType: "load" | "recovery"
-    activityType: string
+    activityType: ActivityTypeKey
     startedAt: Date
     endedAt: Date
     energyBefore: number

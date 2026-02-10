@@ -33,6 +33,9 @@ export const CurrentStateStep = ({
                 <View style={styles.logoContainer}>
                     <Logo />
                 </View>
+                <View style={styles.textContainer}>
+                    <Text style={styles.currentStateText}>How do you feel yourself now?</Text>
+                </View>
                 <View style={styles.selectorContainer}>
                     {choices.map((choice, index) => {
                         const isActive = choice.state === initialState.state
@@ -95,6 +98,15 @@ const createStyles = (colors: AppColors) => {
         selectorButton: {
             padding: 8,
             borderRadius: 20,
+        },
+
+        textContainer: {
+            marginBottom: 20,
+        },
+        currentStateText: {
+            fontSize: 18,
+            fontWeight: "600",
+            color: colors.textPrimary,
         },
 
         controlsContainer: {

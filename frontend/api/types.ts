@@ -1,3 +1,4 @@
+import { InitialEnergyType, LoadOrderElementType } from "@/features/register/types"
 import { ActivityTypeKey } from "@/shared/constants"
 
 interface PendingRequest<T> {
@@ -107,6 +108,20 @@ interface StatisticsDTO {
     }
 }
 
+interface RegisterPayloadDTO {
+    email: string
+    nickname: string
+    password: string
+    timezone: string
+    load_order: string[]
+    initial_energy_state: "very_tired" | "normal" | "full"
+}
+
+interface RegisterResponse {
+    access: string
+    refresh: string
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -119,4 +134,6 @@ export {
     EventsListElementDTO,
     EventsListDTO,
     StatisticsDTO,
+    RegisterPayloadDTO,
+    RegisterResponse,
 }
