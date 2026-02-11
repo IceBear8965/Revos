@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native"
 import { formatEventDateTime } from "@/utils/formatDate"
 import { useTheme } from "@/context/ThemeContext"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { ArrowsRenderer } from "./ArrowsRenderer"
 import { EventCardProps } from "../types"
 

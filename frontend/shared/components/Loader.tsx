@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native"
 import { useTheme } from "@/context/ThemeContext"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { Logo } from "./Logo"
 
 interface LoaderProps {

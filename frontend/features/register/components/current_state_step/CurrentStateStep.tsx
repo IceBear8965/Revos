@@ -1,7 +1,7 @@
 import { useTheme } from "@/context/ThemeContext"
 import { View, Text, StyleSheet, Pressable } from "react-native"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { Logo } from "@/shared/components/Logo"
 import { InitialEnergyType } from "../../types"
 

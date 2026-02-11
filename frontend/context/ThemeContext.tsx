@@ -2,7 +2,7 @@ import { PropsWithChildren, useEffect, useState, useContext } from "react"
 import { createContext } from "react"
 import { loadTheme, saveTheme } from "@/utils/theme"
 import { themes } from "@/theme"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 
 type ThemeName = "dark" | "light"
 

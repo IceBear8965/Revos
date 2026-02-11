@@ -4,7 +4,7 @@ import { View, Text, TextInput, StyleSheet, Image, Pressable, Alert } from "reac
 import { Link } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTheme } from "@/context/ThemeContext"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { Logo } from "@/shared/components/Logo"
 
 export default function Index() {

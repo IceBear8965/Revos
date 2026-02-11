@@ -1,6 +1,6 @@
 import { useTheme } from "@/context/ThemeContext"
 import { Logo } from "@/shared/components/Logo"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { View, Text, Pressable, StyleSheet, TextInput } from "react-native"
 import { Link } from "expo-router"
 
