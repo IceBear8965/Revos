@@ -1,8 +1,8 @@
 MIN_ENERGY = 0.05
 MAX_ENERGY = 1.0
 
-BASE_LOAD_COEF = 0.00005
-BASE_RECOVERY_COEF = 0.00003
+BASE_LOAD_COEF = 0.000008
+BASE_RECOVERY_COEF = 0.00001
 
 # --- Типы событий ---
 LOAD = "load"
@@ -14,7 +14,7 @@ EVENT_TYPE_CHOICES = [
 ]
 
 # --- Коды активностей ---
-ACTIVITY_CODES = ["work", "study", "society", "sleep", "rest", "sport", "walk"]
+ACTIVITY_CODES = ["work", "study", "society", "sleep", "rest", "sport", "walking"]
 
 LOAD_ACTIVITIES = [
     "work",
@@ -41,10 +41,10 @@ ACTIVITY_CATEGORIES = {
     "sport": LOAD,
     "sleep": RECOVERY,
     "rest": RECOVERY,
-    "walk": RECOVERY,
+    "walking": RECOVERY,
 }
 
 ALLOWED_LOAD_ACTIVITIES = {"work", "study", "sport", "society"}
 
-PERSONAL_COEF_MIN = 1.0
-PERSONAL_COEF_MAX = 1.4
+PERSONAL_COEF_MIN = 0.9
+PERSONAL_COEF_MAX = 1.2

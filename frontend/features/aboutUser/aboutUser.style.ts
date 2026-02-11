@@ -1,0 +1,88 @@
+import { AppColors } from "@/theme/types"
+import { StyleSheet } from "react-native"
+
+export const createStyles = (colors: AppColors) => {
+    return StyleSheet.create({
+        aboutUserContainer: {
+            paddingHorizontal: 30,
+            paddingTop: 20,
+        },
+        changeNicknameCard: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: colors.card,
+            padding: 25,
+            borderRadius: 20,
+        },
+        userIcon: {
+            width: 45,
+            height: 45,
+        },
+
+        changeNicknameCardRight: {
+            flexDirection: "row",
+            alignItems: "center",
+        },
+        nickname: {
+            fontSize: 22,
+            fontWeight: 500,
+            color: colors.textPrimary,
+            marginRight: 25,
+        },
+
+        toggleThemeCard: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: colors.card,
+            padding: 25,
+            borderRadius: 20,
+            marginTop: 30,
+        },
+        themeSwitcherText: {
+            fontSize: 22,
+            fontWeight: 500,
+            color: colors.textPrimary,
+            textTransform: "capitalize",
+        },
+        themeSwitcher: {},
+
+        loadOrderSelectorContainer: {
+            backgroundColor: colors.card,
+            padding: 20,
+            marginTop: 30,
+            borderRadius: 20,
+        },
+        saveLoadOrderButtonContainer: {
+            alignItems: "center",
+        },
+        saveLoadOrderButton: {
+            paddingHorizontal: 30,
+            paddingVertical: 15,
+            borderRadius: 10,
+            backgroundColor: colors.foreground,
+        },
+        saveLoadOrderText: {
+            fontSize: 16,
+            fontWeight: 600,
+            color: colors.textPrimary,
+        },
+
+        signOutContainer: {
+            marginTop: 30,
+            alignItems: "center",
+        },
+        signOutButton: {
+            paddingHorizontal: 30,
+            paddingVertical: 15,
+            borderRadius: 10,
+            backgroundColor: colors.foreground,
+        },
+        signOutButtonText: {
+            fontSize: 16,
+            fontWeight: 600,
+            color: colors.textPrimary,
+        },
+    })
+}

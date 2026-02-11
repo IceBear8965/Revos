@@ -18,7 +18,7 @@ class EnergyEventCreateSerializer(serializers.Serializer):
 
 
 class EnergyEventEditSerializer(serializers.Serializer):
-    event_id = serializers.IntegerField()
+    id = serializers.IntegerField()
     activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
@@ -41,12 +41,13 @@ class EnergyDashboardSerializer(serializers.Serializer):
 
 
 class EventItemSerializer(serializers.Serializer):
-    event_id = serializers.IntegerField()
+    id = serializers.IntegerField()
     event_type = serializers.ChoiceField(choices=["load", "recovery"])
     activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
     energy_delta = serializers.FloatField()
+    subjective_coef = serializers.FloatField()
 
 
 class EventsListSerializer(serializers.Serializer):

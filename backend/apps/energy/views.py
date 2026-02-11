@@ -106,6 +106,7 @@ class EnergyEventCreateView(APIView):
                 "energy_before": event.energy_before,
                 "energy_after": event.energy_after,
                 "energy_delta": event.energy_delta,
+                "subjective_coef": event.subjective_coef,
             },
             status=HTTP_201_CREATED,
         )
@@ -185,6 +186,7 @@ class EnergyEventEditView(APIView):
                 "energy_before": event.energy_before,
                 "energy_after": event.energy_after,
                 "energy_delta": event.energy_delta,
+                "subjective_coef": event.subjective_coef,
             },
             status=HTTP_200_OK,
         )
@@ -236,6 +238,11 @@ class EnergyEventEditView(APIView):
                             "type": "number",
                             "format": "float",
                             "description": "Energy delta of the last energy event",
+                        },
+                        "subjective_coef": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Subjective assessment of the last event",
                         },
                     },
                 },
@@ -371,7 +378,7 @@ class BaseStatisticsView(APIView):
     responses={
         200: {
             "load_order": {
-                "type": "object",
+                "type": "array",
                 "description": "Sequnce of user's personal coef",
             }
         }
