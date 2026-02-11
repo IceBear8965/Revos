@@ -17,7 +17,7 @@ export const useRegistration = (): UseAsyncPost<null, RegisterPayloadType> => {
             nickname: body.nickname,
             password: body.password,
             timezone: body.timezone,
-            load_order: body.loadOrder.map((el) => el.label),
+            load_order: body.loadOrder.map((el) => el.key),
             initial_energy_state: body.initialEnergyState.state,
         }
 

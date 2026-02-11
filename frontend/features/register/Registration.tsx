@@ -83,12 +83,13 @@ export const Registration = () => {
                     router.replace("/(auth)/login")
                 }
             }
-        } catch (e) {
-            if (e instanceof Error) {
-                Alert.alert("Register failed", e.message)
-            } else {
-                Alert.alert("Register failed", "Unknown error occured")
-            }
+        } catch (err) {
+            const message =
+                typeof err === "object" && err !== null && "message" in err
+                    ? (err as { message: string }).message
+                    : "Unknown error"
+
+            Alert.alert("Changing load order failed", message)
         }
     }
 

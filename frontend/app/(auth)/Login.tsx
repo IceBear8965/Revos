@@ -31,14 +31,17 @@ export default function Index() {
                     <TextInput
                         style={styles.input}
                         placeholder="Email"
+                        placeholderTextColor={colors.textPrimary}
                         autoCapitalize="none"
                         onChangeText={setEmail}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
+                        placeholderTextColor={colors.textPrimary}
                         autoCapitalize="none"
                         onChangeText={setPassword}
+                        secureTextEntry
                     />
                 </View>
                 <Pressable style={styles.loginPressable} onPress={onLogin}>

@@ -44,6 +44,7 @@ export const CredentialsStep = ({
                     <TextInput
                         style={styles.inputField}
                         placeholder="Nickname"
+                        placeholderTextColor={colors.textPrimary}
                         value={nickname}
                         onChangeText={setNickname}
                         autoCapitalize="none"
@@ -51,6 +52,7 @@ export const CredentialsStep = ({
                     <TextInput
                         style={styles.inputField}
                         placeholder="Email"
+                        placeholderTextColor={colors.textPrimary}
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
@@ -59,6 +61,7 @@ export const CredentialsStep = ({
                     <TextInput
                         style={styles.inputField}
                         placeholder="Password"
+                        placeholderTextColor={colors.textPrimary}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
