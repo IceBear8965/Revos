@@ -7,7 +7,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet"
 import { useTheme } from "@/context/ThemeContext"
 import { TextInput } from "react-native-gesture-handler"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { ChangeNicknameModalProps } from "./types"
 import { useNickname } from "./hooks/useNickname"
 import { Loader } from "@/shared/components/Loader"

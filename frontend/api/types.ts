@@ -155,6 +155,13 @@ interface ChangeNicknameResponseDTO {
     updated_nickname: string
 }
 
+interface ChangeLoadOrderPayloadDTO {
+    load_order: string[]
+}
+interface ChangeLoadOrderResponseDTO {
+    load_order: string[]
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -174,4 +181,6 @@ export {
     AboutUserResponseDTO,
     ChangeNicknamePayloadDTO,
     ChangeNicknameResponseDTO,
+    ChangeLoadOrderPayloadDTO,
+    ChangeLoadOrderResponseDTO,
 }

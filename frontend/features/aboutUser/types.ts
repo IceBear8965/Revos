@@ -1,3 +1,5 @@
+import { LoadOrderElementType } from "../register/types"
+
 interface AboutUserResponseType {
     userId: number
     email: string
@@ -6,4 +8,11 @@ interface AboutUserResponseType {
     loadOrder: string[]
 }
 
-export { AboutUserResponseType }
+interface ChangeLoadOrderPayloadType {
+    loadOrder: LoadOrderElementType[]
+}
+interface ChangeLoadOrderResponseType {
+    loadOrder: string[]
+}
+
+export { AboutUserResponseType, ChangeLoadOrderPayloadType, ChangeLoadOrderResponseType }

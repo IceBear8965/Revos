@@ -13,12 +13,7 @@ interface ThemeContextType {
     toggleTheme: () => void
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-    theme: "dark",
-    colors: {},
-    isThemeReady: false,
-    toggleTheme: () => {},
-})
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export const useTheme = () => {
     const value = useContext(ThemeContext)
@@ -61,10 +56,10 @@ const ThemeProvider = ({ children }: PropsWithChildren) => {
     return (
         <ThemeContext
             value={{
-                theme: theme,
-                colors: colors,
-                isThemeReady: isThemeReady,
-                toggleTheme: toggleTheme,
+                theme,
+                colors,
+                isThemeReady,
+                toggleTheme,
             }}
         >
             {children}

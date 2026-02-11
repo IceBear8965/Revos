@@ -1,4 +1,4 @@
-import { AppColors } from "./colors"
+import { AppColors } from "./types"
 
 export const darkColors: AppColors = {
     background: "#1F232A",

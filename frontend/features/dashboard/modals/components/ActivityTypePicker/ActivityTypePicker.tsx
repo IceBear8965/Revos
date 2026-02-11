@@ -19,11 +19,9 @@ export const ActivitiTypePicker = ({
 
     let chooseValues = []
     if (event_type) {
-        chooseValues =
-            event_type === "load" ? LOAD_ACTIVITIES.map((el) => el.activity) : RECOVERY_ACTIVITIES
+        chooseValues = event_type === "load" ? LOAD_ACTIVITIES : RECOVERY_ACTIVITIES
     } else {
-        const loads = LOAD_ACTIVITIES.map((el) => el.activity)
-        chooseValues = [...loads, ...RECOVERY_ACTIVITIES]
+        chooseValues = [...LOAD_ACTIVITIES, ...RECOVERY_ACTIVITIES]
     }
 
     const items = chooseValues.map((item) => {

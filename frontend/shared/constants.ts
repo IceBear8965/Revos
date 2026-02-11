@@ -9,10 +9,6 @@ export const ACTIVITY_ORDER = [
 ] as const
 export type ActivityTypeKey = (typeof ACTIVITY_ORDER)[number]
 
-export const LOAD_ACTIVITIES = [
-    { activity: "work", icon: "calendar-days" },
-    { activity: "study", icon: "book" },
-    { activity: "sport", icon: "dumbbell" },
-    { activity: "society", icon: "people-group" },
-]
+export const LOAD_ACTIVITIES = ["work", "study", "sport", "society"]
+export type LoadActivityKey = (typeof LOAD_ACTIVITIES)[number]
 export const RECOVERY_ACTIVITIES = ["sleep", "rest", "walking"]

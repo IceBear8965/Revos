@@ -7,6 +7,7 @@ interface LoadOrderElementType {
     id: number
     label: string
     icon: string
+    key: string
 }
 
 interface RegisterPayloadType {
