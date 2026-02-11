@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native"
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist"
 import { FontAwesome6 } from "@expo/vector-icons"
 import { useTheme } from "@/context/ThemeContext"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { LoadOrderElementType } from "@/features/register/types"
 
 interface DraggableListProps {

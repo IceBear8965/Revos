@@ -170,6 +170,10 @@ class HttpClient {
         return await this.fetchWithAccess(endpoint, { method: "POST", body: body })
     }
 
+    async patch<T>(endpoint: string, body: any): Promise<T> {
+        return await this.fetchWithAccess(endpoint, { method: "PATCH", body: body })
+    }
+
     private async parseResponse<T>(response: Response): Promise<T> {
         const contentType = response.headers.get("content-type")
 

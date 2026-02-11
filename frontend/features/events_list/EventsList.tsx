@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import { useFocusEffect } from "expo-router"
 import { useTheme } from "@/context/ThemeContext"
 import { View, Text, FlatList, RefreshControl } from "react-native"
 import { createStyles } from "./eventsList.styles"
@@ -14,6 +15,12 @@ export const EventsList = () => {
     const styles = createStyles(colors)
 
     const [isRefreshing, setIsRefreshing] = useState(false)
+
+    useFocusEffect(
+        useCallback(() => {
+            refetch()
+        }, [])
+    )
 
     const onRefresh = async () => {
         setIsRefreshing(true)

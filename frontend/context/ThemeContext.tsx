@@ -2,7 +2,7 @@ import { PropsWithChildren, useEffect, useState, useContext } from "react"
 import { createContext } from "react"
 import { loadTheme, saveTheme } from "@/utils/theme"
 import { themes } from "@/theme"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 
 type ThemeName = "dark" | "light"
 
@@ -13,12 +13,7 @@ interface ThemeContextType {
     toggleTheme: () => void
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-    theme: "dark",
-    colors: {},
-    isThemeReady: false,
-    toggleTheme: () => {},
-})
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export const useTheme = () => {
     const value = useContext(ThemeContext)
@@ -61,10 +56,10 @@ const ThemeProvider = ({ children }: PropsWithChildren) => {
     return (
         <ThemeContext
             value={{
-                theme: theme,
-                colors: colors,
-                isThemeReady: isThemeReady,
-                toggleTheme: toggleTheme,
+                theme,
+                colors,
+                isThemeReady,
+                toggleTheme,
             }}
         >
             {children}

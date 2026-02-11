@@ -1,20 +1,12 @@
-import { useEffect, useState } from "react"
-import {
-    ScrollView,
-    RefreshControl,
-    Text,
-    View,
-    Image,
-    TouchableWithoutFeedback,
-    Pressable,
-} from "react-native"
+import { useEffect, useState, useCallback } from "react"
+import { ScrollView, RefreshControl, Text, View, Image, Pressable } from "react-native"
+import { useRouter, useFocusEffect } from "expo-router"
+import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
 import { Character } from "@/features/dashboard/components/Character"
 import { createStyles } from "./dashboard.styles"
-import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
 import { useTheme } from "@/context/ThemeContext"
 import { useDashboard } from "./hooks/useDashboard"
 import { EventCard } from "@/shared/components/EventCard"
-
 import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
@@ -32,6 +24,8 @@ export const Dashboard = () => {
     const currentEnergy = data?.currentEnergy
     const energyLevel = useSharedValue(0)
 
+    const router = useRouter()
+
     useEffect(() => {
         if (currentEnergy == null) return
 
@@ -41,6 +35,12 @@ export const Dashboard = () => {
             reduceMotion: ReduceMotion.Never,
         })
     }, [currentEnergy])
+
+    useFocusEffect(
+        useCallback(() => {
+            refetch()
+        }, [])
+    )
 
     const onRefresh = async () => {
         await refetch()
@@ -76,12 +76,16 @@ export const Dashboard = () => {
                 <View style={styles.screenTop}>
                     <View style={styles.header}>
                         <Text style={styles.greeting}>{data?.greeting}</Text>
-                        <TouchableWithoutFeedback>
+                        <Pressable
+                            onPress={() => {
+                                router.navigate("/(auth)/aboutUser")
+                            }}
+                        >
                             <Image
                                 source={require("@/assets/icons/user_icon.png")}
                                 style={styles.userIcon}
                             />
-                        </TouchableWithoutFeedback>
+                        </Pressable>
                     </View>
 
                     <View style={styles.characterContainer}>

@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { LoadOrderList } from "@/shared/components/LoadOrderList"
 import { Logo } from "@/shared/components/Logo"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { LoadOrderElementType } from "../../types"
 
 interface LoadsOrderStepProps {

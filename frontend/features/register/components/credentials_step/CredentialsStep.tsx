@@ -1,6 +1,6 @@
 import { useTheme } from "@/context/ThemeContext"
 import { Logo } from "@/shared/components/Logo"
-import { AppColors } from "@/theme/colors"
+import { AppColors } from "@/theme/types"
 import { View, Text, Pressable, StyleSheet, TextInput } from "react-native"
 import { Link } from "expo-router"
 
@@ -44,6 +44,7 @@ export const CredentialsStep = ({
                     <TextInput
                         style={styles.inputField}
                         placeholder="Nickname"
+                        placeholderTextColor={colors.textPrimary}
                         value={nickname}
                         onChangeText={setNickname}
                         autoCapitalize="none"
@@ -51,6 +52,7 @@ export const CredentialsStep = ({
                     <TextInput
                         style={styles.inputField}
                         placeholder="Email"
+                        placeholderTextColor={colors.textPrimary}
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
@@ -59,6 +61,7 @@ export const CredentialsStep = ({
                     <TextInput
                         style={styles.inputField}
                         placeholder="Password"
+                        placeholderTextColor={colors.textPrimary}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
@@ -75,7 +78,7 @@ export const CredentialsStep = ({
                     </Pressable>
                 </View>
                 <View style={{ marginTop: 10 }}>
-                    <Link style={styles.signInText} href="/(auth)/login">
+                    <Link style={styles.signInText} href="/(auth)/Login">
                         Already have an account? Sign In
                     </Link>
                 </View>

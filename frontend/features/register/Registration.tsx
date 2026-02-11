@@ -9,18 +9,14 @@ import { useRouter } from "expo-router"
 import { useTheme } from "@/context/ThemeContext"
 import { getTimeZone } from "react-native-localize"
 import { RegisterPayloadType } from "./types"
+import { mapToLoadOrder } from "@/shared/utils/mapActivityTypes"
 import { LOAD_ACTIVITIES } from "@/shared/constants"
 import { InitialEnergyType, LoadOrderElementType } from "./types"
 import { useRegistration } from "./hooks/useRegistration"
 import { useAuth } from "@/context/AuthContext"
+import { Error } from "@/shared/components/Error"
 
-const initialLoadOrder = LOAD_ACTIVITIES.map((el, i) => {
-    return {
-        id: i,
-        icon: el.icon,
-        label: el.activity,
-    }
-})
+const initialLoadOrder = mapToLoadOrder([...LOAD_ACTIVITIES])
 
 const initialEnergyState: InitialEnergyType = { icon: "emoticon-neutral-outline", state: "normal" }
 
@@ -87,12 +83,13 @@ export const Registration = () => {
                     router.replace("/(auth)/login")
                 }
             }
-        } catch (error) {
-            if (error instanceof Error) {
-                Alert.alert("Register failed", error.message)
-            } else {
-                Alert.alert("Register failed", "Unknown error occured")
-            }
+        } catch (err) {
+            const message =
+                typeof err === "object" && err !== null && "message" in err
+                    ? (err as { message: string }).message
+                    : "Unknown error"
+
+            Alert.alert("Changing load order failed", message)
         }
     }
 
@@ -106,6 +103,8 @@ export const Registration = () => {
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: translateX.value }],
     }))
+
+    if (error) return <Error error={error} />
 
     return (
         <SafeAreaView

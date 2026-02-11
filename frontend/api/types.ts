@@ -140,6 +140,28 @@ interface EditEventResponseDTO {
     energy_after: number
 }
 
+interface AboutUserResponseDTO {
+    user_id: number
+    email: string
+    nickname: string
+    timezone: string
+    load_order: string[]
+}
+
+interface ChangeNicknamePayloadDTO {
+    nickname: string
+}
+interface ChangeNicknameResponseDTO {
+    updated_nickname: string
+}
+
+interface ChangeLoadOrderPayloadDTO {
+    load_order: string[]
+}
+interface ChangeLoadOrderResponseDTO {
+    load_order: string[]
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -156,4 +178,9 @@ export {
     RegisterResponse,
     EditEventPayloadDTO,
     EditEventResponseDTO,
+    AboutUserResponseDTO,
+    ChangeNicknamePayloadDTO,
+    ChangeNicknameResponseDTO,
+    ChangeLoadOrderPayloadDTO,
+    ChangeLoadOrderResponseDTO,
 }
