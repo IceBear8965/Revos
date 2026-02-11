@@ -1,16 +1,16 @@
 {
     "expo": {
-        "name": "frontend",
-        "slug": "frontend",
+        "name": "Revos",
+        "slug": "revos",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
-        "scheme": "frontend",
+        "scheme": "revos",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
         "ios": {
             "supportsTablet": true,
-            "bundleIdentifier": "com.anonymous.frontend",
+            "bundleIdentifier": "com.revos.revos",
             "icon": {
                 "dark": "./assets/images/ios-dark.png",
                 "light": "./assets/images/ios-light.png",
@@ -25,7 +25,7 @@
             },
             "edgeToEdgeEnabled": true,
             "predictiveBackGestureEnabled": false,
-            "package": "com.anonymous.frontend"
+            "package": "com.revos.revos"
         },
         "web": {
             "output": "static",
