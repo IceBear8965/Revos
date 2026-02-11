@@ -26,9 +26,8 @@ export default function RootLayout() {
 }
 
 const RootNavigator = () => {
-    const { isAuth, isLoading, signOut } = useAuth()
+    const { isAuth, isLoading } = useAuth()
     const { isThemeReady } = useTheme()
-    // signOut()
 
     useEffect(() => {
         if (!isLoading && isThemeReady) {
@@ -44,10 +43,11 @@ const RootNavigator = () => {
         <Stack>
             <Stack.Protected guard={isAuth}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)/aboutUser" options={{ headerShown: false }} />
             </Stack.Protected>
 
             <Stack.Protected guard={!isAuth}>
-                <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
                 <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
             </Stack.Protected>
         </Stack>

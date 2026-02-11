@@ -84,7 +84,7 @@ export const Registration = () => {
                 if (isAuth) {
                     router.replace("/(tabs)")
                 } else {
-                    router.replace("/(auth)/Login")
+                    router.replace("/(auth)/login")
                 }
             }
         } catch (error) {

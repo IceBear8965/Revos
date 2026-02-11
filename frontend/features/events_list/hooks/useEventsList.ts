@@ -42,9 +42,9 @@ export const useEventsList = (): UseAsyncGet<EventsListType> => {
         }
     }, [])
 
-    useEffect(() => {
-        fetchEvents()
-    }, [fetchEvents])
+    // useEffect(() => {
+    //     fetchEvents()
+    // }, [fetchEvents])
 
     return {
         data,

@@ -1,3 +1,5 @@
+import { useCallback } from "react"
+import { useFocusEffect } from "expo-router"
 import { View, ScrollView, RefreshControl } from "react-native"
 import { useFont } from "@shopify/react-native-skia"
 import { CartesianChart, Line, Bar } from "victory-native"
@@ -29,6 +31,12 @@ export const Statistics = () => {
     const onRefresh = async () => {
         await refetch()
     }
+
+    useFocusEffect(
+        useCallback(() => {
+            refetch()
+        }, [])
+    )
 
     if (isLoading) return <Loader message="Aggregating your statistics" />
 

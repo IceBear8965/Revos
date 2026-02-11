@@ -49,9 +49,9 @@ export const useDashboard = (): UseAsyncGet<DashboardType> => {
         }
     }, [])
 
-    useEffect(() => {
-        fetchDashboard()
-    }, [fetchDashboard])
+    // useEffect(() => {
+    //     fetchDashboard()
+    // }, [fetchDashboard])
 
     return {
         data,

@@ -62,9 +62,9 @@ export const useStatistics = (): UseAsyncGet<StatisticsType> => {
         }
     }, [])
 
-    useEffect(() => {
-        fetchStatistics()
-    }, [fetchStatistics])
+    // useEffect(() => {
+    //     fetchStatistics()
+    // }, [fetchStatistics])
 
     return {
         data: data,
