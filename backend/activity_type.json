@@ -1,0 +1,65 @@
+[
+{
+    "model": "energy.activitytype",
+    "pk": 7,
+    "fields": {
+        "code": "work",
+        "category": "load",
+        "activity_coef": 1.1
+    }
+},
+{
+    "model": "energy.activitytype",
+    "pk": 8,
+    "fields": {
+        "code": "study",
+        "category": "load",
+        "activity_coef": 1.1
+    }
+},
+{
+    "model": "energy.activitytype",
+    "pk": 9,
+    "fields": {
+        "code": "society",
+        "category": "load",
+        "activity_coef": 0.8
+    }
+},
+{
+    "model": "energy.activitytype",
+    "pk": 10,
+    "fields": {
+        "code": "sleep",
+        "category": "recovery",
+        "activity_coef": 1.1
+    }
+},
+{
+    "model": "energy.activitytype",
+    "pk": 11,
+    "fields": {
+        "code": "rest",
+        "category": "recovery",
+        "activity_coef": 1.0
+    }
+},
+{
+    "model": "energy.activitytype",
+    "pk": 12,
+    "fields": {
+        "code": "sport",
+        "category": "load",
+        "activity_coef": 0.8
+    }
+},
+{
+    "model": "energy.activitytype",
+    "pk": 13,
+    "fields": {
+        "code": "walking",
+        "category": "recovery",
+        "activity_coef": 0.9
+    }
+}
+]

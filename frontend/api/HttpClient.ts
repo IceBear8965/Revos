@@ -9,8 +9,8 @@ import {
 import { RegisterPayloadDTO } from "./types"
 
 class HttpClient {
-    // private baseURL = "http://10.199.29.245:8000/api/"
-    private baseURL = "http://10.0.2.2:8000/api/"
+    private baseURL = "https://revos-backend-production.up.railway.app/api/"
+    // private baseURL = "http://10.0.2.2:8080/api/" // Localhost
     private isRefreshing: boolean = false
     private pendingRequests: PendingRequest<any>[] = []
 
