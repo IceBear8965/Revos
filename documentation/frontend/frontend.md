@@ -86,7 +86,7 @@ Frontend part of project is beong builded in react-native and expo framework.
 
     ```
     Instructions can be found here:
-    https://docs.expo.dev/workflow/android-studio-emulator/
+    https://docs.expo.dev/guides/local-app-production/
     ```
 
 4. Prebuild app

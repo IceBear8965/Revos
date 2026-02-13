@@ -171,7 +171,7 @@ def generate_dashboard(*, user) -> dict:
     energy_profile, _ = EnergyProfile.objects.get_or_create(user=user)
     current_energy = energy_profile.current_energy
 
-    last_event_obj = EnergyEvent.objects.filter(user=user).order_by("-created_at").first()
+    last_event_obj = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
 
     message, recommendation = generate_dashboard_content(
         user=user,

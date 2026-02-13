@@ -1,0 +1,18 @@
+[
+{
+    "model": "energy.basecoef",
+    "pk": 1,
+    "fields": {
+        "coef_type": "load",
+        "value": 1e-05
+    }
+},
+{
+    "model": "energy.basecoef",
+    "pk": 2,
+    "fields": {
+        "coef_type": "recovery",
+        "value": 8e-06
+    }
+}
+]

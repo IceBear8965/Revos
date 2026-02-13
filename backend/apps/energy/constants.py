@@ -1,8 +1,6 @@
 MIN_ENERGY = 0.05
 MAX_ENERGY = 1.0
 
-BASE_LOAD_COEF = 0.000008
-BASE_RECOVERY_COEF = 0.00001
 
 # --- Типы событий ---
 LOAD = "load"

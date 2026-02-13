@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from .constants import ACTIVITY_TYPE_CHOICES, EVENT_TYPE_CHOICES
+from .constants import ACTIVITY_TYPE_CHOICES, EVENT_TYPE_CHOICES, LOAD, RECOVERY
 
 User = settings.AUTH_USER_MODEL
 
@@ -63,3 +63,11 @@ class PersonalActivityProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.email} personal activity profile"
+
+
+class BaseCoef(models.Model):
+    coef_type = models.CharField(max_length=24, choices=EVENT_TYPE_CHOICES, unique=True)
+    value = models.FloatField(default=1.0)
+
+    def __str__(self):
+        return f"{self.coef_type} - {self.value}"

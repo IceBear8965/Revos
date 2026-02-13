@@ -63,7 +63,7 @@ export const AboutUser = () => {
         }
     }
 
-    if (isLoading || loadOrderLoading) return <Loader />
+    if (isLoading || loadOrderLoading) return <Loader message="Collecting data about you" />
     if (error) return <Error error={error} />
 
     return (

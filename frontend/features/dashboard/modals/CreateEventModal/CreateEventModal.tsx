@@ -14,6 +14,7 @@ import { createStyles } from "./styles"
 import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { useCreateEvent } from "../../hooks/useCreateEvent"
 import { ActivityTypeKey } from "@/shared/constants"
+import { Loader } from "@/shared/components/Loader"
 
 export const CreateEventModal = ({
     refetch,
@@ -96,7 +97,7 @@ export const CreateEventModal = ({
         }
     }
 
-    if (isLoading) return <Text>Saving...</Text>
+    if (isLoading) return <Loader message="Saving your activity" />
 
     if (error) return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
 

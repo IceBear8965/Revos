@@ -1,8 +1,9 @@
 from django.db import transaction
 
 from apps.common.loggers import log_event
+from apps.energy.domain.get_base_coef import get_base_coef
 
-from ..constants import BASE_LOAD_COEF, BASE_RECOVERY_COEF, LOAD, MAX_ENERGY, MIN_ENERGY, RECOVERY
+from ..constants import LOAD, MAX_ENERGY, MIN_ENERGY
 from ..domain.errors import ActivityTypeNotFound
 from ..models import ActivityType, EnergyEvent, EnergyProfile, PersonalActivityProfile
 from .get_personal_activity_coef import get_personal_activity_coef
@@ -37,7 +38,7 @@ def apply_energy_event(
     else:
         personal_coef = 1.0
 
-    base_coef = BASE_LOAD_COEF if event_type == LOAD else BASE_RECOVERY_COEF
+    base_coef = get_base_coef(event_type)
 
     duration_sec = int((ended_at - started_at).total_seconds())
     energy_before = profile.current_energy
