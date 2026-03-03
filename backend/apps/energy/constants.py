@@ -5,11 +5,9 @@ MAX_ENERGY = 1.0
 # --- Типы событий ---
 LOAD = "load"
 RECOVERY = "recovery"
+SYSTEM = "system"
 
-EVENT_TYPE_CHOICES = [
-    (LOAD, "Load"),
-    (RECOVERY, "Recovery"),
-]
+EVENT_TYPE_CHOICES = [(LOAD, "Load"), (RECOVERY, "Recovery"), (SYSTEM, "System")]
 
 # --- Коды активностей ---
 ACTIVITY_CODES = ["work", "study", "society", "sleep", "rest", "sport", "walking"]

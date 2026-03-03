@@ -1,10 +1,8 @@
 from django.contrib import admin
 
-from .models import ActivityType, BaseCoef, EnergyEvent, EnergyProfile, PersonalActivityProfile
+from .models import ActivityType, EnergyEvent, ModelParams
 
 # Register your models here.
 admin.site.register(EnergyEvent)
 admin.site.register(ActivityType)
-admin.site.register(PersonalActivityProfile)
-admin.site.register(EnergyProfile)
-admin.site.register(BaseCoef)
+admin.site.register(ModelParams)

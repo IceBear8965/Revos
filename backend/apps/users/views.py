@@ -9,7 +9,6 @@ from apps.common.loggers import log_event
 
 from .serializers import (
     ChangeNicknameSerializer,
-    ChangeTimezoneSerializer,
     MeSerializer,
     RegisterUserSerializer,
 )
@@ -127,35 +126,3 @@ class ChangeNicknameView(APIView):
             extra={"previous_nickname": previous_nickname, "current_nickname": user.nickname},
         )
         return Response({"updated_nickname": user.nickname}, status=HTTP_202_ACCEPTED)
-
-
-@extend_schema(
-    request=ChangeTimezoneSerializer,
-    responses={
-        202: {
-            "type": "object",
-            "properties": {
-                "updated_timezone": {"type": "string", "description": "Updated user timezone"}
-            },
-        }
-    },
-    description="Change user timezone and return new timezone",
-    summary="Change user timezone",
-)
-class ChangeTimezoneView(APIView):
-    def patch(self, request):
-        user = request.user
-        serializer = ChangeTimezoneSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.data
-
-        previous_timezone = user.timezone
-        user.timezone = validated_data["timezone"]
-        user.save(update_fields=["timezone"])
-
-        log_event(
-            action="timezone_changed",
-            user_id=user.id,
-            extra={"previous_timezone": previous_timezone, "current_timezone": user.timezone},
-        )
-        return Response({"updated_timezone": user.timezone}, status=HTTP_202_ACCEPTED)

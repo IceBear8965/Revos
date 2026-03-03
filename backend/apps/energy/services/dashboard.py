@@ -3,7 +3,7 @@ from random import randint
 
 import pytz
 
-from ..models import EnergyEvent, EnergyProfile
+from ..models import EnergyEvent
 
 # =========================
 # Constants (bounded sets)
@@ -168,10 +168,9 @@ def generate_dashboard_content(*, user, last_event):
 def generate_dashboard(*, user) -> dict:
     greeting = generate_greeting(user.timezone, user)
 
-    energy_profile, _ = EnergyProfile.objects.get_or_create(user=user)
-    current_energy = energy_profile.current_energy
-
     last_event_obj = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
+
+    current_energy = last_event_obj.energy_after - last_event_obj.energy_before
 
     message, recommendation = generate_dashboard_content(
         user=user,

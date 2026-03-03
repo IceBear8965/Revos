@@ -1,84 +1,40 @@
-from django.db import transaction
+from datetime import datetime
 
-from apps.common.loggers import log_event
-from apps.energy.domain.get_base_coef import get_base_coef
+from apps.energy.domain.energy_engine import EnergyEngine
+from apps.energy.domain.engine_params import EngineParams, EventDetails
+from apps.energy.models import EnergyEvent, ModelParams
 
-from ..constants import LOAD, MAX_ENERGY, MIN_ENERGY
-from ..domain.errors import ActivityTypeNotFound
-from ..models import ActivityType, EnergyEvent, EnergyProfile, PersonalActivityProfile
-from .get_personal_activity_coef import get_personal_activity_coef
+from ..constants import MAX_ENERGY, MIN_ENERGY
 
 
 def clamp_energy(value: float) -> float:
     return min(MAX_ENERGY, max(value, MIN_ENERGY))
 
 
-@transaction.atomic
 def apply_energy_event(
     *,
     user,
-    activity_type: str,
-    started_at,
-    ended_at,
+    activity,
+    started_at: datetime,
+    ended_at: datetime,
     subjective_coef: float,
-) -> EnergyEvent:
-    profile, _ = EnergyProfile.objects.get_or_create(user=user)
+):
+    params = ModelParams.objects.order_by("-version").last()
+    params = EngineParams(**params.params_json)
 
-    try:
-        activity = ActivityType.objects.get(code=activity_type)
-    except ActivityType.DoesNotExist:
-        raise ActivityTypeNotFound()
+    last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
+    initial_energy = last_event.energy_after
 
-    event_type = activity.category
-    if event_type == LOAD:
-        personal_profile = PersonalActivityProfile.objects.get(user=user)
-        personal_coef = get_personal_activity_coef(
-            personal_profile=personal_profile, activity_type=activity.code
-        )
-    else:
-        personal_coef = 1.0
-
-    base_coef = get_base_coef(event_type)
-
-    duration_sec = int((ended_at - started_at).total_seconds())
-    energy_before = profile.current_energy
-
-    raw_delta = duration_sec * base_coef * activity.activity_coef * personal_coef * subjective_coef
-    energy_delta = -raw_delta if event_type == LOAD else raw_delta
-
-    energy_after = clamp_energy(energy_before + energy_delta)
-
-    event = EnergyEvent.objects.create(
-        user=user,
-        event_type=event_type,
-        activity_type=activity.code,
-        base_coef=base_coef,
-        activity_coef=activity.activity_coef,
-        personal_coef=personal_coef,
-        subjective_coef=subjective_coef,
+    event_details = EventDetails(
+        initial_energy=initial_energy,
+        event_type=activity.category,
+        activity_type=activity.name,
+        activity_coef=activity.value,
         started_at=started_at,
         ended_at=ended_at,
-        duration_sec=duration_sec,
-        energy_before=energy_before,
-        energy_delta=energy_delta,
-        energy_after=energy_after,
+        subjective_coef=subjective_coef,
     )
 
-    log_event(
-        action="energy_event_created",
-        user_id=user.id,
-        extra={
-            "activity_type": activity.code,
-            "event_type": event_type,
-            "duration_sec": duration_sec,
-            "energy_before": energy_before,
-            "energy_after": energy_after,
-            "personal_coef": personal_coef,
-            "subjective_coef": subjective_coef,
-        },
-    )
-
-    profile.current_energy = energy_after
-    profile.save(update_fields=["current_energy"])
-
-    return event
+    model = EnergyEngine(params=params, event_details=event_details)
+    model.apply()
+    print(model.energy)
