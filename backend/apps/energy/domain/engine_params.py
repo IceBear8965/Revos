@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from .enums import EventType
+
 
 @dataclass
 class EngineParams:
@@ -48,7 +50,9 @@ class EngineParams:
 @dataclass
 class EventDetails:
     initial_energy: float
-    event_type: str
+    initial_acute: float
+    initial_chronic: float
+    event_type: EventType
     activity_type: str
     activity_coef: float
     started_at: datetime

@@ -2,6 +2,7 @@ import math
 from datetime import datetime, timedelta
 
 from .engine_params import EngineParams, EventDetails
+from .enums import EventType
 
 
 class EnergyEngine:
@@ -51,7 +52,7 @@ class EnergyEngine:
             circadian_factor += self.circadian_component(current_time)
 
         # Load
-        if self.event_details.event_type == "load":
+        if self.event_details.event_type == EventType.LOAD:
             self.break_minutes = 0
             self.sleep_minutes = 0
             self.continuous_load_minutes += 1
@@ -172,3 +173,9 @@ class EnergyEngine:
         while current_time < self.event_details.ended_at:
             self.micro_step(current_time)
             current_time += self.dt
+
+        return {
+            "energy": self.energy,
+            "acute_strain": self.acute_strain,
+            "chronic_strain": self.chronic_strain,
+        }

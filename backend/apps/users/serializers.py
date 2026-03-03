@@ -2,9 +2,7 @@ import pytz
 from django.db import transaction
 from rest_framework import serializers
 
-from apps.energy.constants import LOAD_ACTIVITIES
-
-from .constants import INITIAL_ENERGY_CHOICES, INITIAL_ENERGY_MAP
+from .constants import INITIAL_ENERGY_MAP
 from .models import User
 
 
@@ -14,14 +12,6 @@ class RegisterUserSerializer(serializers.Serializer):
     nickname = serializers.CharField(max_length=32)
 
     def validate(self, data):
-        if set(data.get("load_order")) != set(LOAD_ACTIVITIES):
-            raise serializers.ValidationError(
-                {"load_order": f"load_order can contain only {LOAD_ACTIVITIES}"}
-            )
-
-        if data.get("timezone") not in pytz.all_timezones:
-            raise serializers.ValidationError({"timezone": "enter valid timezone"})
-
         if len(data.get("password")) < 8:
             raise serializers.ValidationError(
                 {"password": "password must be at least 8 symbols long"}
@@ -63,13 +53,4 @@ class ChangeNicknameSerializer(serializers.Serializer):
                 {"nickname": "nickname must be not longer than 32 symbols"}
             )
 
-        return data
-
-
-class ChangeTimezoneSerializer(serializers.Serializer):
-    timezone = serializers.CharField(max_length=48)
-
-    def validate(self, data):
-        if data.get("timezone") not in pytz.all_timezones:
-            raise serializers.ValidationError({"timezone": "enter correct timezone"})
         return data

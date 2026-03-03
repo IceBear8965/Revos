@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from .constants import ACTIVITY_CODES
 from .models import ActivityType
 
 
@@ -25,50 +24,50 @@ class EnergyEventCreateSerializer(serializers.Serializer):
         return data
 
 
-class EnergyDashboardSerializer(serializers.Serializer):
-    greeting = serializers.CharField()
-    current_energy = serializers.FloatField()
-    message = serializers.JSONField()
-    recommendation = serializers.CharField()
-    last_event = serializers.JSONField()
-
-
-class EventItemSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    event_type = serializers.ChoiceField(choices=["load", "recovery"])
-    activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
-    started_at = serializers.DateTimeField()
-    ended_at = serializers.DateTimeField()
-    energy_delta = serializers.FloatField()
-    subjective_coef = serializers.FloatField()
-
-
-class EventsListSerializer(serializers.Serializer):
-    results = EventItemSerializer(many=True)
-
-
-class EnergyOverviewActivitiesSerializer(serializers.Serializer):
-    date = serializers.DateTimeField()
-    energy = serializers.FloatField()
-
-
-class EnergyOverviewSerializer(serializers.Serializer):
-    period = serializers.DictField()
-    activities = EnergyOverviewActivitiesSerializer(many=True)
-
-
-class ActivitiesSummaryDataSerializer(serializers.Serializer):
-    activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
-    avg_energy_delta = serializers.FloatField()
-    event_count = serializers.IntegerField()
-
-
-class ActivitiesSummarySerializer(serializers.Serializer):
-    period = serializers.DictField()
-    scale = serializers.DictField()
-    activities = ActivitiesSummaryDataSerializer(many=True)
-
-
-class BaseStatisticsSerializer(serializers.Serializer):
-    energy_overview = EnergyOverviewSerializer()
-    activities_summary = ActivitiesSummarySerializer()
+# class EnergyDashboardSerializer(serializers.Serializer):
+#     greeting = serializers.CharField()
+#     current_energy = serializers.FloatField()
+#     message = serializers.JSONField()
+#     recommendation = serializers.CharField()
+#     last_event = serializers.JSONField()
+#
+#
+# class EventItemSerializer(serializers.Serializer):
+#     id = serializers.IntegerField()
+#     event_type = serializers.ChoiceField(choices=["load", "recovery"])
+#     activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
+#     started_at = serializers.DateTimeField()
+#     ended_at = serializers.DateTimeField()
+#     energy_delta = serializers.FloatField()
+#     subjective_coef = serializers.FloatField()
+#
+#
+# class EventsListSerializer(serializers.Serializer):
+#     results = EventItemSerializer(many=True)
+#
+#
+# class EnergyOverviewActivitiesSerializer(serializers.Serializer):
+#     date = serializers.DateTimeField()
+#     energy = serializers.FloatField()
+#
+#
+# class EnergyOverviewSerializer(serializers.Serializer):
+#     period = serializers.DictField()
+#     activities = EnergyOverviewActivitiesSerializer(many=True)
+#
+#
+# class ActivitiesSummaryDataSerializer(serializers.Serializer):
+#     activity_type = serializers.ChoiceField(choices=ACTIVITY_CODES)
+#     avg_energy_delta = serializers.FloatField()
+#     event_count = serializers.IntegerField()
+#
+#
+# class ActivitiesSummarySerializer(serializers.Serializer):
+#     period = serializers.DictField()
+#     scale = serializers.DictField()
+#     activities = ActivitiesSummaryDataSerializer(many=True)
+#
+#
+# class BaseStatisticsSerializer(serializers.Serializer):
+#     energy_overview = EnergyOverviewSerializer()
+#     activities_summary = ActivitiesSummarySerializer()

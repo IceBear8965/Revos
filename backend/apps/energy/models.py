@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from .constants import ACTIVITY_TYPE_CHOICES, EVENT_TYPE_CHOICES
+from .enums import EventTypeChoices
 
 User = settings.AUTH_USER_MODEL
 
@@ -15,7 +15,7 @@ class ModelParams(models.Model):
 class ActivityType(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_types")
 
-    category = models.CharField(max_length=10, choices=EVENT_TYPE_CHOICES)
+    category = models.CharField(max_length=10, choices=EventTypeChoices.choices)
 
     name = models.CharField(max_length=32)
 
@@ -35,7 +35,7 @@ class ActivityType(models.Model):
 class EnergyEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="energy_events")
 
-    event_type = models.CharField(max_length=10, choices=EVENT_TYPE_CHOICES)
+    event_type = models.CharField(max_length=10, choices=EventTypeChoices.choices)
     activity_type = models.CharField(max_length=32)
 
     activity_coef = models.FloatField()
