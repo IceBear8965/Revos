@@ -1,3 +1,4 @@
+import pytz
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
@@ -8,6 +9,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
 
     nickname = models.CharField(max_length=32)
+
+    timezone = models.CharField(
+        max_length=32,
+        default="UTC",
+        choices=[(tz, tz) for tz in pytz.all_timezones],
+        blank=False,
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

@@ -16,7 +16,11 @@ from .domain.errors import (
     ActivityTypeNotFound,
     EnergyDomainError,
 )
-from .serializers import EnergyDashboardSerializer, EnergyEventCreateSerializer
+from .serializers import (
+    EnergyDashboardSerializer,
+    EnergyEventCreateSerializer,
+    EventsListSerializer,
+)
 from .services.apply_energy_event import apply_energy_event
 from .services.dashboard import generate_dashboard
 from .services.events_list import generate_events_list
@@ -26,7 +30,7 @@ from .services.statistics.energy_overview import generate_energy_overview
 
 @extend_schema(
     request=EnergyEventCreateSerializer,
-    responses={200: {}},
+    responses={201: {"type": "object", "properies": {"status": "event_created"}}},
     description="Create new load or recovery event",
     summary="Create energy event",
 )
@@ -39,7 +43,13 @@ class EnergyEventCreateView(APIView):
 
         apply_energy_event(user=request.user, **serializer.validated_data)
 
-        return Response(status=200)
+        log_event(
+            action="event_created",
+            user_id=request.user.id,
+            extra={"user": request.user.id},
+        )
+
+        return Response({"status": "event_created"}, status=201)
 
 
 @extend_schema(
@@ -111,43 +121,41 @@ class EnergyDashboardView(APIView):
         return Response(dashboard, status=HTTP_200_OK)
 
 
-#
-#
-# @extend_schema(
-#     request=None,
-#     responses={
-#         200: {
-#             "type": "object",
-#             "properties": {
-#                 "results": {
-#                     "type": "array",
-#                     "items": {
-#                         "type": "object",
-#                         "properties": {
-#                             "event_id": {"type": "integer"},
-#                             "event_type": {"type": "string"},
-#                             "activity_type": {"type": "string"},
-#                             "started_at": {"type": "string", "format": "date-time"},
-#                             "ended_at": {"type": "string", "format": "date-time"},
-#                             "energy_delta": {"type": "number"},
-#                         },
-#                     },
-#                 }
-#             },
-#         }
-#     },
-#     description="Returns list of all energy events for the authenticated user",
-#     summary="User energy events list",
-# )
-# class EventsListView(APIView):
-#     def get(self, request):
-#         user = request.user
-#         events_list = generate_events_list(user=user)
-#         serializer = EventsListSerializer(instance=events_list)
-#         events_list = serializer.data
-#         return Response(events_list, status=HTTP_200_OK)
-#
-#
+@extend_schema(
+    request=None,
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "event_id": {"type": "integer"},
+                            "event_type": {"type": "string"},
+                            "activity_type": {"type": "string"},
+                            "started_at": {"type": "string", "format": "date-time"},
+                            "ended_at": {"type": "string", "format": "date-time"},
+                            "energy_delta": {"type": "number"},
+                        },
+                    },
+                }
+            },
+        }
+    },
+    description="Returns list of all energy events for the authenticated user",
+    summary="User energy events list",
+)
+class EventsListView(APIView):
+    def get(self, request):
+        user = request.user
+        events_list = generate_events_list(user=user)
+        serializer = EventsListSerializer(instance=events_list)
+        events_list = serializer.data
+        return Response(events_list, status=HTTP_200_OK)
+
+
 # @extend_schema(
 #     request=None,
 #     responses={

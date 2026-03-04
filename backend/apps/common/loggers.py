@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger("activity")
 
 
-def log_event(action: str, user_id: int, extra: dict = None, level: str = "info"):
+def log_event(action: str, user_id: int, extra: dict, level: str = "info"):
     payload = {
         "action": action,
         "user_id": user_id,

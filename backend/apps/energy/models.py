@@ -54,6 +54,10 @@ class EnergyEvent(models.Model):
     chronic_before = models.FloatField()
     chronic_after = models.FloatField()
 
+    sleep_minutes = models.IntegerField(default=0)
+    break_minutes = models.IntegerField(default=0)
+    continuous_load_minutes = models.IntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

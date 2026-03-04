@@ -54,3 +54,12 @@ class ChangeNicknameSerializer(serializers.Serializer):
             )
 
         return data
+
+
+class ChangeTimezoneSerializer(serializers.Serializer):
+    timezone = serializers.CharField(max_length=48)
+
+    def validate(self, data):
+        if data.get("timezone") not in pytz.all_timezones:
+            raise serializers.ValidationError({"timezone": "enter correct timezone"})
+        return data

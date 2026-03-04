@@ -52,6 +52,9 @@ class EventDetails:
     initial_energy: float
     initial_acute: float
     initial_chronic: float
+    initial_sleep_minutes: float
+    initial_break_minutes: float
+    initial_continuous_load_minutes: float
     event_type: EventType
     activity_type: str
     activity_coef: float

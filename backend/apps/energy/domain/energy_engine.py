@@ -11,12 +11,12 @@ class EnergyEngine:
         self.event_details = event_details
 
         self.energy = self.event_details.initial_energy
-        self.acute_strain = 0.0
-        self.chronic_strain = 0.0
+        self.acute_strain = self.event_details.initial_acute
+        self.chronic_strain = self.event_details.initial_chronic
 
-        self.sleep_minutes = 0
-        self.break_minutes = 0
-        self.continuous_load_minutes = 0
+        self.sleep_minutes = self.event_details.initial_sleep_minutes
+        self.break_minutes = self.event_details.initial_break_minutes
+        self.continuous_load_minutes = self.event_details.initial_continuous_load_minutes
 
         self.current_activity = None
         self.activity_minutes = 0
@@ -80,88 +80,83 @@ class EnergyEngine:
                 * continuous_factor
             )
 
-        # Recovery
-        else:
-            # Sleep
-            if self.event_details.activity_type == "sleep":
-                self.continuous_load_minutes = 0
-                self.break_minutes = 0
-                self.sleep_minutes += 1
+        # Sleep
+        elif self.event_details.activity_type == "sleep":
+            self.continuous_load_minutes = 0
+            self.break_minutes = 0
+            self.sleep_minutes += 1
 
-                t_hours = self.sleep_minutes / 60
+            t_hours = self.sleep_minutes / 60
 
-                sigmoid_now = 1 / (
-                    1
-                    + math.exp(-self.params.sleep_k * (t_hours - self.params.sleep_midpoint_hours))
+            sigmoid_now = 1 / (
+                1 + math.exp(-self.params.sleep_k * (t_hours - self.params.sleep_midpoint_hours))
+            )
+
+            sigmoid_prev = 1 / (
+                1
+                + math.exp(
+                    -self.params.sleep_k * (t_hours - self.params.sleep_midpoint_hours - 1 / 60)
                 )
+            )
 
-                sigmoid_prev = 1 / (
-                    1
-                    + math.exp(
-                        -self.params.sleep_k * (t_hours - self.params.sleep_midpoint_hours - 1 / 60)
-                    )
+            delta_sigmoid = sigmoid_now - sigmoid_prev
+
+            self.energy += (
+                self.params.sleep_energy_multiplier
+                * delta_sigmoid
+                * (max_energy - self.energy)
+                * activity_coef
+                * subjective_coef
+            )
+
+            recovery_curve = 1 / (
+                1
+                + math.exp(
+                    -self.params.sleep_recovery_steepness
+                    * (self.activity_minutes - self.params.sleep_recovery_midpoint)
                 )
+            )
 
-                delta_sigmoid = sigmoid_now - sigmoid_prev
-
-                self.energy += (
-                    self.params.sleep_energy_multiplier
-                    * delta_sigmoid
-                    * (max_energy - self.energy)
-                    * activity_coef
-                    * subjective_coef
-                )
-
-                recovery_curve = 1 / (
-                    1
-                    + math.exp(
-                        -self.params.sleep_recovery_steepness
-                        * (self.activity_minutes - self.params.sleep_recovery_midpoint)
-                    )
-                )
-
-                self.acute_strain *= 1 - self.params.sleep_acute_decay * recovery_curve
-                self.chronic_strain *= 1 - self.params.sleep_chronic_decay * recovery_curve
+            self.acute_strain *= 1 - self.params.sleep_acute_decay * recovery_curve
+            self.chronic_strain *= 1 - self.params.sleep_chronic_decay * recovery_curve
 
             # Rest
-            else:
-                self.continuous_load_minutes = 0
-                self.sleep_minutes = 0
-                self.break_minutes += 1
+        else:
+            self.continuous_load_minutes = 0
+            self.sleep_minutes = 0
+            self.break_minutes += 1
 
-                t = self.activity_minutes
+            t = self.activity_minutes
 
-                delta_exp = (
-                    1 - math.exp(-self.params.recovery_k_e * (t**self.params.recovery_exp_power))
-                ) - (
-                    1
-                    - math.exp(
-                        -self.params.recovery_k_e * ((t - 1) ** self.params.recovery_exp_power)
-                    )
+            delta_exp = (
+                1 - math.exp(-self.params.recovery_k_e * (t**self.params.recovery_exp_power))
+            ) - (
+                1
+                - math.exp(-self.params.recovery_k_e * ((t - 1) ** self.params.recovery_exp_power))
+            )
+
+            strain_factor = 1 / (1 + self.acute_strain)
+
+            self.energy += (
+                self.params.recovery_energy_multiplier
+                * delta_exp
+                * (max_energy - self.energy)
+                * strain_factor
+                * circadian_factor
+                * activity_coef
+                * subjective_coef
+            )
+
+            recovery_curve = 1 / (
+                1
+                + math.exp(
+                    -self.params.recovery_steepness
+                    * (self.activity_minutes - self.params.recovery_midpoint)
                 )
+            )
 
-                strain_factor = 1 / (1 + self.acute_strain)
-
-                self.energy += (
-                    self.params.recovery_energy_multiplier
-                    * delta_exp
-                    * (max_energy - self.energy)
-                    * strain_factor
-                    * circadian_factor
-                    * activity_coef
-                    * subjective_coef
-                )
-
-                recovery_curve = 1 / (
-                    1
-                    + math.exp(
-                        -self.params.recovery_steepness
-                        * (self.activity_minutes - self.params.recovery_midpoint)
-                    )
-                )
-
-                self.acute_strain *= 1 - self.params.recovery_acute_decay * recovery_curve
-                self.chronic_strain *= 1 - self.params.recovery_chronic_decay * recovery_curve
+            self.acute_strain *= 1 - self.params.recovery_acute_decay * recovery_curve
+            self.chronic_strain *= 1 - self.params.recovery_chronic_decay * recovery_curve
 
         # Clamps to prevent overflow
         self.energy = max(min_energy, min(self.energy, max_energy))
@@ -178,4 +173,7 @@ class EnergyEngine:
             "energy": self.energy,
             "acute_strain": self.acute_strain,
             "chronic_strain": self.chronic_strain,
+            "sleep_minutes": self.sleep_minutes,
+            "break_minutes": self.break_minutes,
+            "continuous_load_minutes": self.continuous_load_minutes,
         }

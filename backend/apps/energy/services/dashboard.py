@@ -1,11 +1,12 @@
+import random
 from datetime import datetime
-from random import randint
 
 import pytz
 
 from apps.energy.domain.errors import LastEventNotFound
 
 from ..models import EnergyEvent
+from ..utils.energy_delta import energy_delta
 
 # =========================
 # Constants (bounded sets)
@@ -21,10 +22,7 @@ CONTEXT_AFTER_LOAD = "after_load"
 CONTEXT_AFTER_RECOVERY = "after_recovery"
 
 
-# =========================
 # Messages & recommendations
-# =========================
-
 MESSAGES = {
     ENERGY_LOW: {
         CONTEXT_FIRST: {
@@ -92,13 +90,9 @@ RECOMMENDATIONS = {
 }
 
 
-# =========================
 # Greeting
-# =========================
-
-
-def generate_greeting(timezone, user):
-    tz = pytz.timezone(timezone)
+def generate_greeting(user):
+    tz = pytz.timezone(user.timezone)
     hour = datetime.now(tz).hour
     name = user.nickname or "there"
 
@@ -115,17 +109,12 @@ def generate_greeting(timezone, user):
         f"Hi, {name}!",
     ]
 
-    return greetings[randint(0, len(greetings) - 1)]
+    return random.choice(greetings)
 
 
-# =========================
-# Dashboard content logic
-# =========================
-
-
-def generate_dashboard_content(*, user, last_event):
-    energy_profile = user.energy_profile
-    current_energy = round(energy_profile.current_energy, 3)
+# Dashboard content
+def generate_dashboard_content(*, last_event):
+    current_energy = round(last_event.energy_after, 3)
 
     # --- energy state ---
     if current_energy < 0.25:
@@ -162,29 +151,30 @@ def generate_dashboard_content(*, user, last_event):
     return message, recommendation
 
 
-# =========================
-# Public dashboard generator
-# =========================
-
-
+# Dashboard generator
 def generate_dashboard(*, user) -> dict:
-    greeting = generate_greeting(user.timezone, user)
+    greeting = generate_greeting(user)
 
     last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
     if not last_event:
         raise LastEventNotFound()
 
-    current_energy = last_event.energy_after - last_event.energy_before
+    message, recommendation = generate_dashboard_content(last_event=last_event)
 
-    message, recommendation = generate_dashboard_content(
-        user=user,
-        last_event=last_event,
-    )
+    last_event_response = {
+        "id": last_event.id,
+        "event_type": last_event.event_type,
+        "activity_type": last_event.activity_type,
+        "started_at": last_event.started_at,
+        "ended_at": last_event.ended_at,
+        "energy_delta": energy_delta(last_event),
+        "subjective_coef": last_event.subjective_coef,
+    }
 
     return {
         "greeting": greeting,
-        "current_energy": current_energy,
+        "current_energy": last_event.energy_after,
         "message": message,
         "recommendation": recommendation,
-        "last_event": last_event,
+        "last_event": last_event_response,
     }
