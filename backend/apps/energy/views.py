@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
 )
 from rest_framework.views import APIView
 
@@ -14,7 +16,7 @@ from .domain.errors import (
     ActivityTypeNotFound,
     EnergyDomainError,
 )
-from .serializers import EnergyEventCreateSerializer
+from .serializers import EnergyDashboardSerializer, EnergyEventCreateSerializer
 from .services.apply_energy_event import apply_energy_event
 from .services.dashboard import generate_dashboard
 from .services.events_list import generate_events_list
@@ -37,76 +39,78 @@ class EnergyEventCreateView(APIView):
 
         apply_energy_event(user=request.user, **serializer.validated_data)
 
-        return Response(status=HTTP_201_CREATED)
+        return Response(status=200)
 
 
-# @extend_schema(
-#     request=EnergyDashboardSerializer,
-#     responses={
-#         200: {
-#             "type": "object",
-#             "properties": {
-#                 "greeting": {"type": "string", "description": "Personal user greeting"},
-#                 "current_energy": {
-#                     "type": "number",
-#                     "format": "float",
-#                     "description": "User's current energy level (0.0-1.0)",
-#                 },
-#                 "message": {
-#                     "type": "object",
-#                     "properties": {
-#                         "title": {"type": "string", "description": "Info message title"},
-#                         "content": {"type": "string", "description": "Info message"},
-#                     },
-#                 },
-#                 "recommendation": {
-#                     "type": "string",
-#                     "description": "Personalized recommendation for user",
-#                 },
-#                 "last_event": {
-#                     "type": "object",
-#                     "properties": {
-#                         "id": {"type": "number", "description": "Last user energy event id"},
-#                         "event_type": {
-#                             "type": "string",
-#                             "description": "Event type(load or recovery)",
-#                         },
-#                         "activity_type": {"type": "string", "description": "Activity type"},
-#                         "started_at": {
-#                             "type": "string",
-#                             "format": "date-time",
-#                             "description": "Event start time",
-#                         },
-#                         "ended_at": {
-#                             "type": "string",
-#                             "format": "date-time",
-#                             "description": "Event end time",
-#                         },
-#                         "energy_delta": {
-#                             "type": "number",
-#                             "format": "float",
-#                             "description": "Energy delta of the last energy event",
-#                         },
-#                         "subjective_coef": {
-#                             "type": "number",
-#                             "format": "float",
-#                             "description": "Subjective assessment of the last event",
-#                         },
-#                     },
-#                 },
-#             },
-#         }
-#     },
-#     description="Main screen dashboard with common data",
-#     summary="User dashboard",
-# )
-# class EnergyDashboardView(APIView):
-#     def get(self, request):
-#         user = request.user
-#         dashboard = generate_dashboard(user=user)
-#         serializer = EnergyDashboardSerializer(instance=dashboard)
-#         dashboard = serializer.data
-#         return Response(dashboard, status=HTTP_200_OK)
+@extend_schema(
+    request=EnergyDashboardSerializer,
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "greeting": {"type": "string", "description": "Personal user greeting"},
+                "current_energy": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "User's current energy level (0.0-1.0)",
+                },
+                "message": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string", "description": "Info message title"},
+                        "content": {"type": "string", "description": "Info message"},
+                    },
+                },
+                "recommendation": {
+                    "type": "string",
+                    "description": "Personalized recommendation for user",
+                },
+                "last_event": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "number", "description": "Last user energy event id"},
+                        "event_type": {
+                            "type": "string",
+                            "description": "Event type(load or recovery)",
+                        },
+                        "activity_type": {"type": "string", "description": "Activity type"},
+                        "started_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Event start time",
+                        },
+                        "ended_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Event end time",
+                        },
+                        "energy_delta": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Energy delta of the last energy event",
+                        },
+                        "subjective_coef": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Subjective assessment of the last event",
+                        },
+                    },
+                },
+            },
+        }
+    },
+    description="Main screen dashboard with common data",
+    summary="User dashboard",
+)
+class EnergyDashboardView(APIView):
+    def get(self, request):
+        user = request.user
+        dashboard = generate_dashboard(user=user)
+        serializer = EnergyDashboardSerializer(instance=dashboard)
+        dashboard = serializer.data
+        return Response(dashboard, status=HTTP_200_OK)
+
+
 #
 #
 # @extend_schema(
@@ -213,7 +217,7 @@ class EnergyEventCreateView(APIView):
 # class BaseStatisticsView(APIView):
 #     def get(self, request):
 #         user = request.user
-#         energy_overview = generate_energy_overview(user=user)
+# energy_overview = generate_energy_overview(user=user)
 #         activities_summary = generate_activities_summary(user=user)
 #         statistics = {"energy_overview": energy_overview, "activities_summary": activities_summary}
 #         serializer = BaseStatisticsSerializer(instance=statistics)

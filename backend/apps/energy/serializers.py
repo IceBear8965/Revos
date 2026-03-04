@@ -24,14 +24,14 @@ class EnergyEventCreateSerializer(serializers.Serializer):
         return data
 
 
-# class EnergyDashboardSerializer(serializers.Serializer):
-#     greeting = serializers.CharField()
-#     current_energy = serializers.FloatField()
-#     message = serializers.JSONField()
-#     recommendation = serializers.CharField()
-#     last_event = serializers.JSONField()
-#
-#
+class EnergyDashboardSerializer(serializers.Serializer):
+    greeting = serializers.CharField()
+    current_energy = serializers.FloatField()
+    message = serializers.JSONField()
+    recommendation = serializers.CharField()
+    last_event = serializers.JSONField()
+
+
 # class EventItemSerializer(serializers.Serializer):
 #     id = serializers.IntegerField()
 #     event_type = serializers.ChoiceField(choices=["load", "recovery"])

@@ -3,6 +3,8 @@ from random import randint
 
 import pytz
 
+from apps.energy.domain.errors import LastEventNotFound
+
 from ..models import EnergyEvent
 
 # =========================
@@ -168,29 +170,16 @@ def generate_dashboard_content(*, user, last_event):
 def generate_dashboard(*, user) -> dict:
     greeting = generate_greeting(user.timezone, user)
 
-    last_event_obj = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
+    last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
+    if not last_event:
+        raise LastEventNotFound()
 
-    current_energy = last_event_obj.energy_after - last_event_obj.energy_before
+    current_energy = last_event.energy_after - last_event.energy_before
 
     message, recommendation = generate_dashboard_content(
         user=user,
-        last_event=last_event_obj,
+        last_event=last_event,
     )
-
-    last_event = None
-    if last_event_obj:
-        user_timezone = pytz.timezone(user.timezone)
-        started_at_local = last_event_obj.started_at.astimezone(user_timezone).isoformat()
-        ended_at_local = last_event_obj.ended_at.astimezone(user_timezone).isoformat()
-        last_event = {
-            "id": last_event_obj.id,
-            "event_type": last_event_obj.event_type,
-            "activity_type": last_event_obj.activity_type,
-            "started_at": started_at_local,
-            "ended_at": ended_at_local,
-            "energy_delta": last_event_obj.energy_delta,
-            "subjective_coef": last_event_obj.subjective_coef,
-        }
 
     return {
         "greeting": greeting,

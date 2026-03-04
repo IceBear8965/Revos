@@ -4,6 +4,7 @@ from django.db import transaction
 
 from apps.energy.domain.energy_engine import EnergyEngine
 from apps.energy.domain.engine_params import EngineParams, EventDetails
+from apps.energy.domain.errors import EngineParamsNotFound, LastEventNotFound
 from apps.energy.models import EnergyEvent, ModelParams
 
 from ..constants import MAX_ENERGY, MIN_ENERGY
@@ -26,9 +27,9 @@ def apply_energy_event(
     params = ModelParams.objects.order_by("-version").last()
     last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
     if not last_event:
-        raise RuntimeError("User has no initial energy event")
+        raise LastEventNotFound()
     elif not params:
-        raise RuntimeError("Model params can't be specified")
+        raise EngineParamsNotFound()
 
     engine_params = EngineParams(**params.params_json)
     initial_energy = last_event.energy_after
