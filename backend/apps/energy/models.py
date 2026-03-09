@@ -1,5 +1,8 @@
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeOperators
 from django.db import models
+from django.db.models import CheckConstraint, F, Q
 
 from .enums import EventTypeChoices
 
@@ -67,4 +70,24 @@ class EnergyEvent(models.Model):
         ordering = ["-started_at"]
         indexes = [
             models.Index(fields=["user", "started_at"]),
+        ]
+        constraints = [
+            CheckConstraint(
+                condition=Q(started_at__lt=F("ended_at")),
+                name="event_start_before_end",
+            ),
+            ExclusionConstraint(
+                name="prevent_event_overlap",
+                expressions=[
+                    (
+                        models.Func(
+                            F("started_at"),
+                            F("ended_at"),
+                            function="tstzrange",
+                        ),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    ("user", RangeOperators.EQUAL),
+                ],
+            ),
         ]

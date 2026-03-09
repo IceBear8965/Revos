@@ -18,10 +18,9 @@ class EnergyEngine:
         self.break_minutes = self.event_details.initial_break_minutes
         self.continuous_load_minutes = self.event_details.initial_continuous_load_minutes
 
-        self.current_activity = None
         self.activity_minutes = 0
 
-        self.dt = timedelta(minutes=1)
+        self.__dt = timedelta(minutes=5)
 
     """
     Circadian rythm is being used in all activity types, except of sleep, because if circadial is used for sleep, than energy value will be increasing before about 3 AM and decreasing after it
@@ -33,16 +32,13 @@ class EnergyEngine:
             2 * math.pi * (hour + self.params.circadian_phase_shift) / 24
         )
 
-    def micro_step(self, current_time):
+    def micro_step(self, current_time, dt):
+        minutes = dt.total_seconds() / 60
         activity_type = self.event_details.activity_type
         activity_coef = self.event_details.activity_coef
         subjective_coef = self.event_details.subjective_coef
 
-        if activity_type != self.current_activity:
-            self.current_activity = activity_type
-            self.activity_minutes = 0
-
-        self.activity_minutes += 1
+        self.activity_minutes += minutes
 
         min_energy = self.params.clamp_min
         max_energy = self.params.clamp_max
@@ -55,7 +51,7 @@ class EnergyEngine:
         if self.event_details.event_type == EventType.LOAD:
             self.break_minutes = 0
             self.sleep_minutes = 0
-            self.continuous_load_minutes += 1
+            self.continuous_load_minutes += minutes
 
             energy_cost = (
                 self.params.load_energy_rate
@@ -84,9 +80,10 @@ class EnergyEngine:
         elif self.event_details.activity_type == "sleep":
             self.continuous_load_minutes = 0
             self.break_minutes = 0
-            self.sleep_minutes += 1
+            self.sleep_minutes += minutes
 
             t_hours = self.sleep_minutes / 60
+            delta_hours = minutes / 60
 
             sigmoid_now = 1 / (
                 1 + math.exp(-self.params.sleep_k * (t_hours - self.params.sleep_midpoint_hours))
@@ -95,7 +92,8 @@ class EnergyEngine:
             sigmoid_prev = 1 / (
                 1
                 + math.exp(
-                    -self.params.sleep_k * (t_hours - self.params.sleep_midpoint_hours - 1 / 60)
+                    -self.params.sleep_k
+                    * (t_hours - self.params.sleep_midpoint_hours - delta_hours)
                 )
             )
 
@@ -124,7 +122,7 @@ class EnergyEngine:
         else:
             self.continuous_load_minutes = 0
             self.sleep_minutes = 0
-            self.break_minutes += 1
+            self.break_minutes += minutes
 
             t = self.activity_minutes
 
@@ -132,7 +130,9 @@ class EnergyEngine:
                 1 - math.exp(-self.params.recovery_k_e * (t**self.params.recovery_exp_power))
             ) - (
                 1
-                - math.exp(-self.params.recovery_k_e * ((t - 1) ** self.params.recovery_exp_power))
+                - math.exp(
+                    -self.params.recovery_k_e * ((t - minutes) ** self.params.recovery_exp_power)
+                )
             )
 
             strain_factor = 1 / (1 + self.acute_strain)
@@ -165,9 +165,11 @@ class EnergyEngine:
 
     def apply(self):
         current_time = self.event_details.started_at
-        while current_time < self.event_details.ended_at:
-            self.micro_step(current_time)
-            current_time += self.dt
+        end = self.event_details.ended_at
+        while current_time < end:
+            dt = min(self.__dt, self.event_details.ended_at - current_time)
+            self.micro_step(current_time, dt)
+            current_time += dt
 
         return {
             "energy": self.energy,

@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
@@ -11,19 +14,23 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 from apps.common.loggers import log_event
+from apps.energy.services import edit_energy_event
 
 from .domain.errors import (
     ActivityTypeNotFound,
     EnergyDomainError,
 )
+from .models import EnergyEvent
 from .serializers import (
+    BaseStatisticsSerializer,
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
-    EventsListSerializer,
+    EnergyEventEditSerializer,
+    EventItemSerializer,
 )
-from .services.apply_energy_event import apply_energy_event
+from .services.create_energy_event import create_energy_event
 from .services.dashboard import generate_dashboard
-from .services.events_list import generate_events_list
+from .services.edit_energy_event import edit_energy_event
 from .services.statistics.activities_summary import generate_activities_summary
 from .services.statistics.energy_overview import generate_energy_overview
 
@@ -41,15 +48,26 @@ class EnergyEventCreateView(APIView):
         serializer = EnergyEventCreateSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
-        apply_energy_event(user=request.user, **serializer.validated_data)
+        create_energy_event(user=request.user, **serializer.validated_data)
 
         log_event(
             action="event_created",
             user_id=request.user.id,
             extra={"user": request.user.id},
         )
-
         return Response({"status": "event_created"}, status=201)
+
+
+class EnergyEventEditView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = EnergyEventEditSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        edit_energy_event(user=request.user, **serializer.validated_data)
+
+        return Response(status=HTTP_200_OK)
 
 
 @extend_schema(
@@ -148,86 +166,95 @@ class EnergyDashboardView(APIView):
     summary="User energy events list",
 )
 class EventsListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        user = request.user
-        events_list = generate_events_list(user=user)
-        serializer = EventsListSerializer(instance=events_list)
-        events_list = serializer.data
-        return Response(events_list, status=HTTP_200_OK)
+        week_ago = timezone.now() - timedelta(days=7)
+
+        events = EnergyEvent.objects.filter(user=request.user, started_at__gte=week_ago).order_by(
+            "-started_at"
+        )
+
+        serializer = EventItemSerializer(events, many=True)
+
+        return Response({"results": serializer.data})
 
 
-# @extend_schema(
-#     request=None,
-#     responses={
-#         200: {
-#             "type": "object",
-#             "properties": {
-#                 "energy_overview": {
-#                     "type": "object",
-#                     "properties": {
-#                         "period": {
-#                             "type": "object",
-#                             "properties": {
-#                                 "type": {"type": "string"},
-#                                 "from": {"type": "string", "format": "date"},
-#                                 "to": {"type": "string", "format": "date"},
-#                             },
-#                         },
-#                         "activities": {
-#                             "type": "array",
-#                             "items": {
-#                                 "type": "object",
-#                                 "properties": {
-#                                     "date": {"type": "string", "format": "date"},
-#                                     "energy": {"type": "number", "nullable": True},
-#                                 },
-#                             },
-#                         },
-#                     },
-#                 },
-#                 "activities_summary": {
-#                     "type": "object",
-#                     "properties": {
-#                         "period": {
-#                             "type": "object",
-#                             "properties": {
-#                                 "type": {"type": "string"},
-#                                 "from": {"type": "string", "format": "date"},
-#                                 "to": {"type": "string", "format": "date"},
-#                             },
-#                         },
-#                         "scale": {
-#                             "type": "object",
-#                             "properties": {
-#                                 "min": {"type": "number"},
-#                                 "max": {"type": "number"},
-#                             },
-#                         },
-#                         "activities": {
-#                             "type": "array",
-#                             "items": {
-#                                 "type": "object",
-#                                 "properties": {
-#                                     "activity_type": {"type": "string"},
-#                                     "avg_energy_delta": {"type": "number"},
-#                                     "event_count": {"type": "integer"},
-#                                 },
-#                             },
-#                         },
-#                     },
-#                 },
-#             },
-#         }
-#     },
-#     description="Returns weekly energy overview and summary of user's activities",
-#     summary="User energy statistics",
-# )
-# class BaseStatisticsView(APIView):
-#     def get(self, request):
-#         user = request.user
-# energy_overview = generate_energy_overview(user=user)
-#         activities_summary = generate_activities_summary(user=user)
-#         statistics = {"energy_overview": energy_overview, "activities_summary": activities_summary}
-#         serializer = BaseStatisticsSerializer(instance=statistics)
-#         statistics = serializer.data
-#         return Response(statistics, status=HTTP_200_OK)
+@extend_schema(
+    request=None,
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "energy_overview": {
+                    "type": "object",
+                    "properties": {
+                        "period": {
+                            "type": "object",
+                            "properties": {
+                                "type": {"type": "string"},
+                                "from": {"type": "string", "format": "date"},
+                                "to": {"type": "string", "format": "date"},
+                            },
+                        },
+                        "activities": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "date": {"type": "string", "format": "date"},
+                                    "energy": {"type": "number", "nullable": True},
+                                },
+                            },
+                        },
+                    },
+                },
+                "activities_summary": {
+                    "type": "object",
+                    "properties": {
+                        "period": {
+                            "type": "object",
+                            "properties": {
+                                "type": {"type": "string"},
+                                "from": {"type": "string", "format": "date"},
+                                "to": {"type": "string", "format": "date"},
+                            },
+                        },
+                        "scale": {
+                            "type": "object",
+                            "properties": {
+                                "min": {"type": "number"},
+                                "max": {"type": "number"},
+                            },
+                        },
+                        "activities": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "activity_type": {"type": "string"},
+                                    "avg_energy_delta": {"type": "number"},
+                                    "event_count": {"type": "integer"},
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    },
+    description="Returns weekly energy overview and summary of user's activities",
+    summary="User energy statistics",
+)
+class BaseStatisticsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        statistics = {
+            "energy_overview": generate_energy_overview(user=request.user),
+            "activities_summary": generate_activities_summary(user=request.user),
+        }
+
+        serializer = BaseStatisticsSerializer(instance=statistics)
+
+        return Response(serializer.data)

@@ -11,7 +11,7 @@ from ..domain.enums import EventType
 
 
 @transaction.atomic
-def apply_energy_event(
+def create_energy_event(
     *,
     user,
     activity,
