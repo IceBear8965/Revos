@@ -43,7 +43,6 @@ class EnergyEventCreateSerializer(serializers.Serializer):
 
 
 class EnergyEventEditSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
     activity = serializers.PrimaryKeyRelatedField(queryset=ActivityType.objects.none())
     started_at = serializers.DateTimeField()
     ended_at = serializers.DateTimeField()
@@ -58,15 +57,12 @@ class EnergyEventEditSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = self.context["request"].user
+        event_id = self.context["view"].kwargs["id"]
 
-        event_id = data["id"]
         started_at = data["started_at"]
         ended_at = data["ended_at"]
 
         validate_event_time(started_at, ended_at)
-
-        if not EnergyEvent.objects.filter(id=event_id, user=user).exists():
-            raise serializers.ValidationError({"id": "Event not found"})
 
         validate_event_edit(
             user=user,

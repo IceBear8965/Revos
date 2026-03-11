@@ -53,21 +53,39 @@ class EnergyEventCreateView(APIView):
         log_event(
             action="event_created",
             user_id=request.user.id,
-            extra={"user": request.user.id},
+            extra={},
         )
         return Response({"status": "event_created"}, status=201)
 
 
+@extend_schema(
+    request=EnergyEventEditSerializer,
+    responses={201: {"type": "object", "properies": {"status": "event_edited"}}},
+    description="Edit energy event with history recalculation",
+    summary="Edit energy event",
+)
 class EnergyEventEditView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = EnergyEventEditSerializer(data=request.data, context={"request": request})
+    def patch(self, request, id):
+        serializer = EnergyEventEditSerializer(
+            data=request.data,
+            context={"request": request, "view": self},
+        )
         serializer.is_valid(raise_exception=True)
 
-        edit_energy_event(user=request.user, **serializer.validated_data)
+        edit_energy_event(
+            user=request.user,
+            id=id,
+            **serializer.validated_data,
+        )
 
-        return Response(status=HTTP_200_OK)
+        log_event(
+            action="event_edited",
+            user_id=request.user.id,
+            extra={},
+        )
+        return Response({"status": "event_edited"}, status=HTTP_200_OK)
 
 
 @extend_schema(
