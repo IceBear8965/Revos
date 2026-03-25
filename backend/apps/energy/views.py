@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
@@ -7,27 +8,27 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
-    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
 )
 from rest_framework.views import APIView
 
 from apps.common.loggers import log_event
 from apps.energy.services import edit_energy_event
+from apps.energy.services.activity_types import create_activity_type
 
-from .domain.errors import (
-    ActivityTypeNotFound,
-    EnergyDomainError,
-)
-from .models import EnergyEvent
+from .models import ActivityType, EnergyEvent
 from .serializers import (
+    ActivityTypeCollectionSerializer,
+    ActivityTypeCreateSerializer,
+    ActivityTypeEditSerializer,
     BaseStatisticsSerializer,
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
     EnergyEventEditSerializer,
     EventItemSerializer,
 )
+from .services.activity_types.create_activity_type import create_activity_type
 from .services.create_energy_event import create_energy_event
 from .services.dashboard import generate_dashboard
 from .services.edit_energy_event import edit_energy_event
@@ -86,6 +87,94 @@ class EnergyEventEditView(APIView):
             extra={},
         )
         return Response({"status": "event_edited"}, status=HTTP_200_OK)
+
+
+# Returns user`s activities collection and creates new activity type
+class ActivityTypesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # GET /activity_types/
+    def get(self, request):
+        activities = ActivityType.objects.filter(user=request.user)
+        serializer = ActivityTypeCollectionSerializer(instance=activities, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    # POST /activity_types/
+    def post(self, request):
+        serializer = ActivityTypeCreateSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+        create_activity_type(user=request.user, activity=data)
+
+        log_event(
+            action="new activity type created",
+            user_id=request.user.id,
+            extra={
+                "activity_type": data["name"],
+                "category": data["category"],
+                "value": data["value"],
+            },
+        )
+        return Response({"status": "new activity type created"}, status=HTTP_200_OK)
+
+
+# Controls user`s activities
+class ActivityTypeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # Probably isn't really necessary
+    # GET /activity_type/<id>/
+    def get(self, request, id):
+        pass
+
+    # Change some activity type(name, value, category)
+    # PATCH /activity_type/<id>/
+    def patch(self, request, id):
+        activity = get_object_or_404(ActivityType, id=id, user=request.user)
+
+        serializer = ActivityTypeEditSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        for field, value in serializer.validated_data.items():
+            setattr(activity, field, value)
+
+        activity.save()
+
+        log_event(
+            action="activity_type edited",
+            user_id=request.user.id,
+            extra={
+                "new_activity_type": activity.name,
+                "new_category": activity.category,
+                "new_value": activity.value,
+            },
+        )
+
+        return Response(status=HTTP_200_OK)
+
+    # DELETE /activity_type/<id>/
+    def delete(self, request, id):
+        activity = get_object_or_404(
+            ActivityType,
+            id=id,
+            user=request.user,
+        )
+
+        if not activity.is_editable:
+            return Response(
+                {"detail": "This activity type cannot be deleted"}, status=HTTP_400_BAD_REQUEST
+            )
+
+        activity_type = activity.name
+        activity.delete()
+
+        log_event(
+            action="activity type deleted",
+            user_id=request.user.id,
+            extra={"activity_type": activity_type},
+        )
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 @extend_schema(

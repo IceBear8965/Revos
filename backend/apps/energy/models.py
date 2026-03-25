@@ -19,9 +19,7 @@ class ActivityType(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_types")
 
     category = models.CharField(max_length=10, choices=EventTypeChoices.choices)
-
     name = models.CharField(max_length=32)
-
     value = models.FloatField(default=1.0)
 
     is_custom = models.BooleanField(default=False)

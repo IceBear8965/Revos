@@ -1,6 +1,8 @@
 from django.urls import path
 
 from .views import (
+    ActivityTypesView,
+    ActivityTypeView,
     BaseStatisticsView,
     EnergyDashboardView,
     EnergyEventCreateView,
@@ -9,6 +11,8 @@ from .views import (
 )
 
 urlpatterns = [
+    path("activity_types/", ActivityTypesView.as_view(), name="activity-types"),
+    path("activity_type/<int:id>/", ActivityTypeView.as_view(), name="activity-type"),
     path("create_event/", EnergyEventCreateView.as_view(), name="create-energy-event"),
     path("edit_event/<int:id>/", EnergyEventEditView.as_view(), name="edit-energy-event"),
     path("dashboard/", EnergyDashboardView.as_view(), name="dashboard"),

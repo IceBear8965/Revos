@@ -8,10 +8,6 @@ from apps.energy.domain.errors import LastEventNotFound
 from ..models import EnergyEvent
 from ..utils.energy_delta import energy_delta
 
-# =========================
-# Constants (bounded sets)
-# =========================
-
 ENERGY_LOW = "low"
 ENERGY_BELOW = "below"
 ENERGY_OK = "ok"

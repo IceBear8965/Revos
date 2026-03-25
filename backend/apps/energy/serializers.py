@@ -1,6 +1,7 @@
 from datetime import timedelta
 
-from django.db.models import Q
+from django.db.models import CharField, Q
+from django.utils import choices
 from rest_framework import serializers
 
 from apps.energy.utils.event_validation import (
@@ -8,6 +9,7 @@ from apps.energy.utils.event_validation import (
     validate_event_time,
 )
 
+from .enums import UserTypeChoices
 from .models import ActivityType, EnergyEvent
 from .utils.energy_delta import energy_delta
 
@@ -72,6 +74,34 @@ class EnergyEventEditSerializer(serializers.Serializer):
         )
 
         return data
+
+
+class ActivityTypeCollectionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    category = serializers.ChoiceField(choices=UserTypeChoices.choices)
+    value = serializers.FloatField()
+
+
+class ActivityTypeCreateSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    category = serializers.ChoiceField(choices=UserTypeChoices.choices)
+    value = serializers.FloatField()
+
+    def validate(self, data):
+        user = self.context["request"].user
+        name = data["name"]
+
+        if ActivityType.objects.filter(user=user, name=name).exists():
+            raise serializers.ValidationError({"name": "Activity with this name already exists"})
+
+        return data
+
+
+class ActivityTypeEditSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    category = serializers.ChoiceField(choices=UserTypeChoices.choices)
+    value = serializers.FloatField()
 
 
 class EnergyDashboardSerializer(serializers.Serializer):
