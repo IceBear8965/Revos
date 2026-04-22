@@ -1,9 +1,11 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as dt_timezone
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -87,6 +89,26 @@ class EnergyEventEditView(APIView):
             extra={},
         )
         return Response({"status": "event_edited"}, status=HTTP_200_OK)
+
+
+class EnergyEventDelteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        event = get_object_or_404(
+            EnergyEvent,
+            id=id,
+            user=request.user,
+        )
+
+        event.delete()
+
+        log_event(
+            action="event deleted",
+            user_id=request.user.id,
+            extra={},
+        )
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 # Returns user`s activities collection and creates new activity type
@@ -276,15 +298,47 @@ class EventsListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        week_ago = timezone.now() - timedelta(days=7)
+        date_str = request.query_params.get("date")
 
-        events = EnergyEvent.objects.filter(user=request.user, started_at__gte=week_ago).order_by(
-            "-started_at"
-        )
+        if not date_str:
+            raise ValidationError({"date": "This field is required"})
+
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValidationError({"date": "Invalid format. Use YYYY-MM-DD"})
+
+        today = timezone.now().date()
+
+        if date > today:
+            raise ValidationError({"date": "Cannot request future dates"})
+
+        start = datetime.combine(date, datetime.min.time()).replace(tzinfo=dt_timezone.utc)
+        end = start + timedelta(days=1)
+
+        events = EnergyEvent.objects.filter(
+            user=request.user,
+            started_at__lt=end,
+            ended_at__gt=start,
+        ).order_by("-started_at")
 
         serializer = EventItemSerializer(events, many=True)
 
-        return Response({"results": serializer.data})
+        has_prev = (
+            EnergyEvent.objects.filter(user=request.user, started_at__lt=start)
+            .exclude(event_type="system")
+            .exists()
+        )
+        has_next = EnergyEvent.objects.filter(user=request.user, started_at__gte=end).exists()
+
+        return Response(
+            {
+                "date": date_str,
+                "has_prev": has_prev,
+                "has_next": has_next,
+                "results": serializer.data,
+            }
+        )
 
 
 @extend_schema(

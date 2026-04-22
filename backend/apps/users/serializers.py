@@ -39,7 +39,6 @@ class MeSerializer(serializers.Serializer):
     email = serializers.EmailField()
     nickname = serializers.CharField()
     timezone = serializers.CharField()
-    load_order = serializers.JSONField()
 
 
 class ChangeNicknameSerializer(serializers.Serializer):
