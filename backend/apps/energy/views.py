@@ -1,195 +1,202 @@
-import pytz
-import rest_framework
-from django.http import request
+from datetime import datetime, timedelta
+from datetime import timezone as dt_timezone
+
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
-    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
 )
 from rest_framework.views import APIView
 
 from apps.common.loggers import log_event
+from apps.energy.services import edit_energy_event
+from apps.energy.services.activity_types import create_activity_type
 
-from .domain.errors import (
-    ActivityTypeNotFound,
-    EnergyDomainError,
-)
-from .models import PersonalActivityProfile
+from .models import ActivityType, EnergyEvent
 from .serializers import (
+    ActivityTypeCollectionSerializer,
+    ActivityTypeCreateSerializer,
+    ActivityTypeEditSerializer,
     BaseStatisticsSerializer,
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
     EnergyEventEditSerializer,
-    EventsListSerializer,
-    PersonalActivityOrderSerializer,
+    EventItemSerializer,
 )
-from .services.apply_energy_event import apply_energy_event
+from .services.activity_types.create_activity_type import create_activity_type
+from .services.create_energy_event import create_energy_event
 from .services.dashboard import generate_dashboard
 from .services.edit_energy_event import edit_energy_event
-from .services.events_list import generate_events_list
 from .services.statistics.activities_summary import generate_activities_summary
 from .services.statistics.energy_overview import generate_energy_overview
 
 
 @extend_schema(
     request=EnergyEventCreateSerializer,
-    responses={
-        201: {
-            "type": "object",
-            "properties": {
-                "id": {"type": "number", "description": "New event id"},
-                "activity_type": {"type": "string", "description": "Activity type"},
-                "event_type": {"type": "string", "description": "Event type(load/recovery)"},
-                "started_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Event time of start",
-                },
-                "ended_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Event time of end",
-                },
-                "energy_before": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "User energy before this event",
-                },
-                "energy_delta": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "Energy delta",
-                },
-                "energy_after": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "User energy after this event",
-                },
-            },
-        }
-    },
+    responses={201: {"type": "object", "properies": {"status": "event_created"}}},
     description="Create new load or recovery event",
     summary="Create energy event",
 )
 class EnergyEventCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        serializer = EnergyEventCreateSerializer(data=request.data)
+        serializer = EnergyEventCreateSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
 
-        tz = pytz.UTC
-        validated_data["started_at"] = validated_data["started_at"].astimezone(tz)
-        validated_data["ended_at"] = validated_data["ended_at"].astimezone(tz)
+        create_energy_event(user=request.user, **serializer.validated_data)
 
-        try:
-            event = apply_energy_event(user=request.user, **validated_data)
-        except ActivityTypeNotFound as e:
-            return Response(
-                e.to_response(),
-                status=e.status_code,
-            )
-
-        user_timezone = pytz.timezone(request.user.timezone)
-        started_at_local = event.started_at.astimezone(user_timezone).isoformat()
-        ended_at_local = event.ended_at.astimezone(user_timezone).isoformat()
-        return Response(
-            {
-                "id": event.id,
-                "activity_type": event.activity_type,
-                "event_type": event.event_type,
-                "started_at": started_at_local,
-                "ended_at": ended_at_local,
-                "energy_before": event.energy_before,
-                "energy_after": event.energy_after,
-                "energy_delta": event.energy_delta,
-                "subjective_coef": event.subjective_coef,
-            },
-            status=HTTP_201_CREATED,
+        log_event(
+            action="event_created",
+            user_id=request.user.id,
+            extra={},
         )
+        return Response({"status": "event_created"}, status=201)
 
 
 @extend_schema(
     request=EnergyEventEditSerializer,
-    responses={
-        200: {
-            "type": "object",
-            "properties": {
-                "id": {"type": "number", "description": "New event id"},
-                "activity_type": {"type": "string", "description": "Activity type"},
-                "event_type": {"type": "string", "description": "Event type(load/recovery)"},
-                "started_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Event time of start",
-                },
-                "ended_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Event time of end",
-                },
-                "energy_before": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "User energy before this event",
-                },
-                "energy_delta": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "Energy delta",
-                },
-                "energy_after": {
-                    "type": "number",
-                    "format": "float",
-                    "description": "User energy after this event",
-                },
-            },
-        }
-    },
-    description="Edit last energy event",
-    summary="Edit last energy event",
+    responses={201: {"type": "object", "properies": {"status": "event_edited"}}},
+    description="Edit energy event with history recalculation",
+    summary="Edit energy event",
 )
 class EnergyEventEditView(APIView):
-    def post(self, request):
-        serializer = EnergyEventEditSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
+    permission_classes = [IsAuthenticated]
 
-        tz = pytz.UTC
-        validated_data["started_at"] = validated_data["started_at"].astimezone(tz)
-        validated_data["ended_at"] = validated_data["ended_at"].astimezone(tz)
-
-        try:
-            event = edit_energy_event(
-                user=request.user,
-                **validated_data,
-            )
-        except EnergyDomainError as e:
-            return Response(
-                e.to_response(),
-                status=e.status_code,
-            )
-
-        user_timezone = pytz.timezone(request.user.timezone)
-        started_at_local = event.started_at.astimezone(user_timezone).isoformat()
-        ended_at_local = event.ended_at.astimezone(user_timezone).isoformat()
-        return Response(
-            {
-                "id": event.id,
-                "activity_type": event.activity_type,
-                "event_type": event.event_type,
-                "started_at": started_at_local,
-                "ended_at": ended_at_local,
-                "energy_before": event.energy_before,
-                "energy_after": event.energy_after,
-                "energy_delta": event.energy_delta,
-                "subjective_coef": event.subjective_coef,
-            },
-            status=HTTP_200_OK,
+    def patch(self, request, id):
+        serializer = EnergyEventEditSerializer(
+            data=request.data,
+            context={"request": request, "view": self},
         )
+        serializer.is_valid(raise_exception=True)
+
+        edit_energy_event(
+            user=request.user,
+            id=id,
+            **serializer.validated_data,
+        )
+
+        log_event(
+            action="event_edited",
+            user_id=request.user.id,
+            extra={},
+        )
+        return Response({"status": "event_edited"}, status=HTTP_200_OK)
+
+
+class EnergyEventDelteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        event = get_object_or_404(
+            EnergyEvent,
+            id=id,
+            user=request.user,
+        )
+
+        event.delete()
+
+        log_event(
+            action="event deleted",
+            user_id=request.user.id,
+            extra={},
+        )
+        return Response(status=HTTP_204_NO_CONTENT)
+
+
+# Returns user`s activities collection and creates new activity type
+class ActivityTypesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # GET /activity_types/
+    def get(self, request):
+        activities = ActivityType.objects.filter(user=request.user)
+        serializer = ActivityTypeCollectionSerializer(instance=activities, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    # POST /activity_types/
+    def post(self, request):
+        serializer = ActivityTypeCreateSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+        create_activity_type(user=request.user, activity=data)
+
+        log_event(
+            action="new activity type created",
+            user_id=request.user.id,
+            extra={
+                "activity_type": data["name"],
+                "category": data["category"],
+                "value": data["value"],
+            },
+        )
+        return Response({"status": "new activity type created"}, status=HTTP_200_OK)
+
+
+# Controls user`s activities
+class ActivityTypeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # Probably isn't really necessary
+    # GET /activity_type/<id>/
+    def get(self, request, id):
+        pass
+
+    # Change some activity type(name, value, category)
+    # PATCH /activity_type/<id>/
+    def patch(self, request, id):
+        activity = get_object_or_404(ActivityType, id=id, user=request.user)
+
+        serializer = ActivityTypeEditSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        for field, value in serializer.validated_data.items():
+            setattr(activity, field, value)
+
+        activity.save()
+
+        log_event(
+            action="activity_type edited",
+            user_id=request.user.id,
+            extra={
+                "new_activity_type": activity.name,
+                "new_category": activity.category,
+                "new_value": activity.value,
+            },
+        )
+
+        return Response(status=HTTP_200_OK)
+
+    # DELETE /activity_type/<id>/
+    def delete(self, request, id):
+        activity = get_object_or_404(
+            ActivityType,
+            id=id,
+            user=request.user,
+        )
+
+        if not activity.is_editable:
+            return Response(
+                {"detail": "This activity type cannot be deleted"}, status=HTTP_400_BAD_REQUEST
+            )
+
+        activity_type = activity.name
+        activity.delete()
+
+        log_event(
+            action="activity type deleted",
+            user_id=request.user.id,
+            extra={"activity_type": activity_type},
+        )
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 @extend_schema(
@@ -288,12 +295,50 @@ class EnergyDashboardView(APIView):
     summary="User energy events list",
 )
 class EventsListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        user = request.user
-        events_list = generate_events_list(user=user)
-        serializer = EventsListSerializer(instance=events_list)
-        events_list = serializer.data
-        return Response(events_list, status=HTTP_200_OK)
+        date_str = request.query_params.get("date")
+
+        if not date_str:
+            raise ValidationError({"date": "This field is required"})
+
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValidationError({"date": "Invalid format. Use YYYY-MM-DD"})
+
+        today = timezone.now().date()
+
+        if date > today:
+            raise ValidationError({"date": "Cannot request future dates"})
+
+        start = datetime.combine(date, datetime.min.time()).replace(tzinfo=dt_timezone.utc)
+        end = start + timedelta(days=1)
+
+        events = EnergyEvent.objects.filter(
+            user=request.user,
+            started_at__lt=end,
+            ended_at__gt=start,
+        ).order_by("-started_at")
+
+        serializer = EventItemSerializer(events, many=True)
+
+        has_prev = (
+            EnergyEvent.objects.filter(user=request.user, started_at__lt=start)
+            .exclude(event_type="system")
+            .exists()
+        )
+        has_next = EnergyEvent.objects.filter(user=request.user, started_at__gte=end).exists()
+
+        return Response(
+            {
+                "date": date_str,
+                "has_prev": has_prev,
+                "has_next": has_next,
+                "results": serializer.data,
+            }
+        )
 
 
 @extend_schema(
@@ -363,46 +408,14 @@ class EventsListView(APIView):
     summary="User energy statistics",
 )
 class BaseStatisticsView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        user = request.user
-        energy_overview = generate_energy_overview(user=user)
-        activities_summary = generate_activities_summary(user=user)
-        statistics = {"energy_overview": energy_overview, "activities_summary": activities_summary}
-        serializer = BaseStatisticsSerializer(instance=statistics)
-        statistics = serializer.data
-        return Response(statistics, status=HTTP_200_OK)
-
-
-@extend_schema(
-    request=PersonalActivityOrderSerializer,
-    responses={
-        200: {
-            "load_order": {
-                "type": "array",
-                "description": "Sequnce of user's personal coef",
-            }
+        statistics = {
+            "energy_overview": generate_energy_overview(user=request.user),
+            "activities_summary": generate_activities_summary(user=request.user),
         }
-    },
-    description="Changes user's load activities coef",
-    summary="Adjust personal_coef",
-)
-class PersonalActivityOrderView(APIView):
-    def patch(self, request):
-        serializer = PersonalActivityOrderSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        profile, _ = PersonalActivityProfile.objects.get_or_create(user=request.user)
+        serializer = BaseStatisticsSerializer(instance=statistics)
 
-        profile.load_order = serializer.validated_data["load_order"]
-        profile.save(update_fields=["load_order"])
-
-        log_event(
-            action="personal_coef_updated",
-            user_id=request.user.id,
-            extra={"new_load_order": profile.load_order},
-        )
-
-        return Response(
-            {"load_order": profile.load_order},
-            status=HTTP_200_OK,
-        )
+        return Response(serializer.data)

@@ -1,38 +1,130 @@
+from datetime import datetime
+
 from django.db import transaction
 
-from ..domain.errors import EventIsNotLast, LastEventNotFound
-from ..models import EnergyEvent, EnergyProfile
-from .apply_energy_event import apply_energy_event
+from apps.energy.domain.energy_engine import EnergyEngine
+from apps.energy.domain.engine_params import EngineParams, EventDetails
+from apps.energy.domain.errors import LastEventNotFound
+from apps.energy.models import EnergyEvent
 
 
 @transaction.atomic
 def edit_energy_event(
     *,
     user,
-    event_id,
-    activity_type,
-    started_at,
-    ended_at,
-    subjective_coef,
+    id,
+    activity,
+    started_at: datetime,
+    ended_at: datetime,
+    subjective_coef: float,
 ):
-    last_event = EnergyEvent.objects.filter(user=user).order_by("-created_at").first()
+    editable_event = (
+        EnergyEvent.objects.select_for_update()
+        .select_related("params_version")
+        .get(user=user, id=id)
+    )
 
-    if last_event is None:
+    editable_event.event_type = activity.category
+    editable_event.activity_type = activity.name
+    editable_event.activity_coef = activity.value
+    editable_event.started_at = started_at
+    editable_event.ended_at = ended_at
+    editable_event.subjective_coef = subjective_coef
+
+    editable_event.save(
+        update_fields=[
+            "event_type",
+            "activity_type",
+            "activity_coef",
+            "started_at",
+            "ended_at",
+            "subjective_coef",
+        ]
+    )
+
+    previous_event = (
+        EnergyEvent.objects.filter(user=user, started_at__lt=editable_event.started_at)
+        .order_by("-started_at")
+        .first()
+    )
+
+    if not previous_event:
         raise LastEventNotFound()
 
-    if last_event.id != event_id:
-        raise EventIsNotLast()
+    energy_before = previous_event.energy_after
+    acute_before = previous_event.acute_after
+    chronic_before = previous_event.chronic_after
 
-    profile, _ = EnergyProfile.objects.get_or_create(user=user)
-    profile.current_energy = last_event.energy_before
-    profile.save(update_fields=["current_energy"])
+    sleep_minutes = previous_event.sleep_minutes
+    break_minutes = previous_event.break_minutes
+    continuous_load_minutes = previous_event.continuous_load_minutes
 
-    last_event.delete()
-
-    return apply_energy_event(
-        user=user,
-        activity_type=activity_type,
-        started_at=started_at,
-        ended_at=ended_at,
-        subjective_coef=subjective_coef,
+    events_queue = (
+        EnergyEvent.objects.select_for_update()
+        .filter(user=user, started_at__gte=editable_event.started_at)
+        .select_related("params_version")
+        .order_by("started_at")
     )
+
+    params_cache = {}
+
+    for event in events_queue:
+        params_version_id = event.params_version_id
+
+        if params_version_id not in params_cache:
+            params_cache[params_version_id] = EngineParams(**event.params_version.params_json)
+
+        params = params_cache[params_version_id]
+
+        event_details = EventDetails(
+            initial_energy=energy_before,
+            initial_acute=acute_before,
+            initial_chronic=chronic_before,
+            initial_sleep_minutes=sleep_minutes,
+            initial_break_minutes=break_minutes,
+            initial_continuous_load_minutes=continuous_load_minutes,
+            event_type=event.event_type,
+            activity_type=event.activity_type,
+            activity_coef=event.activity_coef,
+            started_at=event.started_at,
+            ended_at=event.ended_at,
+            subjective_coef=event.subjective_coef,
+        )
+
+        engine = EnergyEngine(params=params, event_details=event_details)
+        result = engine.apply()
+
+        event.energy_before = energy_before
+        event.energy_after = result["energy"]
+
+        event.acute_before = acute_before
+        event.acute_after = result["acute_strain"]
+
+        event.chronic_before = chronic_before
+        event.chronic_after = result["chronic_strain"]
+
+        event.sleep_minutes = result["sleep_minutes"]
+        event.break_minutes = result["break_minutes"]
+        event.continuous_load_minutes = result["continuous_load_minutes"]
+
+        event.save(
+            update_fields=[
+                "energy_before",
+                "energy_after",
+                "acute_before",
+                "acute_after",
+                "chronic_before",
+                "chronic_after",
+                "sleep_minutes",
+                "break_minutes",
+                "continuous_load_minutes",
+            ]
+        )
+
+        energy_before = result["energy"]
+        acute_before = result["acute_strain"]
+        chronic_before = result["chronic_strain"]
+
+        sleep_minutes = result["sleep_minutes"]
+        break_minutes = result["break_minutes"]
+        continuous_load_minutes = result["continuous_load_minutes"]
