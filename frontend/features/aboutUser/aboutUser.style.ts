@@ -12,7 +12,7 @@ export const createStyles = (colors: AppColors) => {
             justifyContent: "space-between",
             alignItems: "center",
             backgroundColor: colors.card,
-            padding: 25,
+            padding: 20,
             borderRadius: 20,
         },
         userIcon: {
@@ -25,10 +25,26 @@ export const createStyles = (colors: AppColors) => {
             alignItems: "center",
         },
         nickname: {
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: 500,
             color: colors.textPrimary,
             marginRight: 25,
+        },
+
+        changeTimezoneContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: colors.card,
+            padding: 20,
+            borderRadius: 20,
+            marginTop: 20,
+        },
+        timezoneSelectorText: {
+            fontSize: 20,
+            fontWeight: 500,
+            color: colors.textPrimary,
+            textTransform: "capitalize",
         },
 
         toggleThemeCard: {
@@ -36,38 +52,17 @@ export const createStyles = (colors: AppColors) => {
             justifyContent: "space-between",
             alignItems: "center",
             backgroundColor: colors.card,
-            padding: 25,
+            padding: 20,
             borderRadius: 20,
-            marginTop: 30,
+            marginTop: 20,
         },
         themeSwitcherText: {
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: 500,
             color: colors.textPrimary,
             textTransform: "capitalize",
         },
         themeSwitcher: {},
-
-        loadOrderSelectorContainer: {
-            backgroundColor: colors.card,
-            padding: 20,
-            marginTop: 30,
-            borderRadius: 20,
-        },
-        saveLoadOrderButtonContainer: {
-            alignItems: "center",
-        },
-        saveLoadOrderButton: {
-            paddingHorizontal: 30,
-            paddingVertical: 15,
-            borderRadius: 10,
-            backgroundColor: colors.foreground,
-        },
-        saveLoadOrderText: {
-            fontSize: 16,
-            fontWeight: 600,
-            color: colors.textPrimary,
-        },
 
         signOutContainer: {
             marginTop: 30,
@@ -81,7 +76,7 @@ export const createStyles = (colors: AppColors) => {
         },
         signOutButtonText: {
             fontSize: 16,
-            fontWeight: 600,
+            fontWeight: 500,
             color: colors.textPrimary,
         },
     })

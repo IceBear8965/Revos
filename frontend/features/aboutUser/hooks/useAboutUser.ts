@@ -25,7 +25,6 @@ export const useAboutUser = (): UseAsyncGet<AboutUserResponseType> => {
                 email: data.email,
                 nickname: data.nickname,
                 timezone: data.timezone,
-                loadOrder: data.load_order,
             }
 
             setData(mappedData)
@@ -35,10 +34,6 @@ export const useAboutUser = (): UseAsyncGet<AboutUserResponseType> => {
             setIsLoading(false)
         }
     }, [])
-
-    // useEffect(() => {
-    //     fetchAboutUser()
-    // }, [fetchAboutUser])
 
     return {
         data,

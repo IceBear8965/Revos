@@ -8,19 +8,19 @@ import BottomSheet, {
 import { useTheme } from "@/context/ThemeContext"
 import { TextInput } from "react-native-gesture-handler"
 import { AppColors } from "@/theme/types"
-import { ChangeNicknameModalProps } from "./types"
-import { useNickname } from "./hooks/useNickname"
+import { ChangeTimezoneModalProps } from "./types"
+import { useTimezone } from "./hooks/useTimezone"
 import { Loader } from "@/shared/components/Loader"
 import { Error } from "@/shared/components/Error"
 
-export const ChangeNicknameModal = ({
+export const ChangeTimezoneModal = ({
     modalVisible,
     setModalVisible,
-    currentNickname,
+    currentTimezone,
     onSuccess,
-}: ChangeNicknameModalProps) => {
-    const [nickname, setNickname] = useState<string | undefined>(currentNickname)
-    const { isLoading, error, refetch: changeNickname } = useNickname()
+}: ChangeTimezoneModalProps) => {
+    const [timezone, setTimezone] = useState<string | undefined>(currentTimezone)
+    const { isLoading, error, refetch: changeTimezone } = useTimezone()
     const snapPoints = useMemo(() => ["30%"], [])
     const { colors } = useTheme()
     const styles = createStyles(colors)
@@ -38,20 +38,20 @@ export const ChangeNicknameModal = ({
     )
 
     const handleSave = async () => {
-        if (nickname) {
-            await changeNickname(nickname)
+        if (timezone) {
+            await changeTimezone(timezone)
             setModalVisible(false)
             onSuccess()
         } else {
-            Alert.alert("Request failed", "Nickname can't be changed now.")
+            Alert.alert("Request failed", "Timezone can't be changed now.")
         }
     }
 
     useEffect(() => {
         if (modalVisible) {
-            setNickname(currentNickname ?? "")
+            setTimezone(currentTimezone ?? "")
         }
-    }, [modalVisible, currentNickname])
+    }, [modalVisible, currentTimezone])
 
     if (isLoading) return <Loader />
     if (error) return <Error error={error} />
@@ -75,8 +75,8 @@ export const ChangeNicknameModal = ({
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <TextInput
-                            value={nickname}
-                            onChangeText={setNickname}
+                            value={timezone}
+                            onChangeText={setTimezone}
                             style={styles.inputField}
                         />
                         <View style={{ flex: 1, alignItems: "center" }}>

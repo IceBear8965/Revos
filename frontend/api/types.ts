@@ -155,11 +155,11 @@ interface ChangeNicknameResponseDTO {
     updated_nickname: string
 }
 
-interface ChangeLoadOrderPayloadDTO {
-    load_order: string[]
+interface ChangeTimezonePayloadDTO {
+    timezone: string
 }
-interface ChangeLoadOrderResponseDTO {
-    load_order: string[]
+interface ChangeTimezoneResponseDTO {
+    updated_timezone: string
 }
 
 export {
@@ -181,6 +181,6 @@ export {
     AboutUserResponseDTO,
     ChangeNicknamePayloadDTO,
     ChangeNicknameResponseDTO,
-    ChangeLoadOrderPayloadDTO,
-    ChangeLoadOrderResponseDTO,
+    ChangeTimezonePayloadDTO,
+    ChangeTimezoneResponseDTO,
 }
