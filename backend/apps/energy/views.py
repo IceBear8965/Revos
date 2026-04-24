@@ -308,11 +308,6 @@ class EventsListView(APIView):
         except ValueError:
             raise ValidationError({"date": "Invalid format. Use YYYY-MM-DD"})
 
-        today = timezone.now().date()
-
-        if date > today:
-            raise ValidationError({"date": "Cannot request future dates"})
-
         start = datetime.combine(date, datetime.min.time()).replace(tzinfo=dt_timezone.utc)
         end = start + timedelta(days=1)
 

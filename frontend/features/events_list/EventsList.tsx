@@ -8,15 +8,16 @@ import { EventType } from "@/shared/types"
 import { EventCard } from "@/shared/components/EventCard"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
-import { getWeekday, formatDateDDMM } from "@/shared/utils/formatDate"
+import { getWeekday, formatDateDDMM } from "@/utils/formatDate"
 
 const ITEM_WIDTH = 80
-
 const SCREEN_WIDTH = Dimensions.get("window").width
-const SIDE_PADDING = SCREEN_WIDTH / 2 - ITEM_WIDTH / 2
 
 export const EventsList = () => {
+    const [scrollKey, setScrollKey] = useState(0)
     const [selectedDate, setSelectedDate] = useState(new Date())
+    const [targetDate, setTargetDate] = useState<Date | null>(null)
+
     const { data, isLoading, error, refetch } = useEventsList()
     const { colors } = useTheme()
     const styles = createStyles(colors)
@@ -27,6 +28,7 @@ export const EventsList = () => {
     useFocusEffect(
         useCallback(() => {
             refetch(selectedDate)
+            setScrollKey((v) => v + 1)
         }, [])
     )
 
@@ -40,6 +42,7 @@ export const EventsList = () => {
             await refetch(selectedDate)
         } finally {
             setIsRefreshing(false)
+            setScrollKey((v) => v + 1)
         }
     }
 
@@ -61,32 +64,49 @@ export const EventsList = () => {
 
     const dates = useMemo(() => generateDates(selectedDate), [selectedDate])
 
-    // ✅ правильное центрирование
     const scrollToIndex = (index: number) => {
+        const isLast = index === dates.length - 1
+
+        const offset = isLast
+            ? index * ITEM_WIDTH - (SCREEN_WIDTH - ITEM_WIDTH)
+            : index * ITEM_WIDTH - SCREEN_WIDTH / 2 + ITEM_WIDTH / 2
+
         listRef.current?.scrollToOffset({
-            offset: index * ITEM_WIDTH,
+            offset: offset < 0 ? 0 : offset,
             animated: true,
         })
     }
 
     useEffect(() => {
-        const index = dates.findIndex((d) => d.toDateString() === selectedDate.toDateString())
+        if (!targetDate) return
 
-        if (index !== -1) {
-            setTimeout(() => scrollToIndex(index), 50)
-        }
-    }, [dates])
+        const index = dates.findIndex((d) => d.toDateString() === targetDate.toDateString())
+
+        if (index === -1) return
+
+        setTimeout(() => {
+            scrollToIndex(index)
+        }, 50)
+    }, [dates, targetDate, scrollKey])
+
+    useEffect(() => {
+        const todayIndex = dates.length - 1
+
+        setTimeout(() => {
+            scrollToIndex(todayIndex)
+        }, 100)
+    }, [])
 
     const renderItem = ({ item }: { item: EventType }) => <EventCard event={item} />
 
-    const renderDateItem = ({ item, index }: { item: Date; index: number }) => {
+    const renderDateItem = ({ item }: { item: Date; index: number }) => {
         const isSelected = item.toDateString() === selectedDate.toDateString()
 
         return (
             <Pressable
                 onPress={() => {
                     setSelectedDate(item)
-                    scrollToIndex(index)
+                    setTargetDate(item)
                 }}
                 style={[
                     styles.dateElement,
@@ -131,12 +151,7 @@ export const EventsList = () => {
                 keyExtractor={(item) => item.toISOString()}
                 renderItem={renderDateItem}
                 showsHorizontalScrollIndicator={false}
-                decelerationRate="fast"
-                snapToInterval={ITEM_WIDTH}
-                snapToAlignment="center"
-                disableIntervalMomentum={true}
                 contentContainerStyle={{
-                    paddingHorizontal: SIDE_PADDING, // 🔥 ключевой фикс
                     paddingVertical: 10,
                 }}
             />
