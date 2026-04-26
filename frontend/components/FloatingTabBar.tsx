@@ -8,7 +8,7 @@ import { useTabBar } from "@/context/TabBarContext"
 
 export const FloatingTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const { colors } = useTheme()
-    const { setBubbleReady } = useTabBar()
+    const { setBubbleReady, isVisible } = useTabBar()
 
     const [layout, setLayout] = useState({ width: 0, height: 0 })
 
@@ -68,6 +68,8 @@ export const FloatingTabBar = ({ state, descriptors, navigation }: BottomTabBarP
             height: bubbleHeight,
         },
     })
+
+    if (!isVisible) return null
 
     return (
         <View onLayout={onLayout} style={styles.tabBar}>

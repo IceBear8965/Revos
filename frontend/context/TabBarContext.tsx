@@ -2,14 +2,18 @@ import { PropsWithChildren, createContext, useState, useEffect, useContext } fro
 
 interface TabBarContextType {
     isTabBarReady: boolean
+    isVisible: boolean
     setBubbleReady: () => void
     setIconReady: () => void
+    setVisible: (visible: boolean) => void
 }
 
 export const TabBarContext = createContext<TabBarContextType>({
     isTabBarReady: false,
+    isVisible: true,
     setBubbleReady: () => {},
     setIconReady: () => {},
+    setVisible: (visible: boolean) => {},
 })
 
 export const useTabBar = () => {
@@ -25,6 +29,8 @@ export const TabBarProvider = ({ children }: PropsWithChildren) => {
     const [isBubbleReady, setIsBubbleReady] = useState<boolean>(false)
     const [isIconReady, setIsIconReady] = useState<boolean>(false)
 
+    const [isVisible, setIsVisible] = useState<boolean>(true)
+
     useEffect(() => {
         if (isBubbleReady && isIconReady) {
             setIsTabBarReady(true)
@@ -36,12 +42,18 @@ export const TabBarProvider = ({ children }: PropsWithChildren) => {
     }
     const setIconReady = () => setIsIconReady(true)
 
+    const setVisible = (visible: boolean) => {
+        setIsVisible(visible)
+    }
+
     return (
         <TabBarContext
             value={{
                 isTabBarReady: isTabBarReady,
+                isVisible: isVisible,
                 setBubbleReady: setBubbleReady,
                 setIconReady: setIconReady,
+                setVisible: setVisible,
             }}
         >
             {children}
