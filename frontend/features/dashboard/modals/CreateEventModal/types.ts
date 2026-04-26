@@ -1,6 +1,5 @@
 import React from "react"
 import { LastEvent } from "../../types"
-import { ActivityTypeKey } from "@/shared/constants"
 
 interface CreateEventProps {
     activity: number
@@ -11,7 +10,7 @@ interface CreateEventProps {
 
 interface CreateEventResponse {
     id: number
-    eventType: "load" | "recovery"
+    eventType: "load" | "recovery" | "system"
     activityType: string
     startedAt: Date
     endedAt: Date

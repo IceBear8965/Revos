@@ -1,49 +1,40 @@
-import { useEffect, useRef, useState } from "react"
-import { Pressable, Text, View, Animated, PanResponder, Dimensions } from "react-native"
+import { act, useEffect, useRef, useState } from "react"
+import { Pressable, Text, View, Animated, PanResponder, Dimensions, TextInput } from "react-native"
 import { useTheme } from "@/context/ThemeContext"
-import { ActivitiTypePicker } from "../components/ActivityTypePicker/ActivityTypePicker"
-import { ModalTimePicker } from "../components/ModalTimePicker/ModalTimePicker"
-import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
-import { useCreateEvent } from "../../hooks/useCreateEvent"
-import { createStyles } from "./styles"
 import { Alert } from "react-native"
 import { useTabBar } from "@/context/TabBarContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
-import { ActivityTypeDTO } from "@/api/types"
 import { Loader } from "@/shared/components/Loader"
-import { CreateEventModalType } from "./types"
+import { createStyles } from "./styles"
+import { EditTypeModalProps } from "./types"
+import DropDownPicker from "react-native-dropdown-picker"
+import { ActivityCoefSelector } from "./ActivityCoefSelector"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
-export const CreateEventModal = ({
-    refetch,
-    event_type,
-    lastEvent,
+export const EditTypeModal = ({
+    activity_type,
     modalVisible,
     setModalVisible,
-}: CreateEventModalType) => {
+}: EditTypeModalProps) => {
     const { colors } = useTheme()
-    const { setVisible } = useTabBar()
-    const { types, isLoading: isTypesLoading } = useActivityTypes()
     const styles = createStyles(colors)
+    const { setVisible } = useTabBar()
+    const { types, isLoading: isTypesLoading, refetch: refetchActivities } = useActivityTypes()
 
-    const { refetch: createEventPost, isLoading, error } = useCreateEvent()
+    const [name, setName] = useState<string>("")
+    const [activityCategory, setActivityCategory] = useState<"load" | "recovery">("load")
+    const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false)
+
+    const [activityCoef, setActivityCoef] = useState<number>(1.0)
+
+    const items = [
+        { label: "Load", value: "load" },
+        { label: "Recovery", value: "recovery" },
+    ]
 
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current
     const [isOpen, setIsOpen] = useState(false)
-
-    // Event type picker
-    const [dropDownValues, setDropDownValues] = useState<ActivityTypeDTO[] | null>(null)
-    const [isDropDownOpen, setIsDropDownOpen] = useState(false)
-    const [dropDownValue, setDropDownValue] = useState<number | null>(null)
-
-    // Time picker
-    const [startedAt, setStartedAt] = useState<Date>(new Date())
-    const [endedAt, setEndedAt] = useState<Date>(new Date())
-    const [resetSignal, setResetSignal] = useState<boolean>(false)
-
-    // Subjective coef picker
-    const [subjectiveCoef, setSubjectiveCoef] = useState(1.0)
 
     const open = () => {
         setIsOpen(true)
@@ -72,18 +63,6 @@ export const CreateEventModal = ({
         else close()
     }, [modalVisible])
 
-    useEffect(() => {
-        const startDate = lastEvent?.endedAt
-        setStartedAt(startDate ?? new Date())
-        setEndedAt(new Date())
-    }, [modalVisible])
-
-    // Update values dependent on selected event_type
-    useEffect(() => {
-        const values = types.filter((el) => el.category === event_type)
-        setDropDownValues(values)
-    }, [modalVisible, event_type])
-
     const panResponder = useRef(
         PanResponder.create({
             onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
@@ -98,26 +77,33 @@ export const CreateEventModal = ({
     ).current
 
     const createEvent = async () => {
-        if (!dropDownValue) return
-
-        try {
-            await createEventPost({
-                activity: dropDownValue,
-                startedAt,
-                endedAt,
-                subjectiveCoef,
-            })
-
-            await refetch()
-            close()
-        } catch (error) {
-            console.log(error)
-            Alert.alert("Error", "Failed to create event")
-        }
+        console.log("create")
+        // if (!dropDownValue) return
+        //
+        // try {
+        //     await createEventPost({
+        //         activity: dropDownValue,
+        //         startedAt,
+        //         endedAt,
+        //         subjectiveCoef,
+        //     })
+        //
+        //     await refetch()
+        //     close()
+        // } catch (error) {
+        //     console.log(error)
+        //     Alert.alert("Error", "Failed to create event")
+        // }
     }
 
+    // Init modal
+    useEffect(() => {
+        setName(activity_type.name)
+        setActivityCategory(activity_type.category)
+        setActivityCoef(activity_type.value)
+    }, [modalVisible, activity_type])
+
     if (!isOpen) return null
-    if (isLoading) return <Loader message="Saving your activity" />
     if (isTypesLoading) return <Loader message="Loading your activities" />
 
     return (
@@ -175,34 +161,56 @@ export const CreateEventModal = ({
 
                     {/* HEADER */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>New Event</Text>
+                        <Text style={styles.headerTitle}>Activity Type</Text>
 
                         <Pressable onPress={createEvent} style={styles.saveButton}>
                             <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>
 
-                    {/* CONTENT */}
                     <View style={styles.modalContentContainer}>
                         <View style={styles.modalContent}>
-                            <ActivitiTypePicker
-                                dropDownValues={dropDownValues}
-                                isDropDownOpen={isDropDownOpen}
-                                dropDownValue={dropDownValue}
-                                setIsDropDownOpen={setIsDropDownOpen}
-                                setDropDownValue={setDropDownValue}
+                            <TextInput
+                                style={styles.input}
+                                placeholderTextColor={colors.textPrimary}
+                                autoCapitalize="none"
+                                onChangeText={setName}
+                                value={name}
                             />
-                            <ModalTimePicker
-                                startedAt={startedAt}
-                                endedAt={endedAt}
-                                setStartedAt={setStartedAt}
-                                setEndedAt={setEndedAt}
-                                resetSignal={resetSignal}
+
+                            <DropDownPicker
+                                style={{
+                                    backgroundColor: colors.card,
+                                    borderColor: colors.topBar,
+                                    borderRadius: 12,
+                                    marginBottom: 20,
+                                }}
+                                textStyle={{
+                                    color: colors.textPrimary,
+                                    fontSize: 16,
+                                }}
+                                dropDownContainerStyle={{
+                                    backgroundColor: colors.card,
+                                    borderColor: colors.topBar,
+                                    borderRadius: 12,
+                                }}
+                                arrowIconStyle={{
+                                    tintColor: colors.textPrimary,
+                                }}
+                                tickIconStyle={{
+                                    tintColor: colors.textPrimary,
+                                }}
+                                open={isDropDownOpen}
+                                value={activityCategory}
+                                setValue={setActivityCategory}
+                                items={items}
+                                setOpen={setIsDropDownOpen}
                             />
-                            <SubjectiveCoefSelector
-                                eventType={event_type}
-                                subjectiveCoef={subjectiveCoef}
-                                onChange={setSubjectiveCoef}
+
+                            <ActivityCoefSelector
+                                eventType={activityCategory}
+                                value={activityCoef}
+                                onChange={setActivityCoef}
                             />
                         </View>
                     </View>

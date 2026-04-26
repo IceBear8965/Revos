@@ -8,12 +8,12 @@ import { Loader } from "@/shared/components/Loader"
 import { Error } from "@/shared/components/Error"
 import { createStyles } from "./aboutUser.style"
 import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
-import { ChangeTimezoneModal } from "./components/changeTimezoneModal/ChangeTimezoneModal"
+import { ChangeTimezoneModal } from "./modals/ChangeTimezoneModal/ChangeTimezoneModal"
+import { EditTypeModal } from "./modals/ActivityTypes/EditEventModal/EditTypeModal"
 import { useAuth } from "@/context/AuthContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { ActivityTypeDTO } from "@/api/types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
-import DropDownPicker from "react-native-dropdown-picker"
 
 export const AboutUser = () => {
     const { data, isLoading, error, refetch } = useAboutUser()
@@ -21,12 +21,17 @@ export const AboutUser = () => {
     const { theme, toggleTheme, colors } = useTheme()
     const { types, isLoading: isTypesLoading } = useActivityTypes()
     const styles = createStyles(colors)
-    const [nicknameModalVisible, setNicknameModalVisible] = useState(false)
-    const [timezoneModalVisible, setTimezoneModalVisible] = useState(false)
+    const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
+    const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
+    const [activityTypeEditModal, setActivityTypeEditModal] = useState<boolean>(false)
+    const [selectedActivityType, setSelectedActivityType] = useState<ActivityTypeDTO>({
+        id: 0,
+        name: "",
+        category: "load",
+        value: 1.0,
+        is_editable: false,
+    })
     const router = useRouter()
-
-    const [dropDownValue, setDropDownValue] = useState<"load" | "recovery">()
-    const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false)
 
     useFocusEffect(
         useCallback(() => {
@@ -63,11 +68,34 @@ export const AboutUser = () => {
         const activeIconColor = item.category === "load" ? colors.accentRed : colors.accentGreen
 
         return (
-            <Pressable
-                style={[{ opacity: item.is_editable ? 1 : 0.5 }, styles.activityTypeCard]}
-                onPress={() => console.log(item.name)}
-            >
-                <Text style={styles.activityTypeName}>{item.name}</Text>
+            <View style={[{ opacity: item.is_editable ? 1 : 0.5 }, styles.activityTypeCard]}>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                >
+                    <Text style={styles.activityTypeName}>{item.name}</Text>
+                    <View style={{ flexDirection: "row" }}>
+                        <Pressable
+                            onPress={() => {
+                                setSelectedActivityType(item)
+                                setActivityTypeEditModal(true)
+                            }}
+                            style={{ marginRight: 10 }}
+                        >
+                            <FontAwesome6
+                                name="pen-to-square"
+                                size={24}
+                                color={colors.textPrimary}
+                            />
+                        </Pressable>
+                        <Pressable onPress={() => console.log("Delete")}>
+                            <FontAwesome6 name="trash-can" size={24} color={colors.textPrimary} />
+                        </Pressable>
+                    </View>
+                </View>
                 <View style={{ justifyContent: "flex-start", flexDirection: "row" }}>
                     <Text
                         style={[
@@ -105,7 +133,7 @@ export const AboutUser = () => {
                         )
                     })}
                 </View>
-            </Pressable>
+            </View>
         )
     }
 
@@ -181,6 +209,11 @@ export const AboutUser = () => {
                 modalVisible={timezoneModalVisible}
                 setModalVisible={setTimezoneModalVisible}
                 onSuccess={refetchOnSuccess}
+            />
+            <EditTypeModal
+                activity_type={selectedActivityType}
+                modalVisible={activityTypeEditModal}
+                setModalVisible={setActivityTypeEditModal}
             />
         </View>
     )
