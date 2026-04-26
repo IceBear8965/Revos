@@ -119,7 +119,7 @@ export const EventsList = () => {
                     style={[
                         styles.dateWeekday,
                         {
-                            color: isSelected ? colors.accentGreen : colors.textSecondary,
+                            color: isSelected ? colors.accentGreen : colors.textPrimary,
                         },
                     ]}
                 >
@@ -129,7 +129,7 @@ export const EventsList = () => {
                     style={[
                         styles.dateNumber,
                         {
-                            color: isSelected ? colors.accentGreen : colors.textSecondary,
+                            color: isSelected ? colors.accentGreen : colors.textPrimary,
                         },
                     ]}
                 >
@@ -166,7 +166,7 @@ export const EventsList = () => {
                 }}
                 ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
                 ListFooterComponent={<View style={{ height: 10 }} />}
-                showsVerticalScrollIndicator={true}
+                showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
                         refreshing={isRefreshing}

@@ -7,7 +7,7 @@ import { useAboutUser } from "./hooks/useAboutUser"
 import { Loader } from "@/shared/components/Loader"
 import { Error } from "@/shared/components/Error"
 import { createStyles } from "./aboutUser.style"
-import { ChangeNicknameModal } from "./components/changeNicknameModal/ChangeNicknameModal"
+import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
 import { ChangeTimezoneModal } from "./components/changeTimezoneModal/ChangeTimezoneModal"
 import { useAuth } from "@/context/AuthContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
@@ -159,7 +159,7 @@ export const AboutUser = () => {
                     }}
                     ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
                     ListFooterComponent={<View style={{ height: 10 }} />}
-                    showsVerticalScrollIndicator={true}
+                    showsVerticalScrollIndicator={false}
                 />
             </View>
 
