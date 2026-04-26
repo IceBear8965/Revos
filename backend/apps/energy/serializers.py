@@ -81,6 +81,7 @@ class ActivityTypeCollectionSerializer(serializers.Serializer):
     name = serializers.CharField()
     category = serializers.ChoiceField(choices=UserTypeChoices.choices)
     value = serializers.FloatField()
+    is_editable = serializers.BooleanField()
 
 
 class ActivityTypeCreateSerializer(serializers.Serializer):

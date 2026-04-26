@@ -3,7 +3,7 @@ import { LastEvent } from "../../types"
 import { ActivityTypeKey } from "@/shared/constants"
 
 interface CreateEventProps {
-    activityType: ActivityTypeKey
+    activity: number
     startedAt: Date
     endedAt: Date
     subjectiveCoef: number
@@ -12,7 +12,7 @@ interface CreateEventProps {
 interface CreateEventResponse {
     id: number
     eventType: "load" | "recovery"
-    activityType: ActivityTypeKey
+    activityType: string
     startedAt: Date
     endedAt: Date
     energyBefore: number

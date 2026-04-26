@@ -3,10 +3,6 @@ import { AppColors } from "@/theme/types"
 
 export const createStyles = (colors: AppColors) => {
     return StyleSheet.create({
-        modalBottomSheet: {
-            backgroundColor: colors.background,
-        },
-
         header: {
             flexDirection: "row",
             justifyContent: "space-between",
@@ -15,6 +11,8 @@ export const createStyles = (colors: AppColors) => {
             paddingVertical: 10,
             backgroundColor: colors.foreground,
             marginBottom: 20,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
         },
         headerTitle: {
             color: colors.textPrimary,
@@ -33,18 +31,14 @@ export const createStyles = (colors: AppColors) => {
             fontWeight: 600,
         },
 
-        modalContainer: {
-            flex: 1,
-        },
-
         modalContentContainer: {
             flex: 1,
-            justifyContent: "space-between",
             alignItems: "center",
         },
         modalContent: {
             flex: 1,
             width: "80%",
+            maxHeight: "60%",
             justifyContent: "space-between",
             paddingHorizontal: 20,
         },

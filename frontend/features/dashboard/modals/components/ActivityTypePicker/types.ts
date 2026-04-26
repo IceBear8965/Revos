@@ -1,13 +1,12 @@
-import { ActivityTypeKey } from "@/shared/constants"
+import { ActivityTypeDTO } from "@/api/types"
 import { Dispatch, SetStateAction } from "react"
 
 interface ActivityTypePickerProps {
-    event_type?: "load" | "recovery"
+    dropDownValues: ActivityTypeDTO[] | null
     isDropDownOpen: boolean
-    dropDownValue: string | null
+    dropDownValue: number | null
     setIsDropDownOpen: Dispatch<SetStateAction<boolean>>
-    setDropDownValue: Dispatch<SetStateAction<ActivityTypeKey | null>>
-    closeModal: () => void
+    setDropDownValue: Dispatch<SetStateAction<number | null>>
 }
 
 export { ActivityTypePickerProps }

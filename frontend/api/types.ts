@@ -23,8 +23,8 @@ interface RefreshResponse {
 
 interface LastEventDTO {
     id: number
-    event_type: "load" | "recovery"
-    activity_type: ActivityTypeKey
+    event_type: "load" | "recovery" | "system"
+    activity_type: string
     started_at: string // ISO8601
     ended_at: string // ISO8601
     energy_delta: number
@@ -43,7 +43,7 @@ interface DashboardDTO {
 }
 
 interface CreateEventPayload {
-    activity_type: ActivityTypeKey
+    activity: number
     started_at: string
     ended_at: string
     subjective_coef: number
@@ -52,7 +52,7 @@ interface CreateEventPayload {
 interface EventDTO {
     id: number
     event_type: "load" | "recovery"
-    activity_type: ActivityTypeKey
+    activity_type: string
     started_at: string
     ended_at: string
     energy_before: number
@@ -64,7 +64,7 @@ interface EventDTO {
 interface EventsListElementDTO {
     id: number
     event_type: "load" | "recovery"
-    activity_type: ActivityTypeKey
+    activity_type: string
     started_at: string
     ended_at: string
     energy_delta: number
@@ -123,7 +123,7 @@ interface RegisterResponse {
 
 interface EditEventPayloadDTO {
     id: number
-    activity_type: ActivityTypeKey
+    activity_type: string
     started_at: string // ISO8601
     ended_at: string // ISO8601
     subjective_coef: number
@@ -131,7 +131,7 @@ interface EditEventPayloadDTO {
 
 interface EditEventResponseDTO {
     id: number
-    activity_type: ActivityTypeKey
+    activity_type: string
     event_type: "load" | "recovery"
     started_at: string
     ended_at: string
@@ -162,6 +162,14 @@ interface ChangeTimezoneResponseDTO {
     updated_timezone: string
 }
 
+interface ActivityTypeDTO {
+    id: number
+    name: string
+    category: "load" | "recovery"
+    value: number
+    is_editable: boolean
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -183,4 +191,5 @@ export {
     ChangeNicknameResponseDTO,
     ChangeTimezonePayloadDTO,
     ChangeTimezoneResponseDTO,
+    ActivityTypeDTO,
 }

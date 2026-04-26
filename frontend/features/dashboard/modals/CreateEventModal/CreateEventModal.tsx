@@ -1,20 +1,19 @@
-import { useEffect, useState, useMemo, useRef, useCallback } from "react"
-import { Pressable, Text, View, Alert } from "react-native"
-import BottomSheet, {
-    BottomSheetView,
-    BottomSheetBackdrop,
-    BottomSheetBackdropProps,
-} from "@gorhom/bottom-sheet"
+import { useEffect, useRef, useState, useMemo } from "react"
+import { Pressable, Text, View, Animated, PanResponder, Dimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTheme } from "@/context/ThemeContext"
-import { CreateEventProps, CreateEventModalType } from "./types"
 import { ActivitiTypePicker } from "../components/ActivityTypePicker/ActivityTypePicker"
 import { ModalTimePicker } from "../components/ModalTimePicker/ModalTimePicker"
-import { createStyles } from "./styles"
 import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { useCreateEvent } from "../../hooks/useCreateEvent"
-import { ActivityTypeKey } from "@/shared/constants"
+import { createStyles } from "./styles"
+import { Alert } from "react-native"
+import { useTabBar } from "@/context/TabBarContext"
+import { useActivityTypes } from "@/context/ActivityTypesContext"
+import { ActivityTypeDTO } from "@/api/types"
 import { Loader } from "@/shared/components/Loader"
+
+const SCREEN_HEIGHT = Dimensions.get("window").height
 
 export const CreateEventModal = ({
     refetch,
@@ -22,118 +21,176 @@ export const CreateEventModal = ({
     lastEvent,
     modalVisible,
     setModalVisible,
-}: CreateEventModalType) => {
-    const sheetRef = useRef<BottomSheet>(null)
-    const snapPoints = useMemo(() => ["50%"], [])
-    const renderBackdrop = useCallback(
-        (props: BottomSheetBackdropProps) => (
-            <BottomSheetBackdrop
-                {...props}
-                appearsOnIndex={0}
-                disappearsOnIndex={-1}
-                opacity={0.5}
-            />
-        ),
-        []
-    )
+}: any) => {
+    const { colors } = useTheme()
+    const { setVisible } = useTabBar()
+    const { types, isLoading: isTypesLoading } = useActivityTypes()
+    const styles = createStyles(colors)
 
     const { refetch: createEventPost, isLoading, error } = useCreateEvent()
 
-    useEffect(() => {
-        if (modalVisible) {
-            sheetRef.current?.expand()
-        } else {
-            sheetRef.current?.close()
-        }
-    }, [modalVisible])
+    const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current
+    const [isOpen, setIsOpen] = useState(false)
 
-    // Activity Type picker
-    const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false) // DropDownPicker option to open
-    const [dropDownValue, setDropDownValue] = useState<ActivityTypeKey | null>(null) // DropDownPicker value
+    // Event type picker
+    const [dropDownValues, setDropDownValues] = useState<ActivityTypeDTO[] | null>(null)
+    const [isDropDownOpen, setIsDropDownOpen] = useState(false)
+    const [dropDownValue, setDropDownValue] = useState<number | null>(null)
 
-    // Date-time picker
+    // Time picker
     const [startedAt, setStartedAt] = useState<Date>(new Date())
     const [endedAt, setEndedAt] = useState<Date>(new Date())
     const [resetSignal, setResetSignal] = useState<boolean>(false)
 
-    // Subjectiv coef picker
-    const [subjectiveCoef, setSubjectiveCoef] = useState<number>(1.0)
+    // Subjective coef picker
+    const [subjectiveCoef, setSubjectiveCoef] = useState(1.0)
 
-    const { colors } = useTheme()
-    const styles = createStyles(colors)
+    const open = () => {
+        setIsOpen(true)
+        setVisible(false)
+        Animated.timing(translateY, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start()
+    }
 
-    const closeModal = () => {
-        setIsDropDownOpen(false)
-        setResetSignal(!resetSignal)
-        setModalVisible(false)
+    const close = () => {
+        Animated.timing(translateY, {
+            toValue: SCREEN_HEIGHT,
+            duration: 250,
+            useNativeDriver: true,
+        }).start(() => {
+            setIsOpen(false)
+            setModalVisible(false)
+            setVisible(true)
+        })
     }
 
     useEffect(() => {
+        if (modalVisible) open()
+        else close()
+    }, [modalVisible])
+
+    useEffect(() => {
         const startDate = lastEvent?.endedAt
-        if (startDate) {
-            setStartedAt(startDate)
-        } else {
-            setStartedAt(new Date())
-        }
+        setStartedAt(startDate ?? new Date())
         setEndedAt(new Date())
     }, [modalVisible])
 
+    // Update values dependent on selected event_type
+    useEffect(() => {
+        const values = types.filter((el) => el.category === event_type)
+        setDropDownValues(values)
+    }, [modalVisible, event_type])
+
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
+            onPanResponderMove: (_, g) => {
+                if (g.dy > 0) translateY.setValue(g.dy)
+            },
+            onPanResponderRelease: (_, g) => {
+                if (g.dy > 120) close()
+                else open()
+            },
+        })
+    ).current
+
     const createEvent = async () => {
-        if (dropDownValue) {
-            const requestBody: CreateEventProps = {
-                activityType: dropDownValue,
-                startedAt: startedAt,
-                endedAt: endedAt,
-                subjectiveCoef: subjectiveCoef,
-            }
-            try {
-                await createEventPost(requestBody)
-                await refetch()
-                closeModal()
-            } catch (error) {
-                console.log(error)
-                Alert.alert("Error", "Failed to create event")
-            }
+        if (!dropDownValue) return
+
+        try {
+            await createEventPost({
+                activity: dropDownValue,
+                startedAt,
+                endedAt,
+                subjectiveCoef,
+            })
+
+            await refetch()
+            close()
+        } catch (error) {
+            console.log(error)
+            Alert.alert("Error", "Failed to create event")
         }
     }
 
+    if (!isOpen) return null
     if (isLoading) return <Loader message="Saving your activity" />
-
-    if (error) return <Text style={{ color: colors.accentRed }}>Error: {error.message}</Text>
+    if (isTypesLoading) return <Loader message="Loading your activities" />
 
     return (
-        <BottomSheet
-            ref={sheetRef}
-            index={-1}
-            snapPoints={snapPoints}
-            backdropComponent={renderBackdrop}
-            enablePanDownToClose={true}
-            onClose={closeModal}
-            backgroundStyle={{ backgroundColor: colors.background }}
-            handleIndicatorStyle={{ backgroundColor: colors.textPrimary }}
-            handleStyle={{
-                backgroundColor: colors.foreground,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+        <View
+            style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 999,
             }}
         >
-            <BottomSheetView>
-                <SafeAreaView style={styles.modalContainer} edges={["bottom"]}>
+            {/* Press on background to close modal */}
+            <Pressable
+                onPress={close}
+                style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                }}
+            />
+            {/* SHEET */}
+            <Animated.View
+                style={{
+                    position: "absolute",
+                    bottom: 0,
+                    width: "100%",
+                    height: SCREEN_HEIGHT * 0.4,
+                    backgroundColor: colors.background,
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                    transform: [{ translateY }],
+                }}
+            >
+                <View style={{ flex: 1 }}>
+                    <View
+                        {...panResponder.panHandlers}
+                        style={{
+                            height: 30,
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <View
+                            style={{
+                                width: 40,
+                                height: 5,
+                                borderRadius: 3,
+                                backgroundColor: colors.textPrimary,
+                            }}
+                        />
+                    </View>
+
+                    {/* HEADER */}
                     <View style={styles.header}>
                         <Text style={styles.headerTitle}>New Event</Text>
-                        <Pressable style={styles.saveButton} onPress={createEvent}>
+
+                        <Pressable onPress={createEvent} style={styles.saveButton}>
                             <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>
+
+                    {/* CONTENT */}
                     <View style={styles.modalContentContainer}>
                         <View style={styles.modalContent}>
                             <ActivitiTypePicker
-                                event_type={event_type}
+                                dropDownValues={dropDownValues}
                                 isDropDownOpen={isDropDownOpen}
                                 dropDownValue={dropDownValue}
                                 setIsDropDownOpen={setIsDropDownOpen}
                                 setDropDownValue={setDropDownValue}
-                                closeModal={closeModal}
                             />
                             <ModalTimePicker
                                 startedAt={startedAt}
@@ -149,8 +206,8 @@ export const CreateEventModal = ({
                             />
                         </View>
                     </View>
-                </SafeAreaView>
-            </BottomSheetView>
-        </BottomSheet>
+                </View>
+            </Animated.View>
+        </View>
     )
 }

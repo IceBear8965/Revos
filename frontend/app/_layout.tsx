@@ -2,10 +2,11 @@ import { Stack } from "expo-router"
 import { useEffect } from "react"
 import { AuthProvider, useAuth } from "@/context/AuthContext"
 import { ThemeProvider, useTheme } from "@/context/ThemeContext"
-import { TabBarProvider, useTabBar } from "@/context/TabBarContext"
+import { TabBarProvider } from "@/context/TabBarContext"
 import * as SplashScreen from "expo-splash-screen"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { ActivityTypesProvider } from "@/context/ActivityTypesContext"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -15,9 +16,11 @@ export default function RootLayout() {
             <ThemeProvider>
                 <TabBarProvider>
                     <AuthProvider>
-                        <GestureHandlerRootView style={{ flex: 1 }}>
-                            <RootNavigator />
-                        </GestureHandlerRootView>
+                        <ActivityTypesProvider>
+                            <GestureHandlerRootView style={{ flex: 1 }}>
+                                <RootNavigator />
+                            </GestureHandlerRootView>
+                        </ActivityTypesProvider>
                     </AuthProvider>
                 </TabBarProvider>
             </ThemeProvider>
