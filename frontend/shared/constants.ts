@@ -1,3 +1,5 @@
+export const ACTIVITY_TYPES_KEY = "activity_types"
+
 export const ACTIVITY_ORDER = [
     "work",
     "sleep",

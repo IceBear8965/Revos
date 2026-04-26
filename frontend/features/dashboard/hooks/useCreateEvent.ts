@@ -13,7 +13,7 @@ export const useCreateEvent = (): UseAsyncPost<void, CreateEventProps> => {
         setError(null)
 
         const requestBody: CreateEventPayload = {
-            activity_type: body.activityType,
+            activity: body.activity,
             started_at: body.startedAt.toISOString(),
             ended_at: body.endedAt.toISOString(),
             subjective_coef: body.subjectiveCoef,

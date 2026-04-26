@@ -6,10 +6,12 @@ import { ActivitiTypePicker } from "../components/ActivityTypePicker/ActivityTyp
 import { ModalTimePicker } from "../components/ModalTimePicker/ModalTimePicker"
 import { SubjectiveCoefSelector } from "../components/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { useCreateEvent } from "../../hooks/useCreateEvent"
-import { ActivityTypeKey } from "@/shared/constants"
 import { createStyles } from "./styles"
 import { Alert } from "react-native"
 import { useTabBar } from "@/context/TabBarContext"
+import { useActivityTypes } from "@/context/ActivityTypesContext"
+import { ActivityTypeDTO } from "@/api/types"
+import { Loader } from "@/shared/components/Loader"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
@@ -22,6 +24,7 @@ export const CreateEventModal = ({
 }: any) => {
     const { colors } = useTheme()
     const { setVisible } = useTabBar()
+    const { types, isLoading: isTypesLoading } = useActivityTypes()
     const styles = createStyles(colors)
 
     const { refetch: createEventPost, isLoading, error } = useCreateEvent()
@@ -30,8 +33,9 @@ export const CreateEventModal = ({
     const [isOpen, setIsOpen] = useState(false)
 
     // Event type picker
+    const [dropDownValues, setDropDownValues] = useState<ActivityTypeDTO[] | null>(null)
     const [isDropDownOpen, setIsDropDownOpen] = useState(false)
-    const [dropDownValue, setDropDownValue] = useState<ActivityTypeKey | null>(null)
+    const [dropDownValue, setDropDownValue] = useState<number | null>(null)
 
     // Time picker
     const [startedAt, setStartedAt] = useState<Date>(new Date())
@@ -74,6 +78,12 @@ export const CreateEventModal = ({
         setEndedAt(new Date())
     }, [modalVisible])
 
+    // Update values dependent on selected event_type
+    useEffect(() => {
+        const values = types.filter((el) => el.category === event_type)
+        setDropDownValues(values)
+    }, [modalVisible, event_type])
+
     const panResponder = useRef(
         PanResponder.create({
             onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
@@ -92,7 +102,7 @@ export const CreateEventModal = ({
 
         try {
             await createEventPost({
-                activityType: dropDownValue,
+                activity: dropDownValue,
                 startedAt,
                 endedAt,
                 subjectiveCoef,
@@ -100,13 +110,15 @@ export const CreateEventModal = ({
 
             await refetch()
             close()
-        } catch (e) {
-            console.log(e)
+        } catch (error) {
+            console.log(error)
             Alert.alert("Error", "Failed to create event")
         }
     }
 
     if (!isOpen) return null
+    if (isLoading) return <Loader message="Saving your activity" />
+    if (isTypesLoading) return <Loader message="Loading your activities" />
 
     return (
         <View
@@ -135,18 +147,18 @@ export const CreateEventModal = ({
                     position: "absolute",
                     bottom: 0,
                     width: "100%",
-                    height: SCREEN_HEIGHT * 0.7,
+                    height: SCREEN_HEIGHT * 0.4,
                     backgroundColor: colors.background,
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
                     transform: [{ translateY }],
                 }}
             >
-                <SafeAreaView style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
                     <View
                         {...panResponder.panHandlers}
                         style={{
-                            height: 10,
+                            height: 30,
                             alignItems: "center",
                             justifyContent: "center",
                         }}
@@ -173,31 +185,28 @@ export const CreateEventModal = ({
                     {/* CONTENT */}
                     <View style={styles.modalContentContainer}>
                         <View style={styles.modalContent}>
-                            {/* <ActivitiTypePicker */}
-                            {/*     event_type={event_type} */}
-                            {/*     isDropDownOpen={isDropDownOpen} */}
-                            {/*     dropDownValue={dropDownValue} */}
-                            {/*     setIsDropDownOpen={setIsDropDownOpen} */}
-                            {/*     setDropDownValue={setDropDownValue} */}
-                            {/*     closeModal={close} */}
-                            {/* /> */}
-                            {/**/}
-                            {/* <ModalTimePicker */}
-                            {/*     startedAt={startedAt} */}
-                            {/*     endedAt={endedAt} */}
-                            {/*     setStartedAt={setStartedAt} */}
-                            {/*     setEndedAt={setEndedAt} */}
-                            {/*     resetSignal={resetSignal} */}
-                            {/* /> */}
-                            {/**/}
-                            {/* <SubjectiveCoefSelector */}
-                            {/*     eventType={event_type} */}
-                            {/*     subjectiveCoef={subjectiveCoef} */}
-                            {/*     onChange={setSubjectiveCoef} */}
-                            {/* /> */}
+                            <ActivitiTypePicker
+                                dropDownValues={dropDownValues}
+                                isDropDownOpen={isDropDownOpen}
+                                dropDownValue={dropDownValue}
+                                setIsDropDownOpen={setIsDropDownOpen}
+                                setDropDownValue={setDropDownValue}
+                            />
+                            <ModalTimePicker
+                                startedAt={startedAt}
+                                endedAt={endedAt}
+                                setStartedAt={setStartedAt}
+                                setEndedAt={setEndedAt}
+                                resetSignal={resetSignal}
+                            />
+                            <SubjectiveCoefSelector
+                                eventType={event_type}
+                                subjectiveCoef={subjectiveCoef}
+                                onChange={setSubjectiveCoef}
+                            />
                         </View>
                     </View>
-                </SafeAreaView>
+                </View>
             </Animated.View>
         </View>
     )
