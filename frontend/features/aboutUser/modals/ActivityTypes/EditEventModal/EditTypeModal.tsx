@@ -1,4 +1,4 @@
-import { act, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Pressable, Text, View, Animated, PanResponder, Dimensions, TextInput } from "react-native"
 import { useTheme } from "@/context/ThemeContext"
 import { Alert } from "react-native"
@@ -9,6 +9,7 @@ import { createStyles } from "./styles"
 import { EditTypeModalProps } from "./types"
 import DropDownPicker from "react-native-dropdown-picker"
 import { ActivityCoefSelector } from "./ActivityCoefSelector"
+import { useEditType } from "./hooks/useEditType"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
@@ -21,6 +22,7 @@ export const EditTypeModal = ({
     const styles = createStyles(colors)
     const { setVisible } = useTabBar()
     const { types, isLoading: isTypesLoading, refetch: refetchActivities } = useActivityTypes()
+    const { isLoading, error, refetch: editActivityType } = useEditType()
 
     const [name, setName] = useState<string>("")
     const [activityCategory, setActivityCategory] = useState<"load" | "recovery">("load")
@@ -76,24 +78,20 @@ export const EditTypeModal = ({
         })
     ).current
 
-    const createEvent = async () => {
-        console.log("create")
-        // if (!dropDownValue) return
-        //
-        // try {
-        //     await createEventPost({
-        //         activity: dropDownValue,
-        //         startedAt,
-        //         endedAt,
-        //         subjectiveCoef,
-        //     })
-        //
-        //     await refetch()
-        //     close()
-        // } catch (error) {
-        //     console.log(error)
-        //     Alert.alert("Error", "Failed to create event")
-        // }
+    const updateActivityType = async () => {
+        try {
+            await editActivityType({
+                id: activity_type.id,
+                name: name,
+                category: activityCategory,
+                value: activityCoef,
+            })
+            await refetchActivities()
+            close()
+        } catch (error) {
+            console.log(error)
+            Alert.alert("Error", "Failed to edit activity")
+        }
     }
 
     // Init modal
@@ -104,6 +102,7 @@ export const EditTypeModal = ({
     }, [modalVisible, activity_type])
 
     if (!isOpen) return null
+    if (isLoading) return <Loader message="Updating selected activity" />
     if (isTypesLoading) return <Loader message="Loading your activities" />
 
     return (
@@ -163,7 +162,7 @@ export const EditTypeModal = ({
                     <View style={styles.header}>
                         <Text style={styles.headerTitle}>Activity Type</Text>
 
-                        <Pressable onPress={createEvent} style={styles.saveButton}>
+                        <Pressable onPress={updateActivityType} style={styles.saveButton}>
                             <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>

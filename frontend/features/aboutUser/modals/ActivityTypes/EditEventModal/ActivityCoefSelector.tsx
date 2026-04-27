@@ -34,10 +34,7 @@ export const ActivityCoefSelector = ({
                     return (
                         <Pressable
                             key={index}
-                            onPress={(event: GestureResponderEvent) => {
-                                onChange(choice.value)
-                                console.log(choice.value)
-                            }}
+                            onPress={(event: GestureResponderEvent) => onChange(choice.value)}
                             style={[
                                 { backgroundColor: isActive ? activeButtonColor : "transparent" },
                                 styles.selectorButton,

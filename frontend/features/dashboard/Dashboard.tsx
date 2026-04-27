@@ -11,9 +11,11 @@ import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { EventOptionsType } from "@/shared/types"
+import { useActivityTypes } from "@/context/ActivityTypesContext"
 
 export const Dashboard = () => {
     const { data, isLoading, error, refetch } = useDashboard()
+    const { refetch: updateActivityTypes } = useActivityTypes()
 
     const [modalVisible, setModalVisible] = useState(false)
     const [eventType, setEventType] = useState<EventOptionsType>("load")
@@ -39,6 +41,7 @@ export const Dashboard = () => {
     useFocusEffect(
         useCallback(() => {
             refetch()
+            updateActivityTypes()
         }, [])
     )
 

@@ -100,10 +100,6 @@ export const createStyles = (colors: AppColors) => {
             justifyContent: "space-between",
             alignItems: "center",
         },
-        valueIndicator: {
-            padding: 8,
-            borderRadius: 20,
-        },
 
         // Sign Out Btn
         signOutContainer: {

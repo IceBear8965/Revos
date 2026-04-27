@@ -28,6 +28,12 @@ interface UseAsyncPost<T, P> {
     refetch: (body: P) => Promise<void>
 }
 
+interface UseAsyncDelete<T> {
+    isLoading: boolean
+    error: Error | null
+    refetch: (body: T) => Promise<void>
+}
+
 type EventOptionsType = "load" | "recovery"
 
-export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, EventOptionsType }
+export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, UseAsyncDelete, EventOptionsType }

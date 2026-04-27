@@ -7,7 +7,7 @@ interface PendingRequest<T> {
 }
 
 interface RequestOptions {
-    method?: "GET" | "POST" | "PATCH"
+    method?: "GET" | "POST" | "PATCH" | "DELETE"
     body?: any
     headers?: Record<string, string>
 }
@@ -170,6 +170,12 @@ interface ActivityTypeDTO {
     is_editable: boolean
 }
 
+interface EditActivityTypePayload {
+    name: string
+    category: "load" | "recovery"
+    value: number
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -192,4 +198,5 @@ export {
     ChangeTimezonePayloadDTO,
     ChangeTimezoneResponseDTO,
     ActivityTypeDTO,
+    EditActivityTypePayload,
 }

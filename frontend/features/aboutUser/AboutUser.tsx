@@ -14,12 +14,16 @@ import { useAuth } from "@/context/AuthContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { ActivityTypeDTO } from "@/api/types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
+import { useDeleteType } from "./hooks/useDeleteType"
+import { DeleteTypePayload } from "./types"
 
 export const AboutUser = () => {
     const { data, isLoading, error, refetch } = useAboutUser()
     const { signOut } = useAuth()
     const { theme, toggleTheme, colors } = useTheme()
-    const { types, isLoading: isTypesLoading } = useActivityTypes()
+    const { types, isLoading: isTypesLoading, refetch: updateActivityTypes } = useActivityTypes()
+    const { isLoading: isDeleting, refetch: deleteActivityType } = useDeleteType()
     const styles = createStyles(colors)
     const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
     const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
@@ -31,6 +35,8 @@ export const AboutUser = () => {
         value: 1.0,
         is_editable: false,
     })
+    const [delteConfirmationModal, setDeleteConfirmationModal] = useState<boolean>(false)
+    const [typeToDelete, setTypeToDelete] = useState<number | null>(null)
     const router = useRouter()
 
     useFocusEffect(
@@ -41,6 +47,28 @@ export const AboutUser = () => {
 
     const refetchOnSuccess = () => {
         refetch()
+    }
+
+    const onDeleteConfirmed = async () => {
+        if (typeToDelete) {
+            try {
+                await deleteActivityType({ id: typeToDelete })
+                await updateActivityTypes()
+                refetchOnSuccess()
+                setTypeToDelete(null)
+                setDeleteConfirmationModal(false)
+            } catch (error) {
+                Alert.alert("Error", "Activity Type can't be deleted now", [
+                    { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
+                ])
+            }
+        } else {
+            setDeleteConfirmationModal(false)
+        }
+    }
+    const onDeleteDenied = () => {
+        setTypeToDelete(null)
+        setDeleteConfirmationModal(false)
     }
 
     interface Choices {
@@ -80,8 +108,10 @@ export const AboutUser = () => {
                     <View style={{ flexDirection: "row" }}>
                         <Pressable
                             onPress={() => {
-                                setSelectedActivityType(item)
-                                setActivityTypeEditModal(true)
+                                if (item.is_editable) {
+                                    setSelectedActivityType(item)
+                                    setActivityTypeEditModal(true)
+                                }
                             }}
                             style={{ marginRight: 10 }}
                         >
@@ -91,7 +121,14 @@ export const AboutUser = () => {
                                 color={colors.textPrimary}
                             />
                         </Pressable>
-                        <Pressable onPress={() => console.log("Delete")}>
+                        <Pressable
+                            onPress={() => {
+                                if (item.is_editable) {
+                                    setTypeToDelete(item.id)
+                                    setDeleteConfirmationModal(true)
+                                }
+                            }}
+                        >
                             <FontAwesome6 name="trash-can" size={24} color={colors.textPrimary} />
                         </Pressable>
                     </View>
@@ -117,12 +154,12 @@ export const AboutUser = () => {
                         return (
                             <View
                                 key={index}
-                                style={[
-                                    {
-                                        backgroundColor: isActive ? activeIconColor : "transparent",
-                                    },
-                                    styles.valueIndicator,
-                                ]}
+                                style={{
+                                    backgroundColor: isActive ? activeIconColor : "transparent",
+                                    padding: 8,
+                                    borderRadius: 20,
+                                    overflow: "hidden",
+                                }}
                             >
                                 <MaterialCommunityIcons
                                     name={icon.icon}
@@ -214,6 +251,15 @@ export const AboutUser = () => {
                 activity_type={selectedActivityType}
                 modalVisible={activityTypeEditModal}
                 setModalVisible={setActivityTypeEditModal}
+            />
+
+            {/* Delte Activity Modal */}
+            <ConfirmationModal
+                title="Are you sure you want to continue?"
+                onConfirm={onDeleteConfirmed}
+                onDeny={onDeleteDenied}
+                modalVisible={delteConfirmationModal}
+                setModalVisible={setDeleteConfirmationModal}
             />
         </View>
     )

@@ -5,4 +5,8 @@ interface AboutUserResponseType {
     timezone: string
 }
 
-export { AboutUserResponseType }
+interface DeleteTypePayload {
+    id: number
+}
+
+export { AboutUserResponseType, DeleteTypePayload }
