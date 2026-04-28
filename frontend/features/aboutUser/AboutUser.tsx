@@ -1,23 +1,44 @@
 import { useCallback, useEffect, useState } from "react"
-import { View, Text, Pressable, Image, Switch, Alert } from "react-native"
+import { View, Text, Pressable, Image, Switch, Alert, FlatList } from "react-native"
 import { useRouter, useFocusEffect } from "expo-router"
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6"
+import AntDesign from "@expo/vector-icons/AntDesign"
 import { useTheme } from "@/context/ThemeContext"
 import { useAboutUser } from "./hooks/useAboutUser"
 import { Loader } from "@/shared/components/Loader"
 import { Error } from "@/shared/components/Error"
 import { createStyles } from "./aboutUser.style"
-import { ChangeNicknameModal } from "./components/changeNicknameModal/ChangeNicknameModal"
-import { ChangeTimezoneModal } from "./components/changeTimezoneModal/ChangeTimezoneModal"
+import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
+import { ChangeTimezoneModal } from "./modals/ChangeTimezoneModal/ChangeTimezoneModal"
 import { useAuth } from "@/context/AuthContext"
+import { useActivityTypes } from "@/context/ActivityTypesContext"
+import { ActivityTypeDTO } from "@/api/types"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
+import { useDeleteType } from "./hooks/useDeleteType"
+import { EditTypeModal } from "./modals/ActivityTypes/EditTypeModal/EditTypeModal"
+import { CreateTypeModal } from "./modals/ActivityTypes/CreateTypeModal/CreateTypeModal"
 
 export const AboutUser = () => {
     const { data, isLoading, error, refetch } = useAboutUser()
     const { signOut } = useAuth()
     const { theme, toggleTheme, colors } = useTheme()
+    const { types, isLoading: isTypesLoading, refetch: updateActivityTypes } = useActivityTypes()
+    const { isLoading: isDeleting, refetch: deleteActivityType } = useDeleteType()
     const styles = createStyles(colors)
-    const [nicknameModalVisible, setNicknameModalVisible] = useState(false)
-    const [timezoneModalVisible, setTimezoneModalVisible] = useState(false)
+    const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
+    const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
+    const [activityTypeEditModal, setActivityTypeEditModal] = useState<boolean>(false)
+    const [selectedActivityType, setSelectedActivityType] = useState<ActivityTypeDTO>({
+        id: 0,
+        name: "",
+        category: "load",
+        value: 1.0,
+        is_editable: false,
+    })
+    const [activityTypeCreateModal, setActivityTypeCreateModal] = useState<boolean>(false)
+    const [delteConfirmationModal, setDeleteConfirmationModal] = useState<boolean>(false)
+    const [typeToDelete, setTypeToDelete] = useState<number | null>(null)
     const router = useRouter()
 
     useFocusEffect(
@@ -30,8 +51,130 @@ export const AboutUser = () => {
         refetch()
     }
 
+    const onDeleteConfirmed = async () => {
+        if (typeToDelete) {
+            try {
+                await deleteActivityType({ id: typeToDelete })
+                await updateActivityTypes()
+                refetchOnSuccess()
+                setTypeToDelete(null)
+                setDeleteConfirmationModal(false)
+            } catch (error) {
+                Alert.alert("Error", "Activity Type can't be deleted now", [
+                    { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
+                ])
+            }
+        } else {
+            setDeleteConfirmationModal(false)
+        }
+    }
+    const onDeleteDenied = () => {
+        setTypeToDelete(null)
+        setDeleteConfirmationModal(false)
+    }
+
+    interface Choices {
+        icon: "emoticon-sad-outline" | "emoticon-neutral-outline" | "emoticon-happy-outline"
+        value: number
+    }
+
+    const iconsLoad: Choices[] = [
+        { icon: "emoticon-sad-outline", value: 1.15 },
+        { icon: "emoticon-neutral-outline", value: 1.0 },
+        { icon: "emoticon-happy-outline", value: 0.85 },
+    ]
+    const iconsRecovery: Choices[] = [
+        { icon: "emoticon-sad-outline", value: 0.85 },
+        { icon: "emoticon-neutral-outline", value: 1.0 },
+        { icon: "emoticon-happy-outline", value: 1.15 },
+    ]
+
     if (isLoading) return <Loader message="Collecting data about you" />
+    if (isTypesLoading) return <Loader message="Loading your activities" />
     if (error) return <Error error={error} />
+
+    const renderActivityCard = ({ item }: { item: ActivityTypeDTO }) => {
+        const icons = item.category === "load" ? iconsLoad : iconsRecovery
+        const activeIconColor = item.category === "load" ? colors.accentRed : colors.accentGreen
+
+        return (
+            <View style={[{ opacity: item.is_editable ? 1 : 0.5 }, styles.activityTypeCard]}>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                >
+                    <Text style={styles.activityTypeName}>{item.name}</Text>
+                    <View style={{ flexDirection: "row" }}>
+                        <Pressable
+                            onPress={() => {
+                                if (item.is_editable) {
+                                    setSelectedActivityType(item)
+                                    setActivityTypeEditModal(true)
+                                }
+                            }}
+                            style={{ marginRight: 10 }}
+                        >
+                            <FontAwesome6
+                                name="pen-to-square"
+                                size={24}
+                                color={colors.textPrimary}
+                            />
+                        </Pressable>
+                        <Pressable
+                            onPress={() => {
+                                if (item.is_editable) {
+                                    setTypeToDelete(item.id)
+                                    setDeleteConfirmationModal(true)
+                                }
+                            }}
+                        >
+                            <FontAwesome6 name="trash-can" size={24} color={colors.textPrimary} />
+                        </Pressable>
+                    </View>
+                </View>
+                <View style={{ justifyContent: "flex-start", flexDirection: "row" }}>
+                    <Text
+                        style={[
+                            {
+                                backgroundColor:
+                                    item.category === "load"
+                                        ? colors.accentRed
+                                        : colors.accentGreen,
+                            },
+                            styles.activityTypeCategory,
+                        ]}
+                    >
+                        {item.category}
+                    </Text>
+                </View>
+                <View style={styles.valueIndicatorContainer}>
+                    {icons.map((icon, index) => {
+                        const isActive = icon.value === item.value
+                        return (
+                            <View
+                                key={index}
+                                style={{
+                                    backgroundColor: isActive ? activeIconColor : "transparent",
+                                    padding: 8,
+                                    borderRadius: 20,
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <MaterialCommunityIcons
+                                    name={icon.icon}
+                                    size={36}
+                                    color={colors.textPrimary}
+                                />
+                            </View>
+                        )
+                    })}
+                </View>
+            </View>
+        )
+    }
 
     return (
         <View style={{ flex: 1 }}>
@@ -70,12 +213,41 @@ export const AboutUser = () => {
                         value={theme === "dark" ? true : false}
                     />
                 </View>
-                <View style={styles.signOutContainer}>
-                    <Pressable style={styles.signOutButton} onPress={signOut}>
-                        <Text style={styles.signOutButtonText}>Sign Out</Text>
+            </View>
+
+            <View style={styles.activityTypesContainer}>
+                <View style={styles.addTypeContainer}>
+                    <Pressable
+                        style={styles.addTypeBtn}
+                        onPress={() => {
+                            setActivityTypeCreateModal(true)
+                        }}
+                    >
+                        <Text style={styles.addTypeBtnText}>Add Activity Type</Text>
+                        <AntDesign name="plus-circle" size={24} color={colors.textPrimary} />
                     </Pressable>
                 </View>
+                <FlatList
+                    data={types}
+                    renderItem={renderActivityCard}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={{
+                        paddingHorizontal: 20,
+                        paddingVertical: 10,
+                    }}
+                    ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                    ListFooterComponent={<View style={{ height: 10 }} />}
+                    showsVerticalScrollIndicator={false}
+                />
             </View>
+
+            <View style={styles.signOutContainer}>
+                <Pressable style={styles.signOutButton} onPress={signOut}>
+                    <Text style={styles.signOutButtonText}>Sign Out</Text>
+                </Pressable>
+            </View>
+
+            {/* Modals */}
             <ChangeNicknameModal
                 currentNickname={data?.nickname}
                 modalVisible={nicknameModalVisible}
@@ -87,6 +259,24 @@ export const AboutUser = () => {
                 modalVisible={timezoneModalVisible}
                 setModalVisible={setTimezoneModalVisible}
                 onSuccess={refetchOnSuccess}
+            />
+            <EditTypeModal
+                activity_type={selectedActivityType}
+                modalVisible={activityTypeEditModal}
+                setModalVisible={setActivityTypeEditModal}
+            />
+            <CreateTypeModal
+                modalVisible={activityTypeCreateModal}
+                setModalVisible={setActivityTypeCreateModal}
+            />
+
+            {/* Delte Activity Modal */}
+            <ConfirmationModal
+                title="Are you sure you want to continue?"
+                onConfirm={onDeleteConfirmed}
+                onDeny={onDeleteDenied}
+                modalVisible={delteConfirmationModal}
+                setModalVisible={setDeleteConfirmationModal}
             />
         </View>
     )

@@ -7,7 +7,7 @@ import { ActivityTypeDTO } from "@/api/types"
 interface ActivityTypesContextType {
     types: ActivityTypeDTO[]
     isLoading: boolean
-    refetch: () => {}
+    refetch: () => Promise<void>
 }
 
 export const useActivityTypes = () => {

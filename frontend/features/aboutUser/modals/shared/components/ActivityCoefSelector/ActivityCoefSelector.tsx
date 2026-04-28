@@ -1,13 +1,13 @@
 import { GestureResponderEvent, Pressable, View } from "react-native"
-import { Choices, SubjectiveCoefSelectorProps } from "./types"
+import { Choices, SubjectiveCoefSelectorProps } from "./coefSelector.types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useTheme } from "@/context/ThemeContext"
-import { createStyles } from "./styles"
+import { createStyles } from "./coefSelector.styles"
 import { useEffect } from "react"
 
-export const SubjectiveCoefSelector = ({
+export const ActivityCoefSelector = ({
     eventType,
-    subjectiveCoef,
+    value,
     onChange,
 }: SubjectiveCoefSelectorProps) => {
     const { colors } = useTheme()
@@ -27,10 +27,10 @@ export const SubjectiveCoefSelector = ({
 
     const activeButtonColor = eventType === "load" ? colors.accentRed : colors.accentGreen
     return (
-        <View style={styles.subjectiveCoefSelector}>
+        <View style={styles.activityCoefSelector}>
             <View style={styles.selectorContainer}>
                 {choices.map((choice, index) => {
-                    const isActive = subjectiveCoef === choice.value
+                    const isActive = value === choice.value
                     return (
                         <Pressable
                             key={index}

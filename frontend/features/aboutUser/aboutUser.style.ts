@@ -64,6 +64,64 @@ export const createStyles = (colors: AppColors) => {
         },
         themeSwitcher: {},
 
+        // Activity Type list
+        activityTypesContainer: {
+            flex: 1,
+            backgroundColor: colors.card,
+            paddingVertical: 20,
+            marginHorizontal: 30,
+            borderRadius: 20,
+            marginTop: 20,
+        },
+        addTypeContainer: {
+            alignItems: "center",
+        },
+        addTypeBtn: {
+            width: "70%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 20,
+            paddingHorizontal: 15,
+            backgroundColor: colors.foreground,
+
+            borderRadius: 20,
+        },
+        addTypeBtnText: {
+            fontSize: 20,
+            fontWeight: 500,
+            color: colors.textPrimary,
+            marginRight: 20,
+        },
+        activityTypeCard: {
+            backgroundColor: colors.background,
+            padding: 25,
+            borderRadius: 20,
+        },
+        activityTypeName: {
+            color: colors.textPrimary,
+            fontSize: 20,
+            fontWeight: 500,
+            textTransform: "capitalize",
+            marginBottom: 10,
+        },
+        activityTypeCategory: {
+            color: colors.textPrimary,
+            fontSize: 16,
+            fontWeight: 400,
+            textTransform: "capitalize",
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            borderRadius: 10,
+            marginBottom: 10,
+        },
+        valueIndicatorContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+        },
+
+        // Sign Out Btn
         signOutContainer: {
             marginTop: 30,
             alignItems: "center",

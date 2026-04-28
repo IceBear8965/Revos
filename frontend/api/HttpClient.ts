@@ -174,18 +174,30 @@ class HttpClient {
         return await this.fetchWithAccess(endpoint, { method: "PATCH", body: body })
     }
 
-    private async parseResponse<T>(response: Response): Promise<T> {
+    async delete<T>(endpoint: string): Promise<T> {
+        return await this.fetchWithAccess(endpoint, { method: "DELETE" })
+    }
+
+    private async parseResponse<T>(response: Response): Promise<T | null> {
+        if (response.status === 204) {
+            return null
+        }
+
         const contentType = response.headers.get("content-type")
 
         if (!contentType) {
-            throw new Error("No content-type")
+            const text = await response.text()
+
+            return text ? (text as unknown as T) : null
         }
 
         if (contentType.includes("application/json")) {
             return (await response.json()) as T
         }
 
-        return (await response.text()) as unknown as T
+        const text = await response.text()
+
+        return text ? (text as unknown as T) : null
     }
 }
 
