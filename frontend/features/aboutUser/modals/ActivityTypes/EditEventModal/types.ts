@@ -1,7 +1,7 @@
 import { ActivityTypeDTO } from "@/api/types"
 import { SetStateAction } from "react"
 
-interface EditTypeModalProps {
+interface HandleTypeModalProps {
     activity_type: ActivityTypeDTO
     modalVisible: boolean
     setModalVisible: React.Dispatch<SetStateAction<boolean>>
@@ -14,4 +14,4 @@ interface EditTypeProps {
     value: number
 }
 
-export { EditTypeModalProps, EditTypeProps }
+export { HandleTypeModalProps, EditTypeProps }

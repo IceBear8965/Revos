@@ -6,18 +6,18 @@ import { useTabBar } from "@/context/TabBarContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { Loader } from "@/shared/components/Loader"
 import { createStyles } from "./styles"
-import { EditTypeModalProps } from "./types"
+import { HandleTypeModalProps } from "./types"
 import DropDownPicker from "react-native-dropdown-picker"
 import { ActivityCoefSelector } from "./ActivityCoefSelector"
 import { useEditType } from "./hooks/useEditType"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
-export const EditTypeModal = ({
+export const HandleTypeModal = ({
     activity_type,
     modalVisible,
     setModalVisible,
-}: EditTypeModalProps) => {
+}: HandleTypeModalProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
     const { setVisible } = useTabBar()

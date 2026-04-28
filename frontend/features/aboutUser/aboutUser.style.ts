@@ -73,6 +73,26 @@ export const createStyles = (colors: AppColors) => {
             borderRadius: 20,
             marginTop: 20,
         },
+        addTypeContainer: {
+            alignItems: "center",
+        },
+        addTypeBtn: {
+            width: "70%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 20,
+            paddingHorizontal: 15,
+            backgroundColor: colors.foreground,
+
+            borderRadius: 20,
+        },
+        addTypeBtnText: {
+            fontSize: 16,
+            fontWeight: 500,
+            color: colors.textPrimary,
+            marginRight: 20,
+        },
         activityTypeCard: {
             backgroundColor: colors.background,
             padding: 25,

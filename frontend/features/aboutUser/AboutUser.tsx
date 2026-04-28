@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import { View, Text, Pressable, Image, Switch, Alert, FlatList } from "react-native"
 import { useRouter, useFocusEffect } from "expo-router"
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6"
+import AntDesign from "@expo/vector-icons/AntDesign"
 import { useTheme } from "@/context/ThemeContext"
 import { useAboutUser } from "./hooks/useAboutUser"
 import { Loader } from "@/shared/components/Loader"
@@ -9,14 +10,13 @@ import { Error } from "@/shared/components/Error"
 import { createStyles } from "./aboutUser.style"
 import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
 import { ChangeTimezoneModal } from "./modals/ChangeTimezoneModal/ChangeTimezoneModal"
-import { EditTypeModal } from "./modals/ActivityTypes/EditEventModal/EditTypeModal"
 import { useAuth } from "@/context/AuthContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { ActivityTypeDTO } from "@/api/types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 import { useDeleteType } from "./hooks/useDeleteType"
-import { DeleteTypePayload } from "./types"
+import { HandleTypeModal } from "./modals/ActivityTypes/EditEventModal/HandleTypeModal"
 
 export const AboutUser = () => {
     const { data, isLoading, error, refetch } = useAboutUser()
@@ -27,7 +27,7 @@ export const AboutUser = () => {
     const styles = createStyles(colors)
     const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
     const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
-    const [activityTypeEditModal, setActivityTypeEditModal] = useState<boolean>(false)
+    const [activityTypeHandleModal, setActivityTypeHandleModal] = useState<boolean>(false)
     const [selectedActivityType, setSelectedActivityType] = useState<ActivityTypeDTO>({
         id: 0,
         name: "",
@@ -110,7 +110,7 @@ export const AboutUser = () => {
                             onPress={() => {
                                 if (item.is_editable) {
                                     setSelectedActivityType(item)
-                                    setActivityTypeEditModal(true)
+                                    setActivityTypeHandleModal(true)
                                 }
                             }}
                             style={{ marginRight: 10 }}
@@ -214,6 +214,12 @@ export const AboutUser = () => {
             </View>
 
             <View style={styles.activityTypesContainer}>
+                <View style={styles.addTypeContainer}>
+                    <Pressable style={styles.addTypeBtn} onPress={() => {}}>
+                        <Text style={styles.addTypeBtnText}>Add Activity Type</Text>
+                        <AntDesign name="plus-circle" size={24} color={colors.textPrimary} />
+                    </Pressable>
+                </View>
                 <FlatList
                     data={types}
                     renderItem={renderActivityCard}
@@ -247,10 +253,10 @@ export const AboutUser = () => {
                 setModalVisible={setTimezoneModalVisible}
                 onSuccess={refetchOnSuccess}
             />
-            <EditTypeModal
+            <HandleTypeModal
                 activity_type={selectedActivityType}
-                modalVisible={activityTypeEditModal}
-                setModalVisible={setActivityTypeEditModal}
+                modalVisible={activityTypeHandleModal}
+                setModalVisible={setActivityTypeHandleModal}
             />
 
             {/* Delte Activity Modal */}
