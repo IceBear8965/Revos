@@ -16,7 +16,8 @@ import { ActivityTypeDTO } from "@/api/types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 import { useDeleteType } from "./hooks/useDeleteType"
-import { HandleTypeModal } from "./modals/ActivityTypes/EditEventModal/HandleTypeModal"
+import { EditTypeModal } from "./modals/ActivityTypes/EditTypeModal/EditTypeModal"
+import { CreateTypeModal } from "./modals/ActivityTypes/CreateTypeModal/CreateTypeModal"
 
 export const AboutUser = () => {
     const { data, isLoading, error, refetch } = useAboutUser()
@@ -27,7 +28,7 @@ export const AboutUser = () => {
     const styles = createStyles(colors)
     const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
     const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
-    const [activityTypeHandleModal, setActivityTypeHandleModal] = useState<boolean>(false)
+    const [activityTypeEditModal, setActivityTypeEditModal] = useState<boolean>(false)
     const [selectedActivityType, setSelectedActivityType] = useState<ActivityTypeDTO>({
         id: 0,
         name: "",
@@ -35,6 +36,7 @@ export const AboutUser = () => {
         value: 1.0,
         is_editable: false,
     })
+    const [activityTypeCreateModal, setActivityTypeCreateModal] = useState<boolean>(false)
     const [delteConfirmationModal, setDeleteConfirmationModal] = useState<boolean>(false)
     const [typeToDelete, setTypeToDelete] = useState<number | null>(null)
     const router = useRouter()
@@ -110,7 +112,7 @@ export const AboutUser = () => {
                             onPress={() => {
                                 if (item.is_editable) {
                                     setSelectedActivityType(item)
-                                    setActivityTypeHandleModal(true)
+                                    setActivityTypeEditModal(true)
                                 }
                             }}
                             style={{ marginRight: 10 }}
@@ -215,7 +217,12 @@ export const AboutUser = () => {
 
             <View style={styles.activityTypesContainer}>
                 <View style={styles.addTypeContainer}>
-                    <Pressable style={styles.addTypeBtn} onPress={() => {}}>
+                    <Pressable
+                        style={styles.addTypeBtn}
+                        onPress={() => {
+                            setActivityTypeCreateModal(true)
+                        }}
+                    >
                         <Text style={styles.addTypeBtnText}>Add Activity Type</Text>
                         <AntDesign name="plus-circle" size={24} color={colors.textPrimary} />
                     </Pressable>
@@ -253,10 +260,14 @@ export const AboutUser = () => {
                 setModalVisible={setTimezoneModalVisible}
                 onSuccess={refetchOnSuccess}
             />
-            <HandleTypeModal
+            <EditTypeModal
                 activity_type={selectedActivityType}
-                modalVisible={activityTypeHandleModal}
-                setModalVisible={setActivityTypeHandleModal}
+                modalVisible={activityTypeEditModal}
+                setModalVisible={setActivityTypeEditModal}
+            />
+            <CreateTypeModal
+                modalVisible={activityTypeCreateModal}
+                setModalVisible={setActivityTypeCreateModal}
             />
 
             {/* Delte Activity Modal */}

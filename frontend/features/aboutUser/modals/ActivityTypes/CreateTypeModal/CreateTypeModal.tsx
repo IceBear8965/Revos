@@ -6,23 +6,19 @@ import { useTabBar } from "@/context/TabBarContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { Loader } from "@/shared/components/Loader"
 import { createStyles } from "./styles"
-import { HandleTypeModalProps } from "./types"
+import { CreateTypeModalProps } from "./types"
 import DropDownPicker from "react-native-dropdown-picker"
-import { ActivityCoefSelector } from "./ActivityCoefSelector"
-import { useEditType } from "./hooks/useEditType"
+import { ActivityCoefSelector } from "../../shared/components/ActivityCoefSelector/ActivityCoefSelector"
+import { useCreateType } from "./hooks/useCreateType"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
-export const HandleTypeModal = ({
-    activity_type,
-    modalVisible,
-    setModalVisible,
-}: HandleTypeModalProps) => {
+export const CreateTypeModal = ({ modalVisible, setModalVisible }: CreateTypeModalProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
     const { setVisible } = useTabBar()
     const { types, isLoading: isTypesLoading, refetch: refetchActivities } = useActivityTypes()
-    const { isLoading, error, refetch: editActivityType } = useEditType()
+    const { isLoading, error, refetch: createActivityType } = useCreateType()
 
     const [name, setName] = useState<string>("")
     const [activityCategory, setActivityCategory] = useState<"load" | "recovery">("load")
@@ -78,10 +74,9 @@ export const HandleTypeModal = ({
         })
     ).current
 
-    const updateActivityType = async () => {
+    const createActivity = async () => {
         try {
-            await editActivityType({
-                id: activity_type.id,
+            await createActivityType({
                 name: name,
                 category: activityCategory,
                 value: activityCoef,
@@ -94,15 +89,8 @@ export const HandleTypeModal = ({
         }
     }
 
-    // Init modal
-    useEffect(() => {
-        setName(activity_type.name)
-        setActivityCategory(activity_type.category)
-        setActivityCoef(activity_type.value)
-    }, [modalVisible, activity_type])
-
     if (!isOpen) return null
-    if (isLoading) return <Loader message="Updating selected activity" />
+    if (isLoading) return <Loader message="Creating activity" />
     if (isTypesLoading) return <Loader message="Loading your activities" />
 
     return (
@@ -160,9 +148,9 @@ export const HandleTypeModal = ({
 
                     {/* HEADER */}
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Activity Type</Text>
+                        <Text style={styles.headerTitle}>Create Activity Type</Text>
 
-                        <Pressable onPress={updateActivityType} style={styles.saveButton}>
+                        <Pressable onPress={createActivity} style={styles.saveButton}>
                             <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>

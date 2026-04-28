@@ -176,6 +176,16 @@ interface EditActivityTypePayload {
     value: number
 }
 
+interface CreateActivityTypePayload {
+    name: string
+    category: "load" | "recovery"
+    value: number
+}
+
+interface CreateActivityTypeResponse {
+    status: string
+}
+
 export {
     PendingRequest,
     RequestOptions,
@@ -199,4 +209,6 @@ export {
     ChangeTimezoneResponseDTO,
     ActivityTypeDTO,
     EditActivityTypePayload,
+    CreateActivityTypePayload,
+    CreateActivityTypeResponse,
 }

@@ -88,7 +88,7 @@ export const createStyles = (colors: AppColors) => {
             borderRadius: 20,
         },
         addTypeBtnText: {
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: 500,
             color: colors.textPrimary,
             marginRight: 20,
