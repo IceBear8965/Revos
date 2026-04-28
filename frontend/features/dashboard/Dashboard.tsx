@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react"
-import { ScrollView, RefreshControl, Text, View, Image, Pressable } from "react-native"
+import { ScrollView, RefreshControl, Text, View, Image, Pressable, Alert } from "react-native"
 import { useRouter, useFocusEffect } from "expo-router"
 import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
 import { Character } from "@/features/dashboard/components/Character"
@@ -12,12 +12,16 @@ import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { EventOptionsType } from "@/shared/types"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
+import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
+import { useDeleteEvent } from "./hooks/useDeleteEvent"
 
 export const Dashboard = () => {
     const { data, isLoading, error, refetch } = useDashboard()
     const { refetch: updateActivityTypes } = useActivityTypes()
 
-    const [modalVisible, setModalVisible] = useState(false)
+    // Handling hooks
+    const { isLoading: deletingEvent, error: deleteError, refetch: deleteEvent } = useDeleteEvent()
+
     const [eventType, setEventType] = useState<EventOptionsType>("load")
 
     const { colors } = useTheme()
@@ -27,6 +31,12 @@ export const Dashboard = () => {
     const energyLevel = useSharedValue(0)
 
     const router = useRouter()
+
+    // Events handling
+    const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false)
+    const [eventToDelete, setEventToDelete] = useState<number | null>(null)
 
     useEffect(() => {
         if (currentEnergy == null) return
@@ -51,12 +61,41 @@ export const Dashboard = () => {
 
     const openModal = (type: EventOptionsType) => {
         setEventType(type)
-        setModalVisible(true)
+        setCreateModalVisible(true)
+    }
+
+    const onEditBtn = () => {}
+
+    const onDeleteBtn = (id: number) => {
+        setEventToDelete(id)
+        setDeleteModalVisible(true)
+    }
+
+    const onDeleteConfirmed = async () => {
+        if (eventToDelete) {
+            try {
+                await deleteEvent({ id: eventToDelete })
+                await refetch()
+                setEventToDelete(null)
+                setDeleteModalVisible(false)
+            } catch (error) {
+                Alert.alert("Error", "Event can't be deleted now", [
+                    { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
+                ])
+            }
+        } else {
+            setDeleteModalVisible(false)
+        }
+    }
+    const onDeleteDenied = () => {
+        setEventToDelete(null)
+        setDeleteModalVisible(false)
     }
 
     if (isLoading) {
         return <Loader />
     }
+    if (deletingEvent) return <Loader message="Deleting selected event" />
 
     if (error) {
         return <Error error={error} />
@@ -107,7 +146,11 @@ export const Dashboard = () => {
                     </View>
 
                     {data?.lastEvent ? (
-                        <EventCard event={data.lastEvent} />
+                        <EventCard
+                            event={data.lastEvent}
+                            onEdit={onEditBtn}
+                            onDelete={onDeleteBtn}
+                        />
                     ) : (
                         <View
                             style={{
@@ -137,8 +180,16 @@ export const Dashboard = () => {
                 refetch={refetch}
                 event_type={eventType}
                 lastEvent={data?.lastEvent}
-                modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
+                modalVisible={createModalVisible}
+                setModalVisible={setCreateModalVisible}
+            />
+
+            <ConfirmationModal
+                title="Are you sure you want to continue?"
+                onConfirm={onDeleteConfirmed}
+                onDeny={() => {}}
+                modalVisible={deleteModalVisible}
+                setModalVisible={setDeleteModalVisible}
             />
         </View>
     )

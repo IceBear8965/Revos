@@ -18,4 +18,8 @@ interface DashboardType {
     lastEvent: LastEvent | null
 }
 
-export { LastEvent, DashboardType }
+interface DeleteEventPayload {
+    id: number
+}
+
+export { LastEvent, DashboardType, DeleteEventPayload }

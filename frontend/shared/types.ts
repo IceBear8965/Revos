@@ -12,6 +12,8 @@ interface EventType {
 
 interface EventCardProps {
     event: EventType
+    onEdit: () => void
+    onDelete: (id: number) => void
 }
 
 interface UseAsyncGet<T> {
