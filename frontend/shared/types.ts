@@ -1,9 +1,9 @@
-import { ActivityTypeKey } from "./constants"
+import { ActivityTypeDTO } from "@/api/types"
 
 interface EventType {
     id: number
-    eventType: string
-    activityType: ActivityTypeKey
+    eventType: EventOptionsType
+    activityType: ActivityTypeDTO
     startedAt: Date
     endedAt: Date
     energyDelta: number
@@ -12,8 +12,16 @@ interface EventType {
 
 interface EventCardProps {
     event: EventType
-    onEdit: () => void
+    onEdit: (event: EventType) => void
     onDelete: (id: number) => void
+}
+
+interface EditEventProps {
+    id: number // Passed to url as param
+    activity: number
+    startedAt: Date
+    endedAt: Date
+    subjeciveCoef: number
 }
 
 interface UseAsyncGet<T> {
@@ -36,6 +44,14 @@ interface UseAsyncDelete<T> {
     refetch: (body: T) => Promise<void>
 }
 
-type EventOptionsType = "load" | "recovery"
+type EventOptionsType = "load" | "recovery" | "system"
 
-export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, UseAsyncDelete, EventOptionsType }
+export {
+    EventType,
+    EventCardProps,
+    EditEventProps,
+    UseAsyncGet,
+    UseAsyncPost,
+    UseAsyncDelete,
+    EventOptionsType,
+}

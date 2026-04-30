@@ -4,7 +4,7 @@ import DateTimePicker from "@react-native-community/datetimepicker"
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./styles"
 import { ModalTimePickerProps } from "./types"
-import { setDatePart, setTimePart } from "../../utils/changeDate"
+import { setDatePart, setTimePart } from "@/shared/utils/changeDate"
 
 export const ModalTimePicker = ({
     startedAt,

@@ -36,7 +36,7 @@ export const EventCard = ({ event, onDelete, onEdit }: EventCardProps) => {
                 <View style={styles.rightControls}>
                     <Pressable
                         onPress={() => {
-                            onEdit()
+                            onEdit(event)
                         }}
                         style={{ marginRight: 10 }}
                     >

@@ -1,4 +1,5 @@
 import { ActivityTypeKey } from "@/shared/constants"
+import { EventType } from "@/shared/types"
 
 interface PendingRequest<T> {
     execute: () => Promise<T>
@@ -122,22 +123,14 @@ interface RegisterResponse {
 }
 
 interface EditEventPayloadDTO {
-    id: number
-    activity_type: string
+    activity: number
     started_at: string // ISO8601
     ended_at: string // ISO8601
     subjective_coef: number
 }
 
 interface EditEventResponseDTO {
-    id: number
-    activity_type: string
-    event_type: "load" | "recovery"
-    started_at: string
-    ended_at: string
-    energy_before: number
-    energy_delta: number
-    energy_after: number
+    status: string
 }
 
 interface AboutUserResponseDTO {

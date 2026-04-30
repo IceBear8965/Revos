@@ -1,33 +1,32 @@
 import { useEffect, useRef, useState } from "react"
 import { Pressable, Text, View, Animated, PanResponder, Dimensions } from "react-native"
 import { useTheme } from "@/context/ThemeContext"
-import { ActivitiTypePicker } from "@/shared/components/selectors/ActivityTypePicker/ActivityTypePicker"
-import { ModalTimePicker } from "@/shared/components/selectors/ModalTimePicker/ModalTimePicker"
-import { SubjectiveCoefSelector } from "@/shared/components/selectors/SubjectiveCoefSelector/SubjectiveCoefSelector"
-import { useCreateEvent } from "../../hooks/useCreateEvent"
+import { ActivitiTypePicker } from "../selectors/ActivityTypePicker/ActivityTypePicker"
+import { ModalTimePicker } from "../selectors/ModalTimePicker/ModalTimePicker"
+import { SubjectiveCoefSelector } from "../selectors/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { createStyles } from "./styles"
 import { Alert } from "react-native"
 import { useTabBar } from "@/context/TabBarContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { ActivityTypeDTO } from "@/api/types"
 import { Loader } from "@/shared/components/Loader"
-import { CreateEventModalType } from "./types"
+import { EditEventModalType } from "./types"
+import { useEditEvent } from "@/shared/hooks/useEditEvent"
+import { Error } from "../Error"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
 
-export const CreateEventModal = ({
+export const EditEventModal = ({
     refetch,
-    event_type,
-    lastEvent,
+    event,
     modalVisible,
     setModalVisible,
-}: CreateEventModalType) => {
+}: EditEventModalType) => {
     const { colors } = useTheme()
     const { setVisible } = useTabBar()
     const { types, isLoading: isTypesLoading } = useActivityTypes()
+    const { data: response, isLoading, error: editingError, refetch: editEvent } = useEditEvent()
     const styles = createStyles(colors)
-
-    const { refetch: createEventPost, isLoading, error } = useCreateEvent()
 
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current
     const [isOpen, setIsOpen] = useState(false)
@@ -74,16 +73,18 @@ export const CreateEventModal = ({
     }, [modalVisible])
 
     useEffect(() => {
-        const startDate = lastEvent?.endedAt
-        setStartedAt(startDate ?? new Date())
-        setEndedAt(new Date())
+        console.log(event)
+        setDropDownValue(event.id)
+        setStartedAt(event.startedAt)
+        setEndedAt(event.endedAt)
+        setSubjectiveCoef(event.subjectiveCoef)
     }, [modalVisible])
 
     // Update values dependent on selected event_type
     useEffect(() => {
-        const values = types.filter((el) => el.category === event_type)
+        const values = types.filter((el) => el.category === event.eventType)
         setDropDownValues(values)
-    }, [modalVisible, event_type])
+    }, [modalVisible, event])
 
     const panResponder = useRef(
         PanResponder.create({
@@ -98,17 +99,17 @@ export const CreateEventModal = ({
         })
     ).current
 
-    const createEvent = async () => {
+    const handleEditEvent = async () => {
         if (!dropDownValue) return
 
         try {
-            await createEventPost({
+            await editEvent({
+                id: event.id,
                 activity: dropDownValue,
-                startedAt,
-                endedAt,
-                subjectiveCoef,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                subjeciveCoef: subjectiveCoef,
             })
-
             await refetch()
             close()
         } catch (error) {
@@ -120,6 +121,8 @@ export const CreateEventModal = ({
     if (!isOpen) return null
     if (isLoading) return <Loader message="Saving your activity" />
     if (isTypesLoading) return <Loader message="Loading your activities" />
+
+    if (editingError) return <Error error={editingError} />
 
     return (
         <View
@@ -178,7 +181,7 @@ export const CreateEventModal = ({
                     <View style={styles.header}>
                         <Text style={styles.headerTitle}>New Event</Text>
 
-                        <Pressable onPress={createEvent} style={styles.saveButton}>
+                        <Pressable onPress={handleEditEvent} style={styles.saveButton}>
                             <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>
@@ -201,7 +204,7 @@ export const CreateEventModal = ({
                                 resetSignal={resetSignal}
                             />
                             <SubjectiveCoefSelector
-                                eventType={event_type}
+                                eventType={event.eventType}
                                 subjectiveCoef={subjectiveCoef}
                                 onChange={setSubjectiveCoef}
                             />

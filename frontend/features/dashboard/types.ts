@@ -1,4 +1,5 @@
 import { ActivityTypeKey } from "@/shared/constants"
+import { EventType } from "@/shared/types"
 
 interface LastEvent {
     id: number
@@ -15,7 +16,7 @@ interface DashboardType {
     currentEnergy: number
     message: { title: string; content: string }
     recommendation: string
-    lastEvent: LastEvent | null
+    lastEvent: EventType | null
 }
 
 interface DeleteEventPayload {

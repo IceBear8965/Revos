@@ -10,10 +10,11 @@ import { EventCard } from "@/shared/components/EventCard"
 import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
-import { EventOptionsType } from "@/shared/types"
+import { EventOptionsType, EventType } from "@/shared/types"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 import { useDeleteEvent } from "./hooks/useDeleteEvent"
+import { EditEventModal } from "@/shared/components/EditEventModal/EditEventModal"
 
 export const Dashboard = () => {
     const { data, isLoading, error, refetch } = useDashboard()
@@ -37,6 +38,9 @@ export const Dashboard = () => {
 
     const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false)
     const [eventToDelete, setEventToDelete] = useState<number | null>(null)
+
+    const [editModalVisible, setEditModalVisible] = useState<boolean>(false)
+    const [eventToEdit, setEventToEdit] = useState<EventType | null>(null)
 
     useEffect(() => {
         if (currentEnergy == null) return
@@ -64,7 +68,10 @@ export const Dashboard = () => {
         setCreateModalVisible(true)
     }
 
-    const onEditBtn = () => {}
+    const onEditBtn = (event: EventType) => {
+        setEventToEdit(event)
+        setEditModalVisible(true)
+    }
 
     const onDeleteBtn = (id: number) => {
         setEventToDelete(id)
@@ -191,6 +198,15 @@ export const Dashboard = () => {
                 modalVisible={deleteModalVisible}
                 setModalVisible={setDeleteModalVisible}
             />
+
+            {eventToEdit && (
+                <EditEventModal
+                    refetch={refetch}
+                    event={eventToEdit}
+                    modalVisible={editModalVisible}
+                    setModalVisible={setEditModalVisible}
+                />
+            )}
         </View>
     )
 }
