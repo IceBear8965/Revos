@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from "react-native"
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6"
-import { formatEventDateTime } from "@/utils/formatDate"
+import { formatEventDateTime } from "@/shared/utils/formatDate"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/types"
 import { EventCardProps } from "../model/types"

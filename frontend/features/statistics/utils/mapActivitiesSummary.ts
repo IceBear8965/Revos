@@ -1,42 +1,21 @@
-import { ACTIVITY_ORDER, ActivityTypeKey } from "@/shared/constants"
+import { ActivitiesSummaryElement } from "@/entities/statistics/model/types"
 
-interface ActivitiesSummaryElement {
-    activityType: ActivityTypeKey
-    avgEnergyDelta: number
-    eventCount: number
-}
-
-interface MappedActivityBar {
-    activityType: ActivityTypeKey
+type ChartSafeActivity = {
+    activityType: string
     positiveDelta: number | null
     negativeDelta: number | null
-    [key: string]: unknown
-}
+} & Record<string, unknown>
 
 export const mapActivitiesSummary = (
     activities?: ActivitiesSummaryElement[]
-): MappedActivityBar[] => {
-    const byType = new Map<ActivityTypeKey, ActivitiesSummaryElement>()
+): ChartSafeActivity[] => {
+    if (!activities) return []
 
-    ;(activities ?? []).forEach((el) => {
-        byType.set(el.activityType, el)
-    })
-
-    return ACTIVITY_ORDER.map((type) => {
-        const item = byType.get(type)
-
-        if (!item) {
-            return {
-                activityType: type,
-                positiveDelta: null,
-                negativeDelta: null,
-            }
-        }
-
-        return {
-            activityType: type,
-            positiveDelta: item.avgEnergyDelta > 0 ? item.avgEnergyDelta : null,
-            negativeDelta: item.avgEnergyDelta < 0 ? item.avgEnergyDelta : null,
-        }
-    })
+    return activities
+        .map((el) => ({
+            activityType: el.activity,
+            positiveDelta: el.avgEnergyDelta > 0 ? el.avgEnergyDelta : null,
+            negativeDelta: el.avgEnergyDelta < 0 ? el.avgEnergyDelta : null,
+        }))
+        .sort((a, b) => a.activityType.localeCompare(b.activityType))
 }

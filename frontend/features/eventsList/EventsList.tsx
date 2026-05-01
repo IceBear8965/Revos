@@ -4,11 +4,10 @@ import { useTheme } from "@/context/ThemeContext"
 import { View, Text, FlatList, RefreshControl, Pressable, Dimensions } from "react-native"
 import { createStyles } from "./eventsList.styles"
 import { useEventsList } from "./hooks/useEventsList"
-import { EventType } from "@/shared/types"
 import { EventCard } from "@/entities/event/ui/EventCard"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
-import { getWeekday, formatDateDDMM } from "@/utils/formatDate"
+import { getWeekday, formatDateDDMM } from "@/shared/utils/formatDate"
 import { Event } from "@/entities/event/model/types"
 
 const ITEM_WIDTH = 80

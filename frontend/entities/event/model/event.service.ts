@@ -1,3 +1,4 @@
+import { formatDateForApi } from "@/shared/utils/formatDate"
 import { eventApi } from "../api/event.api"
 import { eventsListApi } from "../api/eventsList.api"
 import { mapList } from "./mappers/toDomain"
@@ -17,7 +18,7 @@ export const eventService = {
         await eventApi.edit(id, dto)
     },
     getList: async (date: Date): Promise<EventsList> => {
-        const dto = await eventsListApi.get(date.toISOString())
+        const dto = await eventsListApi.get(formatDateForApi(date))
         return mapList(dto)
     },
 }
