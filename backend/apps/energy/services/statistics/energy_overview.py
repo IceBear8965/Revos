@@ -27,7 +27,7 @@ def generate_energy_overview(*, user):
         if day_events:
             energy = round(day_events[-1].energy_after, 4)
         else:
-            energy = None
+            energy = 0.0
 
         activities.append({"date": day.isoformat(), "energy": energy})
 

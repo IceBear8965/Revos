@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
+    HTTP_201_CREATED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
 )
@@ -40,7 +41,7 @@ from .services.statistics.energy_overview import generate_energy_overview
 
 @extend_schema(
     request=EnergyEventCreateSerializer,
-    responses={201: {"type": "object", "properies": {"status": "event_created"}}},
+    responses={201: {}},
     description="Create new load or recovery event",
     summary="Create energy event",
 )
@@ -58,12 +59,12 @@ class EnergyEventCreateView(APIView):
             user_id=request.user.id,
             extra={},
         )
-        return Response({"status": "event_created"}, status=201)
+        return Response(status=HTTP_201_CREATED)
 
 
 @extend_schema(
     request=EnergyEventEditSerializer,
-    responses={201: {"type": "object", "properies": {"status": "event_edited"}}},
+    responses={200: {}},
     description="Edit energy event with history recalculation",
     summary="Edit energy event",
 )
@@ -88,7 +89,7 @@ class EnergyEventEditView(APIView):
             user_id=request.user.id,
             extra={},
         )
-        return Response({"status": "event_edited"}, status=HTTP_200_OK)
+        return Response(status=HTTP_200_OK)
 
 
 class EnergyEventDelteView(APIView):
@@ -104,7 +105,7 @@ class EnergyEventDelteView(APIView):
         event.delete()
 
         log_event(
-            action="event deleted",
+            action="event_deleted",
             user_id=request.user.id,
             extra={},
         )
@@ -138,7 +139,7 @@ class ActivityTypesView(APIView):
                 "value": data["value"],
             },
         )
-        return Response({"status": "new activity type created"}, status=HTTP_200_OK)
+        return Response(status=HTTP_201_CREATED)
 
 
 # Controls user`s activities

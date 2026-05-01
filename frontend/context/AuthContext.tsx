@@ -1,7 +1,5 @@
 import { createContext, useState, useEffect, PropsWithChildren, useContext } from "react"
-import { authApi } from "@/api/auth/api"
-import { tokenStore } from "@/utils/TokenStore"
-import { httpClient } from "@/api/http/HttpClient"
+import { authService } from "@/entities/auth/model/auth.service"
 
 interface AuthContextType {
     isAuth: boolean
@@ -25,37 +23,25 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     // Initialise Auth
     useEffect(() => {
         const init = async () => {
-            const isRestored = await authApi.restoreSession()
-
-            if (isRestored) {
-                setIsAuth(true)
-            } else {
-                await signOut()
+            try {
+                const isRestored = await authService.restoreSession()
+                setIsAuth(isRestored)
+            } finally {
+                setIsLoading(false)
             }
-
-            setIsLoading(false)
         }
 
         init()
     }, [])
 
     const signIn = async (email: string, password: string) => {
-        try {
-            await authApi.login(email, password)
-            setIsAuth(true)
-        } catch (error) {
-            console.log(error)
-        }
+        await authService.login(email, password)
+        setIsAuth(true)
     }
 
     const signOut = async () => {
-        try {
-            httpClient.clearQueue()
-            tokenStore.clearTokens()
-            setIsAuth(false)
-        } catch {
-            console.log("Can't sign out")
-        }
+        await authService.logout()
+        setIsAuth(false)
     }
 
     return (

@@ -99,14 +99,7 @@ class MeView(APIView):
 
 @extend_schema(
     request=ChangeNicknameSerializer,
-    responses={
-        202: {
-            "type": "object",
-            "properties": {
-                "updated_nickname": {"type": "string", "description": "Updated user nickname"}
-            },
-        }
-    },
+    responses={202: {}},
     description="Change user nickname and return changed nickname",
     summary="Change user nickname",
 )
@@ -126,19 +119,12 @@ class ChangeNicknameView(APIView):
             user_id=user.id,
             extra={"previous_nickname": previous_nickname, "current_nickname": user.nickname},
         )
-        return Response({"updated_nickname": user.nickname}, status=HTTP_202_ACCEPTED)
+        return Response(status=HTTP_202_ACCEPTED)
 
 
 @extend_schema(
     request=ChangeTimezoneSerializer,
-    responses={
-        202: {
-            "type": "object",
-            "properties": {
-                "updated_timezone": {"type": "string", "description": "Updated user timezone"}
-            },
-        }
-    },
+    responses={202: {}},
     description="Change user timezone and return new timezone",
     summary="Change user timezone",
 )
@@ -158,4 +144,3 @@ class ChangeTimezoneView(APIView):
             user_id=user.id,
             extra={"previous_timezone": previous_timezone, "current_timezone": user.timezone},
         )
-        return Response({"updated_timezone": user.timezone}, status=HTTP_202_ACCEPTED)
