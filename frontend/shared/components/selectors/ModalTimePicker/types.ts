@@ -3,9 +3,9 @@ import React from "react"
 interface ModalTimePickerProps {
     startedAt: Date
     endedAt: Date
-    setStartedAt: React.Dispatch<React.SetStateAction<Date>>
-    setEndedAt: React.Dispatch<React.SetStateAction<Date>>
-    resetSignal: boolean
+    setStartedAt: (date: Date) => void
+    setEndedAt: (date: Date) => void
+    resetSignal?: boolean
 }
 
 export { ModalTimePickerProps }

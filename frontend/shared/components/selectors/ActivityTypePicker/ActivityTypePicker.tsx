@@ -5,7 +5,7 @@ import { createStyles } from "./styles"
 import { ActivityTypePickerProps } from "./types"
 import { capitalize } from "@/shared/utils/capitalizeFirstLater"
 
-export const ActivitiTypePicker = ({
+export const ActivityTypePicker = ({
     dropDownValues,
     isDropDownOpen,
     dropDownValue,

@@ -1,12 +1,12 @@
-import { ActivityTypeDTO } from "@/api/types"
+import { ActivityType } from "@/entities/activity-type/model/types"
 import { Dispatch, SetStateAction } from "react"
 
 interface ActivityTypePickerProps {
-    dropDownValues: ActivityTypeDTO[] | null
+    dropDownValues: ActivityType[] | null
     isDropDownOpen: boolean
     dropDownValue: number | null
     setIsDropDownOpen: Dispatch<SetStateAction<boolean>>
-    setDropDownValue: Dispatch<SetStateAction<number | null>>
+    setDropDownValue: (v: number) => void
 }
 
 export { ActivityTypePickerProps }

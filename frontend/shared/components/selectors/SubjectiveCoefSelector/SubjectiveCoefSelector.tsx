@@ -3,7 +3,6 @@ import { Choices, SubjectiveCoefSelectorProps } from "./types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./styles"
-import { useEffect } from "react"
 
 export const SubjectiveCoefSelector = ({
     eventType,

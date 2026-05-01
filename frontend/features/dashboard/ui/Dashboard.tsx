@@ -7,13 +7,12 @@ import { createStyles } from "./dashboard.styles"
 import { useTheme } from "@/context/ThemeContext"
 import { useDashboard } from "../hooks/useDashboard"
 import { EventCard } from "@/shared/components/EventCard"
-// import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { EventOptionsType, EventType } from "@/shared/types"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
-import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
-import { EditEventModal } from "@/shared/components/EditEventModal/EditEventModal"
+import { CreateEventModal } from "@/features/event/ui/CreateEventModal/CreateEventModal"
+import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
 
 export const Dashboard = () => {
     const { data, isLoading, error, execute: refetchDashboard } = useDashboard()
@@ -21,8 +20,6 @@ export const Dashboard = () => {
 
     // Handling hooks
     // const { isLoading: deletingEvent, error: deleteError, refetch: deleteEvent } = useDeleteEvent()
-
-    const [eventType, setEventType] = useState<EventOptionsType>("load")
 
     const { colors } = useTheme()
     const styles = createStyles(colors)
@@ -34,12 +31,7 @@ export const Dashboard = () => {
 
     // Events handling
     const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
-
-    const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false)
-    const [eventToDelete, setEventToDelete] = useState<number | null>(null)
-
-    const [editModalVisible, setEditModalVisible] = useState<boolean>(false)
-    const [eventToEdit, setEventToEdit] = useState<EventType | null>(null)
+    const [eventType, setEventType] = useState<ActivityTypeCategoryWritable>("load")
 
     useEffect(() => {
         if (currentEnergy == null) return
@@ -67,36 +59,36 @@ export const Dashboard = () => {
         setCreateModalVisible(true)
     }
 
-    const onEditBtn = (event: EventType) => {
-        setEventToEdit(event)
-        setEditModalVisible(true)
-    }
-
-    const onDeleteBtn = (id: number) => {
-        setEventToDelete(id)
-        setDeleteModalVisible(true)
-    }
-
-    const onDeleteConfirmed = async () => {
-        if (eventToDelete) {
-            try {
-                // await deleteEvent({ id: eventToDelete })
-                refetchDashboard()
-                setEventToDelete(null)
-                setDeleteModalVisible(false)
-            } catch (error) {
-                Alert.alert("Error", "Event can't be deleted now", [
-                    { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
-                ])
-            }
-        } else {
-            setDeleteModalVisible(false)
-        }
-    }
-    const onDeleteDenied = () => {
-        setEventToDelete(null)
-        setDeleteModalVisible(false)
-    }
+    // const onEditBtn = (event: EventType) => {
+    //     setEventToEdit(event)
+    //     setEditModalVisible(true)
+    // }
+    //
+    // const onDeleteBtn = (id: number) => {
+    //     setEventToDelete(id)
+    //     setDeleteModalVisible(true)
+    // }
+    //
+    // const onDeleteConfirmed = async () => {
+    //     if (eventToDelete) {
+    //         try {
+    //             // await deleteEvent({ id: eventToDelete })
+    //             refetchDashboard()
+    //             setEventToDelete(null)
+    //             setDeleteModalVisible(false)
+    //         } catch (error) {
+    //             Alert.alert("Error", "Event can't be deleted now", [
+    //                 { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
+    //             ])
+    //         }
+    //     } else {
+    //         setDeleteModalVisible(false)
+    //     }
+    // }
+    // const onDeleteDenied = () => {
+    //     setEventToDelete(null)
+    //     setDeleteModalVisible(false)
+    // }
 
     if (isLoading) {
         return <Loader />
@@ -150,21 +142,21 @@ export const Dashboard = () => {
                         <Text style={styles.recommendationText}>{data?.recommendation}</Text>
                     </View>
 
-                    {data?.lastEvent ? (
-                        <EventCard
-                            event={data.lastEvent}
-                            onEdit={onEditBtn}
-                            onDelete={onDeleteBtn}
-                        />
-                    ) : (
-                        <View
-                            style={{
-                                flex: 3,
-                                backgroundColor: colors.card,
-                                borderRadius: 30,
-                            }}
-                        ></View>
-                    )}
+                    {/* {data?.lastEvent ? ( */}
+                    {/*     <EventCard */}
+                    {/*         event={data.lastEvent} */}
+                    {/*         onEdit={onEditBtn} */}
+                    {/*         onDelete={onDeleteBtn} */}
+                    {/*     /> */}
+                    {/* ) : ( */}
+                    {/*     <View */}
+                    {/*         style={{ */}
+                    {/*             flex: 3, */}
+                    {/*             backgroundColor: colors.card, */}
+                    {/*             borderRadius: 30, */}
+                    {/*         }} */}
+                    {/*     ></View> */}
+                    {/* )} */}
 
                     <View style={styles.controlsContainer}>
                         <Pressable style={styles.loadButton} onPress={() => openModal("load")}>
@@ -181,30 +173,13 @@ export const Dashboard = () => {
                 </View>
             </ScrollView>
 
-            {/* <CreateEventModal */}
-            {/*     refetch={refetch} */}
-            {/*     event_type={eventType} */}
-            {/*     lastEvent={data?.lastEvent} */}
-            {/*     modalVisible={createModalVisible} */}
-            {/*     setModalVisible={setCreateModalVisible} */}
-            {/* /> */}
-
-            <ConfirmationModal
-                title="Are you sure you want to continue?"
-                onConfirm={onDeleteConfirmed}
-                onDeny={() => {}}
-                modalVisible={deleteModalVisible}
-                setModalVisible={setDeleteModalVisible}
+            <CreateEventModal
+                refetch={refetchDashboard}
+                isOpen={createModalVisible}
+                setIsOpen={setCreateModalVisible}
+                event={data?.lastEvent ?? null}
+                eventType={eventType}
             />
-
-            {/* {eventToEdit && ( */}
-            {/*     <EditEventModal */}
-            {/*         refetch={refetch} */}
-            {/*         event={eventToEdit} */}
-            {/*         modalVisible={editModalVisible} */}
-            {/*         setModalVisible={setEditModalVisible} */}
-            {/*     /> */}
-            {/* )} */}
         </View>
     )
 }

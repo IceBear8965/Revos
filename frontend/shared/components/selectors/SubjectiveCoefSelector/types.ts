@@ -1,5 +1,7 @@
+import { ActivityTypeCategory } from "@/entities/activity-type/model/types"
+
 interface SubjectiveCoefSelectorProps {
-    eventType: "load" | "recovery"
+    eventType: ActivityTypeCategory
     subjectiveCoef: number
     onChange: (value: number) => void
 }
