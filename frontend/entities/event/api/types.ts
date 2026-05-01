@@ -10,14 +10,14 @@ export interface EventDTO {
     subjective_coef: number
 }
 
-export interface CreateEventRequest {
+export interface CreateEventRequestDTO {
     activity: number
     started_at: string // ISO8601
     ended_at: string // ISO8601
     subjective_coef: number
 }
 
-export interface EditEventRequest {
+export interface EditEventRequestDTO {
     activity: number
     started_at: string // ISO8601
     ended_at: string // ISO8601

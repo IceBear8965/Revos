@@ -20,7 +20,7 @@ import { EditTypeModal } from "./modals/ActivityTypes/EditTypeModal/EditTypeModa
 import { CreateTypeModal } from "./modals/ActivityTypes/CreateTypeModal/CreateTypeModal"
 
 export const AboutUser = () => {
-    const { data, isLoading, error, refetch } = useAboutUser()
+    const { data, isLoading, error, execute: fetchAboutUser } = useAboutUser()
     const { signOut } = useAuth()
     const { theme, toggleTheme, colors } = useTheme()
     const { types, isLoading: isTypesLoading, refetch: updateActivityTypes } = useActivityTypes()
@@ -43,12 +43,12 @@ export const AboutUser = () => {
 
     useFocusEffect(
         useCallback(() => {
-            refetch()
+            fetchAboutUser()
         }, [])
     )
 
     const refetchOnSuccess = () => {
-        refetch()
+        fetchAboutUser()
     }
 
     const onDeleteConfirmed = async () => {

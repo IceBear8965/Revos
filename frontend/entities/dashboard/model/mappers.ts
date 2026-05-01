@@ -1,4 +1,4 @@
-import { mapEvent } from "@/entities/event/model/mappers"
+import { mapEvent } from "@/entities/event/model/mappers/toDomain"
 import { DashboardDTO } from "../api/types"
 import { Dashboard } from "./types"
 

@@ -1,14 +1,14 @@
 import { httpClient } from "@/shared/api/HttpClient"
-import { CreateEventRequest, EditEventRequest } from "./types"
+import { CreateEventRequestDTO, EditEventRequestDTO } from "./types"
 
 export const eventApi = {
-    createEvent: async (body: CreateEventRequest): Promise<void> => {
+    create: async (body: CreateEventRequestDTO): Promise<void> => {
         await httpClient.post("energy/create_event/", body)
     },
-    deleteEvent: async (id: number): Promise<void> => {
+    delete: async (id: number): Promise<void> => {
         await httpClient.delete(`energy/delete_event/${id}/`)
     },
-    editEvent: async (id: number, body: EditEventRequest): Promise<void> => {
+    edit: async (id: number, body: EditEventRequestDTO): Promise<void> => {
         await httpClient.patch(`energy/edit_event/${id}/`, body)
     },
 }

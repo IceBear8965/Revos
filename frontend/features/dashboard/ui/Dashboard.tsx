@@ -16,7 +16,7 @@ import { ConfirmationModal } from "@/shared/components/ConfirmationModal/Confirm
 import { EditEventModal } from "@/shared/components/EditEventModal/EditEventModal"
 
 export const Dashboard = () => {
-    const { data, isLoading, error, refetch } = useDashboard()
+    const { data, isLoading, error, execute: refetchDashboard } = useDashboard()
     const { refetch: updateActivityTypes } = useActivityTypes()
 
     // Handling hooks
@@ -53,13 +53,13 @@ export const Dashboard = () => {
 
     useFocusEffect(
         useCallback(() => {
-            refetch()
+            refetchDashboard()
             updateActivityTypes()
         }, [])
     )
 
     const onRefresh = async () => {
-        await refetch()
+        refetchDashboard()
     }
 
     const openModal = (type: EventOptionsType) => {
@@ -81,7 +81,7 @@ export const Dashboard = () => {
         if (eventToDelete) {
             try {
                 // await deleteEvent({ id: eventToDelete })
-                await refetch()
+                refetchDashboard()
                 setEventToDelete(null)
                 setDeleteModalVisible(false)
             } catch (error) {

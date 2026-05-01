@@ -1,18 +1,18 @@
 import { useState, useCallback } from "react"
-import { UseAsyncDelete } from "@/shared/types"
-import { deleteEvent } from "@/api/deleteEvent"
-import { DeleteEventPayload } from "../types"
+import { UseAsync } from "@/shared/types"
+import { EditEventRequest } from "@/entities/event/model/types"
+import { eventService } from "@/entities/event/model/event.service"
 
-export const useDeleteEvent = (): UseAsyncDelete<DeleteEventPayload> => {
+export const useEditEvent = (): UseAsync<void, [number, EditEventRequest]> => {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<Error | null>(null)
 
-    const deleteEnergyEvent = useCallback(async (body: DeleteEventPayload): Promise<void> => {
+    const editEvent = useCallback(async (id: number, body: EditEventRequest): Promise<void> => {
         setIsLoading(true)
         setError(null)
 
         try {
-            await deleteEvent(body.id)
+            await eventService.edit(id, body)
         } catch (error) {
             setError(error instanceof Error ? error : new Error("Unknown error"))
             throw error
@@ -22,8 +22,9 @@ export const useDeleteEvent = (): UseAsyncDelete<DeleteEventPayload> => {
     }, [])
 
     return {
+        data: null,
         isLoading,
         error,
-        refetch: deleteEnergyEvent,
+        execute: editEvent,
     }
 }

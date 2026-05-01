@@ -1,6 +1,5 @@
-import { EventsListDTO } from "../api/types"
-import { EventDTO } from "../api/types"
-import { Event, EventsList } from "./types"
+import { EventDTO, EventsListDTO } from "../../api/types"
+import { Event, EventsList } from "../types"
 import { toDate } from "@/shared/utils/toDate"
 
 export const mapEvent = (dto: EventDTO): Event => ({

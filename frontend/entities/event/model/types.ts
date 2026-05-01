@@ -16,3 +16,17 @@ export interface EventsList {
     hasNext: boolean
     results: Event[]
 }
+
+export interface CreateEventRequest {
+    activity: number
+    startedAt: Date
+    endedAt: Date
+    subjectiveCoef: number
+}
+
+export interface EditEventRequest {
+    activity: number
+    startedAt: Date
+    endedAt: Date
+    subjectiveCoef: number
+}
