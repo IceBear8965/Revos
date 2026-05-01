@@ -21,10 +21,11 @@ export const CreateEventForm = ({
 
     const [isActivityOpen, setActivityOpen] = useState(false)
 
+    const dropDownItems = types.filter((el) => el.category === eventType)
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             <ActivityTypePicker
-                dropDownValues={types}
+                dropDownValues={dropDownItems}
                 dropDownValue={activity}
                 setDropDownValue={setActivity}
                 isDropDownOpen={isActivityOpen}

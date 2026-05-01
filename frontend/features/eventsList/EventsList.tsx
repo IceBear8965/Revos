@@ -5,10 +5,11 @@ import { View, Text, FlatList, RefreshControl, Pressable, Dimensions } from "rea
 import { createStyles } from "./eventsList.styles"
 import { useEventsList } from "./hooks/useEventsList"
 import { EventType } from "@/shared/types"
-import { EventCard } from "@/shared/components/EventCard"
+import { EventCard } from "@/entities/event/ui/EventCard"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { getWeekday, formatDateDDMM } from "@/utils/formatDate"
+import { Event } from "@/entities/event/model/types"
 
 const ITEM_WIDTH = 80
 const SCREEN_WIDTH = Dimensions.get("window").width
@@ -18,7 +19,7 @@ export const EventsList = () => {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [targetDate, setTargetDate] = useState<Date | null>(null)
 
-    const { data, isLoading, error, refetch } = useEventsList()
+    const { data, isLoading, error, execute: fetchList } = useEventsList()
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
@@ -27,19 +28,19 @@ export const EventsList = () => {
 
     useFocusEffect(
         useCallback(() => {
-            refetch(selectedDate)
+            fetchList(selectedDate)
             setScrollKey((v) => v + 1)
         }, [])
     )
 
     useEffect(() => {
-        refetch(selectedDate)
+        fetchList(selectedDate)
     }, [selectedDate])
 
     const onRefresh = async () => {
         setIsRefreshing(true)
         try {
-            await refetch(selectedDate)
+            await fetchList(selectedDate)
         } finally {
             setIsRefreshing(false)
             setScrollKey((v) => v + 1)
@@ -97,7 +98,9 @@ export const EventsList = () => {
         }, 100)
     }, [])
 
-    const renderItem = ({ item }: { item: EventType }) => <EventCard event={item} />
+    const renderItem = ({ item }: { item: Event }) => (
+        <EventCard event={item} onEdit={() => {}} onDelete={() => {}} />
+    )
 
     const renderDateItem = ({ item }: { item: Date; index: number }) => {
         const isSelected = item.toDateString() === selectedDate.toDateString()

@@ -1,9 +1,9 @@
+import { useEffect } from "react"
 import { GestureResponderEvent, Pressable, View } from "react-native"
 import { Choices, SubjectiveCoefSelectorProps } from "./coefSelector.types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./coefSelector.styles"
-import { useEffect } from "react"
 
 export const ActivityCoefSelector = ({
     eventType,

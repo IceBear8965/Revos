@@ -3,7 +3,6 @@ import { Pressable, View, Animated, PanResponder, Dimensions } from "react-nativ
 
 import { useTheme } from "@/context/ThemeContext"
 import { useTabBar } from "@/context/TabBarContext"
-import { createStyles } from "./styles"
 import { BottomSheetProps } from "./types"
 
 const SCREEN_HEIGHT = Dimensions.get("window").height
@@ -11,7 +10,6 @@ const SCREEN_HEIGHT = Dimensions.get("window").height
 export const BottomSheet = ({ children, visible, setVisible, height = 0.4 }: BottomSheetProps) => {
     const { colors } = useTheme()
     const { setVisible: setTabBarVisible } = useTabBar()
-    const styles = createStyles(colors)
 
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current
     const isOpen = useRef(false)
@@ -124,9 +122,7 @@ export const BottomSheet = ({ children, visible, setVisible, height = 0.4 }: Bot
                     </View>
 
                     {/* content */}
-                    <View style={styles.modalContentContainer}>
-                        <View style={styles.modalContent}>{children}</View>
-                    </View>
+                    <View style={{ flex: 1 }}>{children}</View>
                 </View>
             </Animated.View>
         </View>

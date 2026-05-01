@@ -8,23 +8,18 @@ import { useAboutUser } from "./hooks/useAboutUser"
 import { Loader } from "@/shared/components/Loader"
 import { Error } from "@/shared/components/Error"
 import { createStyles } from "./aboutUser.style"
-import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
-import { ChangeTimezoneModal } from "./modals/ChangeTimezoneModal/ChangeTimezoneModal"
 import { useAuth } from "@/context/AuthContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
-import { ActivityTypeDTO } from "@/api/types"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
-import { useDeleteType } from "./hooks/useDeleteType"
-import { EditTypeModal } from "./modals/ActivityTypes/EditTypeModal/EditTypeModal"
-import { CreateTypeModal } from "./modals/ActivityTypes/CreateTypeModal/CreateTypeModal"
+import { ActivityTypeDTO } from "@/entities/activity-type/api/types"
 
 export const AboutUser = () => {
     const { data, isLoading, error, execute: fetchAboutUser } = useAboutUser()
     const { signOut } = useAuth()
     const { theme, toggleTheme, colors } = useTheme()
     const { types, isLoading: isTypesLoading, refetch: updateActivityTypes } = useActivityTypes()
-    const { isLoading: isDeleting, refetch: deleteActivityType } = useDeleteType()
+    // const { isLoading: isDeleting, refetch: deleteActivityType } = useDeleteType()
     const styles = createStyles(colors)
     const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
     const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
@@ -54,7 +49,7 @@ export const AboutUser = () => {
     const onDeleteConfirmed = async () => {
         if (typeToDelete) {
             try {
-                await deleteActivityType({ id: typeToDelete })
+                // await deleteActivityType({ id: typeToDelete })
                 await updateActivityTypes()
                 refetchOnSuccess()
                 setTypeToDelete(null)
@@ -227,18 +222,18 @@ export const AboutUser = () => {
                         <AntDesign name="plus-circle" size={24} color={colors.textPrimary} />
                     </Pressable>
                 </View>
-                <FlatList
-                    data={types}
-                    renderItem={renderActivityCard}
-                    keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={{
-                        paddingHorizontal: 20,
-                        paddingVertical: 10,
-                    }}
-                    ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
-                    ListFooterComponent={<View style={{ height: 10 }} />}
-                    showsVerticalScrollIndicator={false}
-                />
+                {/* <FlatList */}
+                {/*     data={types} */}
+                {/*     renderItem={renderActivityCard} */}
+                {/*     keyExtractor={(item) => item.id.toString()} */}
+                {/*     contentContainerStyle={{ */}
+                {/*         paddingHorizontal: 20, */}
+                {/*         paddingVertical: 10, */}
+                {/*     }} */}
+                {/*     ItemSeparatorComponent={() => <View style={{ height: 15 }} />} */}
+                {/*     ListFooterComponent={<View style={{ height: 10 }} />} */}
+                {/*     showsVerticalScrollIndicator={false} */}
+                {/* /> */}
             </View>
 
             <View style={styles.signOutContainer}>
@@ -248,36 +243,6 @@ export const AboutUser = () => {
             </View>
 
             {/* Modals */}
-            <ChangeNicknameModal
-                currentNickname={data?.nickname}
-                modalVisible={nicknameModalVisible}
-                setModalVisible={setNicknameModalVisible}
-                onSuccess={refetchOnSuccess}
-            />
-            <ChangeTimezoneModal
-                currentTimezone={data?.timezone}
-                modalVisible={timezoneModalVisible}
-                setModalVisible={setTimezoneModalVisible}
-                onSuccess={refetchOnSuccess}
-            />
-            <EditTypeModal
-                activity_type={selectedActivityType}
-                modalVisible={activityTypeEditModal}
-                setModalVisible={setActivityTypeEditModal}
-            />
-            <CreateTypeModal
-                modalVisible={activityTypeCreateModal}
-                setModalVisible={setActivityTypeCreateModal}
-            />
-
-            {/* Delte Activity Modal */}
-            <ConfirmationModal
-                title="Are you sure you want to continue?"
-                onConfirm={onDeleteConfirmed}
-                onDeny={onDeleteDenied}
-                modalVisible={delteConfirmationModal}
-                setModalVisible={setDeleteConfirmationModal}
-            />
         </View>
     )
 }

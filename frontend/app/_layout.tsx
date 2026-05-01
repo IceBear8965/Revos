@@ -41,8 +41,6 @@ const RootNavigator = () => {
     if (isLoading || !isThemeReady) {
         return null
     }
-    console.log(isAuth)
-
     return (
         <Stack>
             <Stack.Protected guard={isAuth}>

@@ -6,13 +6,13 @@ import { Character } from "./components/Character"
 import { createStyles } from "./dashboard.styles"
 import { useTheme } from "@/context/ThemeContext"
 import { useDashboard } from "../hooks/useDashboard"
-import { EventCard } from "@/shared/components/EventCard"
+import { EventCard } from "@/entities/event/ui/EventCard"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
-import { EventOptionsType, EventType } from "@/shared/types"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { CreateEventModal } from "@/features/event/ui/CreateEventModal/CreateEventModal"
 import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
+import { Event } from "@/entities/event/model/types"
 
 export const Dashboard = () => {
     const { data, isLoading, error, execute: refetchDashboard } = useDashboard()
@@ -54,21 +54,15 @@ export const Dashboard = () => {
         refetchDashboard()
     }
 
-    const openModal = (type: EventOptionsType) => {
+    const openModal = (type: ActivityTypeCategoryWritable) => {
         setEventType(type)
         setCreateModalVisible(true)
     }
 
-    // const onEditBtn = (event: EventType) => {
-    //     setEventToEdit(event)
-    //     setEditModalVisible(true)
-    // }
-    //
-    // const onDeleteBtn = (id: number) => {
-    //     setEventToDelete(id)
-    //     setDeleteModalVisible(true)
-    // }
-    //
+    const onEditBtn = (event: Event) => {}
+
+    const onDeleteBtn = (id: number) => {}
+
     // const onDeleteConfirmed = async () => {
     //     if (eventToDelete) {
     //         try {
@@ -93,7 +87,6 @@ export const Dashboard = () => {
     if (isLoading) {
         return <Loader />
     }
-    // if (deletingEvent) return <Loader message="Deleting selected event" />
     if (error) {
         return <Error error={error} />
     }
@@ -142,21 +135,21 @@ export const Dashboard = () => {
                         <Text style={styles.recommendationText}>{data?.recommendation}</Text>
                     </View>
 
-                    {/* {data?.lastEvent ? ( */}
-                    {/*     <EventCard */}
-                    {/*         event={data.lastEvent} */}
-                    {/*         onEdit={onEditBtn} */}
-                    {/*         onDelete={onDeleteBtn} */}
-                    {/*     /> */}
-                    {/* ) : ( */}
-                    {/*     <View */}
-                    {/*         style={{ */}
-                    {/*             flex: 3, */}
-                    {/*             backgroundColor: colors.card, */}
-                    {/*             borderRadius: 30, */}
-                    {/*         }} */}
-                    {/*     ></View> */}
-                    {/* )} */}
+                    {data?.lastEvent ? (
+                        <EventCard
+                            event={data.lastEvent}
+                            onEdit={onEditBtn}
+                            onDelete={onDeleteBtn}
+                        />
+                    ) : (
+                        <View
+                            style={{
+                                flex: 3,
+                                backgroundColor: colors.card,
+                                borderRadius: 30,
+                            }}
+                        ></View>
+                    )}
 
                     <View style={styles.controlsContainer}>
                         <Pressable style={styles.loadButton} onPress={() => openModal("load")}>

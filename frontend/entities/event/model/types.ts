@@ -30,3 +30,9 @@ export interface EditEventRequest {
     endedAt: Date
     subjectiveCoef: number
 }
+
+export interface EventCardProps {
+    event: Event
+    onEdit: (event: Event) => void
+    onDelete: (id: number) => void
+}

@@ -10,12 +10,6 @@ interface EventType {
     subjectiveCoef: number
 }
 
-interface EventCardProps {
-    event: EventType
-    onEdit: (event: EventType) => void
-    onDelete: (id: number) => void
-}
-
 interface EditEventProps {
     id: number // Passed to url as param
     activity: number
@@ -33,4 +27,4 @@ export interface UseAsync<TData, TArgs extends unknown[] = []> {
 
 type EventOptionsType = "load" | "recovery" | "system"
 
-export { EventType, EventCardProps, EditEventProps, EventOptionsType }
+export { EventType, EditEventProps, EventOptionsType }

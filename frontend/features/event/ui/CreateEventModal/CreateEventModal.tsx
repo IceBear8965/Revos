@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react"
+import { View, StyleSheet } from "react-native"
 import { useCreateEvent } from "../../model/useCreateEvent"
 import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet"
 import { CreateEventModalProps } from "./types"
 import { CreateEventForm } from "./CreateEventForm/CreateEventForm"
+import { CreateEventHeader } from "./CreateEventHeader/CreateEventHeader"
+import { AppColors } from "@/theme/types"
+import { useTheme } from "@/context/ThemeContext"
 
 export const CreateEventModal = ({
     refetch,
@@ -11,6 +15,9 @@ export const CreateEventModal = ({
     event,
     eventType,
 }: CreateEventModalProps) => {
+    const { colors } = useTheme()
+    const styles = createStyles(colors)
+
     const { execute: createEvent } = useCreateEvent()
 
     const [activity, setActivity] = useState<number | null>(null)
@@ -45,17 +52,35 @@ export const CreateEventModal = ({
 
     return (
         <BottomSheet visible={isOpen} setVisible={close}>
-            <CreateEventForm
-                eventType={eventType}
-                activity={activity}
-                startedAt={startedAt}
-                endedAt={endedAt}
-                subjectiveCoef={subjectiveCoef}
-                setActivity={setActivity}
-                setStartedAt={setStartedAt}
-                setEndedAt={setEndedAt}
-                setSubjectiveCoef={setSubjectiveCoef}
-            />
+            <CreateEventHeader onSubmit={handleSubmit} />
+            <View style={styles.modalContentContainer}>
+                <View style={styles.modalContent}>
+                    <CreateEventForm
+                        eventType={eventType}
+                        activity={activity}
+                        startedAt={startedAt}
+                        endedAt={endedAt}
+                        subjectiveCoef={subjectiveCoef}
+                        setActivity={setActivity}
+                        setStartedAt={setStartedAt}
+                        setEndedAt={setEndedAt}
+                        setSubjectiveCoef={setSubjectiveCoef}
+                    />
+                </View>
+            </View>
         </BottomSheet>
     )
+}
+
+const createStyles = (colors: AppColors) => {
+    return StyleSheet.create({
+        modalContentContainer: {
+            flex: 1,
+            alignItems: "center",
+        },
+        modalContent: {
+            flex: 1,
+            width: "75%",
+        },
+    })
 }

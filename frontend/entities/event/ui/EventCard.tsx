@@ -3,8 +3,8 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6"
 import { formatEventDateTime } from "@/utils/formatDate"
 import { useTheme } from "@/context/ThemeContext"
 import { AppColors } from "@/theme/types"
-import { ArrowsRenderer } from "./ArrowsRenderer"
-import { EventCardProps } from "../types"
+import { EventCardProps } from "../model/types"
+import { ArrowsRenderer } from "@/shared/components/ArrowsRenderer"
 
 export const EventCard = ({ event, onDelete, onEdit }: EventCardProps) => {
     const { colors } = useTheme()
