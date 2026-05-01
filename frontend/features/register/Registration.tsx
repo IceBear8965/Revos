@@ -22,7 +22,7 @@ const initialEnergyState: InitialEnergyType = { icon: "emoticon-neutral-outline"
 
 export const Registration = () => {
     const { isLoading, error, refetch } = useRegistration()
-    const { isAuth, authenticateFromTokens } = useAuth()
+    const { isAuth, restoreSession } = useAuth()
     const router = useRouter()
     const [payload, setPayload] = useState<RegisterPayloadType>({
         email: "",
@@ -75,13 +75,11 @@ export const Registration = () => {
         try {
             await refetch(payload)
 
-            await authenticateFromTokens()
-            if (!isLoading) {
-                if (isAuth) {
-                    router.replace("/(tabs)")
-                } else {
-                    router.replace("/(auth)/login")
-                }
+            const ok = await restoreSession()
+            if (ok) {
+                router.replace("/(tabs)")
+            } else {
+                router.replace("/(auth)/login")
             }
         } catch (err) {
             const message =

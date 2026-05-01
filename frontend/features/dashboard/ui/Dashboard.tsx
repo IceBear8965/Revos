@@ -2,18 +2,17 @@ import { useEffect, useState, useCallback } from "react"
 import { ScrollView, RefreshControl, Text, View, Image, Pressable, Alert } from "react-native"
 import { useRouter, useFocusEffect } from "expo-router"
 import { useSharedValue, withTiming, Easing, ReduceMotion } from "react-native-reanimated"
-import { Character } from "@/features/dashboard/components/Character"
+import { Character } from "./components/Character"
 import { createStyles } from "./dashboard.styles"
 import { useTheme } from "@/context/ThemeContext"
-import { useDashboard } from "./hooks/useDashboard"
+import { useDashboard } from "../hooks/useDashboard"
 import { EventCard } from "@/shared/components/EventCard"
-import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
+// import { CreateEventModal } from "./modals/CreateEventModal/CreateEventModal"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { EventOptionsType, EventType } from "@/shared/types"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
-import { useDeleteEvent } from "./hooks/useDeleteEvent"
 import { EditEventModal } from "@/shared/components/EditEventModal/EditEventModal"
 
 export const Dashboard = () => {
@@ -21,7 +20,7 @@ export const Dashboard = () => {
     const { refetch: updateActivityTypes } = useActivityTypes()
 
     // Handling hooks
-    const { isLoading: deletingEvent, error: deleteError, refetch: deleteEvent } = useDeleteEvent()
+    // const { isLoading: deletingEvent, error: deleteError, refetch: deleteEvent } = useDeleteEvent()
 
     const [eventType, setEventType] = useState<EventOptionsType>("load")
 
@@ -81,7 +80,7 @@ export const Dashboard = () => {
     const onDeleteConfirmed = async () => {
         if (eventToDelete) {
             try {
-                await deleteEvent({ id: eventToDelete })
+                // await deleteEvent({ id: eventToDelete })
                 await refetch()
                 setEventToDelete(null)
                 setDeleteModalVisible(false)
@@ -102,8 +101,7 @@ export const Dashboard = () => {
     if (isLoading) {
         return <Loader />
     }
-    if (deletingEvent) return <Loader message="Deleting selected event" />
-
+    // if (deletingEvent) return <Loader message="Deleting selected event" />
     if (error) {
         return <Error error={error} />
     }
@@ -183,13 +181,13 @@ export const Dashboard = () => {
                 </View>
             </ScrollView>
 
-            <CreateEventModal
-                refetch={refetch}
-                event_type={eventType}
-                lastEvent={data?.lastEvent}
-                modalVisible={createModalVisible}
-                setModalVisible={setCreateModalVisible}
-            />
+            {/* <CreateEventModal */}
+            {/*     refetch={refetch} */}
+            {/*     event_type={eventType} */}
+            {/*     lastEvent={data?.lastEvent} */}
+            {/*     modalVisible={createModalVisible} */}
+            {/*     setModalVisible={setCreateModalVisible} */}
+            {/* /> */}
 
             <ConfirmationModal
                 title="Are you sure you want to continue?"
@@ -199,14 +197,14 @@ export const Dashboard = () => {
                 setModalVisible={setDeleteModalVisible}
             />
 
-            {eventToEdit && (
-                <EditEventModal
-                    refetch={refetch}
-                    event={eventToEdit}
-                    modalVisible={editModalVisible}
-                    setModalVisible={setEditModalVisible}
-                />
-            )}
+            {/* {eventToEdit && ( */}
+            {/*     <EditEventModal */}
+            {/*         refetch={refetch} */}
+            {/*         event={eventToEdit} */}
+            {/*         modalVisible={editModalVisible} */}
+            {/*         setModalVisible={setEditModalVisible} */}
+            {/*     /> */}
+            {/* )} */}
         </View>
     )
 }

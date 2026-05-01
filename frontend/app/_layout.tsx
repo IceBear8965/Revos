@@ -47,7 +47,7 @@ const RootNavigator = () => {
         <Stack>
             <Stack.Protected guard={isAuth}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                {/* <Stack.Screen name="(auth)/aboutUser" options={{ headerShown: false }} /> */}
+                <Stack.Screen name="(auth)/aboutUser" options={{ headerShown: false }} />
             </Stack.Protected>
 
             <Stack.Protected guard={!isAuth}>

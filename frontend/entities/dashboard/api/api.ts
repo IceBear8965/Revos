@@ -3,6 +3,6 @@ import { DashboardDTO } from "./types"
 
 export const dashboardApi = {
     get: (): Promise<DashboardDTO> => {
-        return httpClient.get<DashboardDTO>("energy/dashboard/")
+        return httpClient.get("energy/dashboard/")
     },
 }

@@ -6,6 +6,7 @@ interface AuthContextType {
     isLoading: boolean
     signIn: (email: string, password: string) => Promise<void>
     signOut: () => Promise<void>
+    restoreSession: () => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -44,8 +45,12 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setIsAuth(false)
     }
 
+    const restoreSession = async () => {
+        return authService.restoreSession()
+    }
+
     return (
-        <AuthContext.Provider value={{ isAuth, isLoading, signIn, signOut }}>
+        <AuthContext.Provider value={{ isAuth, isLoading, signIn, signOut, restoreSession }}>
             {children}
         </AuthContext.Provider>
     )

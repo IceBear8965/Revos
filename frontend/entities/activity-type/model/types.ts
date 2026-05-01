@@ -7,3 +7,11 @@ export interface ActivityTypeWriteModel {
     category: ActivityTypeCategoryWritable
     value: number
 }
+
+export interface ActivityType {
+    id: number
+    name: string
+    category: ActivityTypeCategory
+    value: number
+    isEditable: boolean
+}

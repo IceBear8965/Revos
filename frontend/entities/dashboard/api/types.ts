@@ -1,3 +1,5 @@
+import { ActivityTypeCategory } from "@/entities/activity-type/model/types"
+
 export interface DashboardDTO {
     greeting: string
     current_energy: number
@@ -8,7 +10,7 @@ export interface DashboardDTO {
     recommendation: string
     last_event: {
         id: number
-        event_type: "load" | "recovery" | "system"
+        event_type: ActivityTypeCategory
         activity_type: string
         started_at: string
         ended_at: string

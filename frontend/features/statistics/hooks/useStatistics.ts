@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback } from "react"
-import { getStatisticsData } from "@/api/statistics"
-import { StatisticsType } from "../types"
-import { UseAsyncGet } from "@/shared/types"
-import { StatisticsDTO } from "@/api/types"
+import { useState, useCallback } from "react"
+import { statisticsService } from "@/entities/statistics/model/statistics.service"
+import { Statistic } from "@/entities/statistics/model/types"
+import { UseAsync } from "@/shared/types"
 
-export const useStatistics = (): UseAsyncGet<StatisticsType> => {
-    const [data, setData] = useState<StatisticsType | null>(null)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+export const useStatistics = (): UseAsync<Statistic> => {
+    const [data, setData] = useState<Statistic | null>(null)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<Error | null>(null)
 
     const fetchStatistics = useCallback(async () => {
@@ -14,47 +13,8 @@ export const useStatistics = (): UseAsyncGet<StatisticsType> => {
         setError(null)
 
         try {
-            const response: StatisticsDTO | null = await getStatisticsData()
-            if (!response) {
-                setData(null)
-                return
-            }
-
-            const mappedData: StatisticsType = {
-                energyOverview: {
-                    period: {
-                        type: response.energy_overview.period.type,
-                        from: new Date(response.energy_overview.period.from),
-                        to: new Date(response.energy_overview.period.to),
-                    },
-                    activities: response.energy_overview.activities.map((element) => {
-                        return {
-                            date: new Date(element.date),
-                            energy: element.energy,
-                        }
-                    }),
-                },
-                activitiesSummary: {
-                    period: {
-                        type: response.activities_summary.period.type,
-                        from: new Date(response.activities_summary.period.from),
-                        to: new Date(response.activities_summary.period.to),
-                    },
-                    scale: {
-                        min: response.activities_summary.scale.min,
-                        max: response.activities_summary.scale.max,
-                    },
-                    activities: response.activities_summary.activities.map((element) => {
-                        return {
-                            activityType: element.activity_type,
-                            avgEnergyDelta: element.avg_energy_delta,
-                            eventCount: element.event_count,
-                        }
-                    }),
-                },
-            }
-
-            setData(mappedData)
+            const statistics = await statisticsService.get()
+            setData(statistics)
         } catch (error) {
             setError(error instanceof Error ? error : new Error("Uknown error"))
         } finally {
@@ -62,14 +22,10 @@ export const useStatistics = (): UseAsyncGet<StatisticsType> => {
         }
     }, [])
 
-    // useEffect(() => {
-    //     fetchStatistics()
-    // }, [fetchStatistics])
-
     return {
         data: data,
         isLoading: isLoading,
         error: error,
-        refetch: fetchStatistics,
+        execute: fetchStatistics,
     }
 }

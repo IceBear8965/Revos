@@ -1,4 +1,4 @@
-import { httpClient } from "../HttpClient"
+import { httpClient } from "@/shared/api/HttpClient"
 import { EventsListDTO } from "./types"
 
 export const eventsListApi = {

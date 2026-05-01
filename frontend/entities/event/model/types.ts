@@ -9,3 +9,10 @@ export interface Event {
     energyDelta: number
     subjectiveCoef: number
 }
+
+export interface EventsList {
+    date: Date // ISO8601
+    hasPrev: boolean
+    hasNext: boolean
+    results: Event[]
+}

@@ -23,3 +23,10 @@ export interface EditEventRequest {
     ended_at: string // ISO8601
     subjective_coef: number
 }
+
+export interface EventsListDTO {
+    date: string
+    has_prev: boolean
+    has_next: boolean
+    results: EventDTO[]
+}

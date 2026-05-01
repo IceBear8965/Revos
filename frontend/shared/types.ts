@@ -24,34 +24,13 @@ interface EditEventProps {
     subjeciveCoef: number
 }
 
-interface UseAsyncGet<T> {
-    data: T | null
+export interface UseAsync<TData, TArgs extends unknown[] = []> {
+    data: TData | null
     isLoading: boolean
     error: Error | null
-    refetch: () => Promise<void>
-}
-
-interface UseAsyncPost<T, P> {
-    data: T | null
-    isLoading: boolean
-    error: Error | null
-    refetch: (body: P) => Promise<void>
-}
-
-interface UseAsyncDelete<T> {
-    isLoading: boolean
-    error: Error | null
-    refetch: (body: T) => Promise<void>
+    execute: (...args: TArgs) => Promise<void>
 }
 
 type EventOptionsType = "load" | "recovery" | "system"
 
-export {
-    EventType,
-    EventCardProps,
-    EditEventProps,
-    UseAsyncGet,
-    UseAsyncPost,
-    UseAsyncDelete,
-    EventOptionsType,
-}
+export { EventType, EventCardProps, EditEventProps, EventOptionsType }

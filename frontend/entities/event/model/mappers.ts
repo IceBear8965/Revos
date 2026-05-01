@@ -1,13 +1,7 @@
+import { EventsListDTO } from "../api/types"
 import { EventDTO } from "../api/types"
-import { Event } from "./types"
-
-const toDate = (value: string) => {
-    const date = new Date(value)
-    if (isNaN(date.getTime())) {
-        throw new Error(`Invalid date: ${value}`)
-    }
-    return date
-}
+import { Event, EventsList } from "./types"
+import { toDate } from "@/shared/utils/toDate"
 
 export const mapEvent = (dto: EventDTO): Event => ({
     id: dto.id,
@@ -17,4 +11,11 @@ export const mapEvent = (dto: EventDTO): Event => ({
     endedAt: toDate(dto.ended_at),
     energyDelta: dto.energy_delta,
     subjectiveCoef: dto.subjective_coef,
+})
+
+export const mapList = (dto: EventsListDTO): EventsList => ({
+    date: toDate(dto.date),
+    hasPrev: dto.has_prev,
+    hasNext: dto.has_next,
+    results: dto.results.map((event: EventDTO) => mapEvent(event)),
 })

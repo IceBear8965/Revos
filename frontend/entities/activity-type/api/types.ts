@@ -1,6 +1,6 @@
 import { ActivityTypeCategory, ActivityTypeWriteModel } from "../model/types"
 
-export interface ActivityTypeCollectionResponse {
+export interface ActivityTypeDTO {
     id: number
     name: string
     category: ActivityTypeCategory

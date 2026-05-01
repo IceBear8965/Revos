@@ -1,12 +1,8 @@
 import { httpClient } from "@/shared/api/HttpClient"
-import {
-    ActivityTypeCollectionResponse,
-    CreateActivityTypeRequest,
-    EditActivityTypeRequest,
-} from "./types"
+import { ActivityTypeDTO, CreateActivityTypeRequest, EditActivityTypeRequest } from "./types"
 
 export const activityTypeApi = {
-    get: async (): Promise<ActivityTypeCollectionResponse[]> => {
+    get: async (): Promise<ActivityTypeDTO[]> => {
         return httpClient.get("energy/activity_types/")
     },
 
