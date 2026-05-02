@@ -92,12 +92,12 @@ export const Statistics = () => {
                                     left: 20,
                                     right: 20,
                                     top: 20,
-                                    bottom: 40,
+                                    bottom: 50,
                                 }}
                                 domainPadding={{ left: 30, right: 30 }}
                                 xAxis={{
                                     tickCount: activitiesSummaryData.length,
-                                    formatXLabel: (label: string) => label,
+                                    formatXLabel: (label: unknown) => String(label ?? ""),
                                     font: font,
                                     labelColor: colors.textPrimary,
                                     labelRotate: -45,

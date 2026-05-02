@@ -14,8 +14,8 @@ export const mapActivitiesSummary = (
     return activities
         .map((el) => ({
             activityType: el.activity,
-            positiveDelta: el.avgEnergyDelta > 0 ? el.avgEnergyDelta : null,
-            negativeDelta: el.avgEnergyDelta < 0 ? el.avgEnergyDelta : null,
+            positiveDelta: el.avgEnergyDelta > 0 ? el.avgEnergyDelta : 0,
+            negativeDelta: el.avgEnergyDelta < 0 ? el.avgEnergyDelta : 0,
         }))
         .sort((a, b) => a.activityType.localeCompare(b.activityType))
 }
