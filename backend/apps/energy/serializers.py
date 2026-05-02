@@ -89,7 +89,7 @@ class EnergyEventDeleteSerializer(serializers.Serializer):
         except EnergyEvent.DoesNotExist:
             raise serializers.ValidationError("Event not found")
 
-        if event.event_type == "system":
+        if event.activity_category == "system":
             raise serializers.ValidationError("System event cannot be deleted")
 
         self.event = event
@@ -142,8 +142,8 @@ class EventItemSerializer(serializers.ModelSerializer):
         model = EnergyEvent
         fields = [
             "id",
-            "event_type",
-            "activity_type",
+            "activity_category",
+            "activity_name",
             "started_at",
             "ended_at",
             "energy_delta",

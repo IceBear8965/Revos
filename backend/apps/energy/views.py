@@ -327,7 +327,7 @@ class EventsListView(APIView):
 
         has_prev = (
             EnergyEvent.objects.filter(user=request.user, started_at__lt=start)
-            .exclude(event_type="system")
+            .exclude(activity_category="system")
             .exists()
         )
         has_next = EnergyEvent.objects.filter(user=request.user, started_at__gte=end).exists()

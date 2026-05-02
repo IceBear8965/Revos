@@ -5,16 +5,14 @@ from django.db import transaction
 from apps.energy.domain.energy_engine import EnergyEngine
 from apps.energy.domain.engine_params import EngineParams, EventDetails
 from apps.energy.domain.errors import EngineParamsNotFound, LastEventNotFound
-from apps.energy.models import EnergyEvent, ModelParams
-
-from ..domain.enums import EventType
+from apps.energy.models import ActivityType, EnergyEvent, ModelParams
 
 
 @transaction.atomic
 def create_energy_event(
     *,
     user,
-    activity,
+    activity: ActivityType,
     started_at: datetime,
     ended_at: datetime,
     subjective_coef: float,
@@ -41,8 +39,6 @@ def create_energy_event(
         initial_break_minutes = 0
         initial_continuous_load_minutes = 0
 
-    event_type = EventType(activity.category)
-
     event_details = EventDetails(
         initial_energy=initial_energy,
         initial_acute=initial_acute,
@@ -50,8 +46,8 @@ def create_energy_event(
         initial_sleep_minutes=initial_sleep_minutes,
         initial_break_minutes=initial_break_minutes,
         initial_continuous_load_minutes=initial_continuous_load_minutes,
-        event_type=event_type,
-        activity_type=activity.name,
+        activity_category=activity.category,
+        activity_name=activity.name,
         activity_coef=activity.value,
         started_at=started_at,
         ended_at=ended_at,
@@ -63,8 +59,9 @@ def create_energy_event(
 
     EnergyEvent.objects.create(
         user=user,
-        event_type=event_type.value,
-        activity_type=activity.name,
+        activity=activity,
+        activity_category=activity.category,
+        activity_name=activity.name,
         activity_coef=activity.value,
         subjective_coef=subjective_coef,
         params_version=params,

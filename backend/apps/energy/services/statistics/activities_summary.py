@@ -19,7 +19,7 @@ def generate_activities_summary(*, user):
         delta = energy_delta(e)
 
         deltas.append(delta)
-        events_by_activity[e.activity_type].append(delta)
+        events_by_activity[e.activity_name].append(delta)
 
     min_delta = min(deltas) if deltas else 0
     max_delta = max(deltas) if deltas else 0

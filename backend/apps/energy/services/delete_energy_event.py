@@ -44,7 +44,7 @@ def delete_energy_event(*, user, event_id):
     params_cache = {}
 
     for event in events_queue:
-        params_version_id = event.params_version_id
+        params_version_id = event.params_version.id
 
         if params_version_id not in params_cache:
             params_cache[params_version_id] = EngineParams(**event.params_version.params_json)
@@ -58,8 +58,8 @@ def delete_energy_event(*, user, event_id):
             initial_sleep_minutes=sleep_minutes,
             initial_break_minutes=break_minutes,
             initial_continuous_load_minutes=continuous_load_minutes,
-            event_type=event.event_type,
-            activity_type=event.activity_type,
+            activity_category=event.activity_category,
+            activity_name=event.activity_name,
             activity_coef=event.activity_coef,
             started_at=event.started_at,
             ended_at=event.ended_at,

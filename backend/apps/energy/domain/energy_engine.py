@@ -2,7 +2,7 @@ import math
 from datetime import datetime, timedelta
 
 from .engine_params import EngineParams, EventDetails
-from .enums import EventType
+from .enums import ActivityCategory
 
 
 class EnergyEngine:
@@ -34,7 +34,7 @@ class EnergyEngine:
 
     def micro_step(self, current_time, dt):
         minutes = dt.total_seconds() / 60
-        activity_type = self.event_details.activity_type
+        activity_type = self.event_details.activity_category
         activity_coef = self.event_details.activity_coef
         subjective_coef = self.event_details.subjective_coef
 
@@ -48,7 +48,7 @@ class EnergyEngine:
             circadian_factor += self.circadian_component(current_time)
 
         # Load
-        if self.event_details.event_type == EventType.LOAD:
+        if self.event_details.activity_category == ActivityCategory.LOAD:
             self.break_minutes = 0
             self.sleep_minutes = 0
             self.continuous_load_minutes += minutes
@@ -77,7 +77,7 @@ class EnergyEngine:
             )
 
         # Sleep
-        elif self.event_details.activity_type == "sleep":
+        elif self.event_details.activity_name == "sleep":
             self.continuous_load_minutes = 0
             self.break_minutes = 0
             self.sleep_minutes += minutes
