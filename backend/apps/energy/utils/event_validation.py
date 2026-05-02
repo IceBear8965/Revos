@@ -51,6 +51,9 @@ def validate_event_edit(user, event_id, started_at, ended_at):
     except EnergyEvent.DoesNotExist:
         raise serializers.ValidationError({"id": "Event not found"})
 
+    if event.event_type == "system":
+        raise serializers.ValidationError({"event_type": "System events cannot be edited"})
+
     prev_event, next_event = get_event_neighbors(user, event)
 
     if prev_event and started_at < prev_event.ended_at:

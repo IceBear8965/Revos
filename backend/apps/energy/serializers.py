@@ -14,6 +14,7 @@ from .models import ActivityType, EnergyEvent
 from .utils.energy_delta import energy_delta
 
 
+# !!! Energy Events !!!
 class EnergyEventCreateSerializer(serializers.Serializer):
     activity = serializers.PrimaryKeyRelatedField(queryset=ActivityType.objects.none())
     started_at = serializers.DateTimeField()
@@ -76,6 +77,27 @@ class EnergyEventEditSerializer(serializers.Serializer):
         return data
 
 
+class EnergyEventDeleteSerializer(serializers.Serializer):
+    def validate(self, data):
+        request = self.context["request"]
+        user = request.user
+        event_id = self.context["view"].kwargs["id"]
+
+        try:
+            event = EnergyEvent.objects.get(id=event_id, user=user)
+
+        except EnergyEvent.DoesNotExist:
+            raise serializers.ValidationError("Event not found")
+
+        if event.event_type == "system":
+            raise serializers.ValidationError("System event cannot be deleted")
+
+        self.event = event
+
+        return data
+
+
+# !!! Activity Types !!!
 class ActivityTypeCollectionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
