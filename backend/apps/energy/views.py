@@ -28,12 +28,14 @@ from .serializers import (
     BaseStatisticsSerializer,
     EnergyDashboardSerializer,
     EnergyEventCreateSerializer,
+    EnergyEventDeleteSerializer,
     EnergyEventEditSerializer,
     EventItemSerializer,
 )
 from .services.activity_types.create_activity_type import create_activity_type
 from .services.create_energy_event import create_energy_event
 from .services.dashboard import generate_dashboard
+from .services.delete_energy_event import delete_energy_event
 from .services.edit_energy_event import edit_energy_event
 from .services.statistics.activities_summary import generate_activities_summary
 from .services.statistics.energy_overview import generate_energy_overview
@@ -92,17 +94,20 @@ class EnergyEventEditView(APIView):
         return Response(status=HTTP_200_OK)
 
 
-class EnergyEventDelteView(APIView):
+class EnergyEventDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
-        event = get_object_or_404(
-            EnergyEvent,
-            id=id,
-            user=request.user,
+        serializer = EnergyEventDeleteSerializer(
+            data={},
+            context={"request": request, "view": self},
         )
+        serializer.is_valid(raise_exception=True)
 
-        event.delete()
+        delete_energy_event(
+            user=request.user,
+            event_id=serializer.event.id,
+        )
 
         log_event(
             action="event_deleted",
