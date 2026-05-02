@@ -1,6 +1,6 @@
 import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
 
-export interface CreateEventFormProps {
+export interface EventFormProps {
     eventType: ActivityTypeCategoryWritable
     activity: number | null
     startedAt: Date

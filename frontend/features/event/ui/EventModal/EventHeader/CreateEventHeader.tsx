@@ -1,9 +1,9 @@
 import { View, Text, Pressable } from "react-native"
 import { createStyles } from "./styles"
 import { useTheme } from "@/context/ThemeContext"
-import { CreateEventHeaderProps } from "./types"
+import { EventHeaderProps } from "./types"
 
-export const CreateEventHeader = ({ onSubmit }: CreateEventHeaderProps) => {
+export const EventHeader = ({ onSubmit }: EventHeaderProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
 

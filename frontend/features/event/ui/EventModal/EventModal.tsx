@@ -1,24 +1,30 @@
 import { useState, useEffect } from "react"
 import { View, StyleSheet } from "react-native"
 import { useCreateEvent } from "../../model/useCreateEvent"
+import { useEditEvent } from "../../model/useEditType"
 import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet"
-import { CreateEventModalProps } from "./types"
-import { CreateEventForm } from "./CreateEventForm/CreateEventForm"
-import { CreateEventHeader } from "./CreateEventHeader/CreateEventHeader"
+import { EventModalProps } from "./types"
+import { EventHeader } from "./EventHeader/CreateEventHeader"
+import { EventForm } from "./EventForm/EventForm"
 import { AppColors } from "@/theme/types"
 import { useTheme } from "@/context/ThemeContext"
+import { useActivityTypes } from "@/context/ActivityTypesContext"
+import { getActivityIdByName } from "@/shared/utils/getActivityId"
 
-export const CreateEventModal = ({
+export const EventModal = ({
+    mode,
     refetch,
     isOpen,
     setIsOpen,
     event,
     eventType,
-}: CreateEventModalProps) => {
+}: EventModalProps) => {
     const { colors } = useTheme()
+    const { types } = useActivityTypes()
     const styles = createStyles(colors)
 
     const { execute: createEvent } = useCreateEvent()
+    const { execute: editEvent } = useEditEvent()
 
     const [activity, setActivity] = useState<number | null>(null)
     const [startedAt, setStartedAt] = useState(new Date())
@@ -30,21 +36,36 @@ export const CreateEventModal = ({
     useEffect(() => {
         if (!isOpen) return
 
-        setStartedAt(event?.endedAt ?? new Date())
-        setEndedAt(new Date())
-        setActivity(null)
-        setSubjectiveCoef(1.0)
-    }, [isOpen])
+        if (mode === "create") {
+            setStartedAt(event?.endedAt ?? new Date())
+            setEndedAt(new Date())
+            setActivity(null)
+            setSubjectiveCoef(1.0)
+        } else {
+            if (event) {
+                setStartedAt(event.startedAt)
+                setEndedAt(event.endedAt)
+                setActivity(getActivityIdByName(types, event.activityType))
+                setSubjectiveCoef(event.subjectiveCoef)
+            }
+        }
+    }, [isOpen, types])
 
     const handleSubmit = async () => {
         if (!activity) return
 
-        await createEvent({
-            activity,
-            startedAt,
-            endedAt,
-            subjectiveCoef: subjectiveCoef,
-        })
+        if (mode === "create") {
+            await createEvent({
+                activity,
+                startedAt,
+                endedAt,
+                subjectiveCoef: subjectiveCoef,
+            })
+        } else {
+            if (event) {
+                await editEvent(event.id, { activity, startedAt, endedAt, subjectiveCoef })
+            }
+        }
 
         refetch()
         close()
@@ -52,16 +73,16 @@ export const CreateEventModal = ({
 
     return (
         <BottomSheet visible={isOpen} setVisible={close}>
-            <CreateEventHeader onSubmit={handleSubmit} />
+            <EventHeader onSubmit={handleSubmit} />
             <View style={styles.modalContentContainer}>
                 <View style={styles.modalContent}>
-                    <CreateEventForm
+                    <EventForm
                         eventType={eventType}
                         activity={activity}
                         startedAt={startedAt}
                         endedAt={endedAt}
-                        subjectiveCoef={subjectiveCoef}
                         setActivity={setActivity}
+                        subjectiveCoef={subjectiveCoef}
                         setStartedAt={setStartedAt}
                         setEndedAt={setEndedAt}
                         setSubjectiveCoef={setSubjectiveCoef}

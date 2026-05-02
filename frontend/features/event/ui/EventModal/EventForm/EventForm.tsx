@@ -4,9 +4,9 @@ import { ActivityTypePicker } from "@/shared/components/selectors/ActivityTypePi
 import { ModalTimePicker } from "@/shared/components/selectors/ModalTimePicker/ModalTimePicker"
 import { SubjectiveCoefSelector } from "@/shared/components/selectors/SubjectiveCoefSelector/SubjectiveCoefSelector"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
-import { CreateEventFormProps } from "./types"
+import { EventFormProps } from "./types"
 
-export const CreateEventForm = ({
+export const EventForm = ({
     eventType,
     activity,
     startedAt,
@@ -16,7 +16,7 @@ export const CreateEventForm = ({
     setStartedAt,
     setEndedAt,
     setSubjectiveCoef,
-}: CreateEventFormProps) => {
+}: EventFormProps) => {
     const { types } = useActivityTypes()
 
     const [isActivityOpen, setActivityOpen] = useState(false)

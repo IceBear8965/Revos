@@ -10,7 +10,7 @@ import { EventCard } from "@/entities/event/ui/EventCard"
 import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
-import { CreateEventModal } from "@/features/event/ui/CreateEventModal/CreateEventModal"
+import { EventModal } from "@/features/event/ui/EventModal/EventModal"
 import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
 import { Event } from "@/entities/event/model/types"
 
@@ -30,7 +30,8 @@ export const Dashboard = () => {
     const router = useRouter()
 
     // Events handling
-    const [createModalVisible, setCreateModalVisible] = useState<boolean>(false)
+    const [eventModalVisible, setEventModalVisible] = useState<boolean>(false)
+    const [eventModalMode, setEventModalMode] = useState<"create" | "edit">("create")
     const [eventType, setEventType] = useState<ActivityTypeCategoryWritable>("load")
 
     useEffect(() => {
@@ -52,11 +53,6 @@ export const Dashboard = () => {
 
     const onRefresh = async () => {
         refetchDashboard()
-    }
-
-    const openModal = (type: ActivityTypeCategoryWritable) => {
-        setEventType(type)
-        setCreateModalVisible(true)
     }
 
     const onEditBtn = (event: Event) => {}
@@ -152,13 +148,24 @@ export const Dashboard = () => {
                     )}
 
                     <View style={styles.controlsContainer}>
-                        <Pressable style={styles.loadButton} onPress={() => openModal("load")}>
+                        <Pressable
+                            style={styles.loadButton}
+                            onPress={() => {
+                                setEventType("load")
+                                setEventModalMode("create")
+                                setEventModalVisible(true)
+                            }}
+                        >
                             <Text style={styles.loadButtonText}>Load</Text>
                         </Pressable>
 
                         <Pressable
                             style={styles.recoveryButton}
-                            onPress={() => openModal("recovery")}
+                            onPress={() => {
+                                setEventType("recovery")
+                                setEventModalMode("edit")
+                                setEventModalVisible(true)
+                            }}
                         >
                             <Text style={styles.recoveryButtonText}>Recovery</Text>
                         </Pressable>
@@ -166,10 +173,11 @@ export const Dashboard = () => {
                 </View>
             </ScrollView>
 
-            <CreateEventModal
+            <EventModal
+                mode={eventModalMode}
                 refetch={refetchDashboard}
-                isOpen={createModalVisible}
-                setIsOpen={setCreateModalVisible}
+                isOpen={eventModalVisible}
+                setIsOpen={setEventModalVisible}
                 event={data?.lastEvent ?? null}
                 eventType={eventType}
             />
