@@ -2,8 +2,11 @@ import { ActivityTypeCategory } from "@/entities/activity-type/model/types"
 
 export interface Event {
     id: number
-    type: ActivityTypeCategory
-    activityType: string
+    activity: {
+        id: number
+        name: string
+        category: ActivityTypeCategory
+    }
     startedAt: Date
     endedAt: Date
     energyDelta: number

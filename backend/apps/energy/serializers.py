@@ -135,20 +135,33 @@ class EnergyDashboardSerializer(serializers.Serializer):
     last_event = serializers.JSONField()
 
 
+class ActivitySnapshotSerializer(serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True)
+    category = serializers.CharField(allow_null=True)
+    name = serializers.CharField(allow_null=True)
+
+
 class EventItemSerializer(serializers.ModelSerializer):
     energy_delta = serializers.SerializerMethodField()
+    activity = serializers.SerializerMethodField()
 
     class Meta:
         model = EnergyEvent
         fields = [
             "id",
-            "activity_category",
-            "activity_name",
+            "activity",
             "started_at",
             "ended_at",
             "energy_delta",
             "subjective_coef",
         ]
+
+    def get_activity(self, obj):
+        return {
+            "id": obj.activity.id if obj.activity else None,
+            "category": obj.activity_category,
+            "name": obj.activity_name,
+        }
 
     def get_energy_delta(self, obj):
         return energy_delta(obj)

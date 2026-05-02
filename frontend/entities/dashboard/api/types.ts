@@ -10,8 +10,11 @@ export interface DashboardDTO {
     recommendation: string
     last_event: {
         id: number
-        event_type: ActivityTypeCategory
-        activity_type: string
+        activity: {
+            id: number
+            name: string
+            category: ActivityTypeCategory
+        }
         started_at: string
         ended_at: string
         energy_delta: number

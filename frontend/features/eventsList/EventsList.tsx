@@ -9,37 +9,45 @@ import { Error } from "@/shared/components/Error"
 import { Loader } from "@/shared/components/Loader"
 import { getWeekday, formatDateDDMM } from "@/shared/utils/formatDate"
 import { Event } from "@/entities/event/model/types"
+import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
+import { EventModal } from "../event/ui/EventModal/EventModal"
 
 const ITEM_WIDTH = 80
 const SCREEN_WIDTH = Dimensions.get("window").width
 
 export const EventsList = () => {
+    const { data, isLoading, error, execute: refetchList } = useEventsList()
+
     const [scrollKey, setScrollKey] = useState(0)
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [targetDate, setTargetDate] = useState<Date | null>(null)
 
-    const { data, isLoading, error, execute: fetchList } = useEventsList()
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
     const [isRefreshing, setIsRefreshing] = useState(false)
     const listRef = useRef<FlatList>(null)
 
+    const [eventModalVisible, setEventModalVisible] = useState<boolean>(false)
+    const eventModalMode = useRef<"create" | "edit">("edit")
+    const [modalEvent, setModalEvent] = useState<Event | null>(null)
+    const [eventType, setEventType] = useState<ActivityTypeCategoryWritable>("load")
+
     useFocusEffect(
         useCallback(() => {
-            fetchList(selectedDate)
+            refetchList(selectedDate)
             setScrollKey((v) => v + 1)
         }, [])
     )
 
     useEffect(() => {
-        fetchList(selectedDate)
+        refetchList(selectedDate)
     }, [selectedDate])
 
     const onRefresh = async () => {
         setIsRefreshing(true)
         try {
-            await fetchList(selectedDate)
+            await refetchList(selectedDate)
         } finally {
             setIsRefreshing(false)
             setScrollKey((v) => v + 1)
@@ -97,8 +105,15 @@ export const EventsList = () => {
         }, 100)
     }, [])
 
+    const onEditBtn = (event: Event) => {
+        const category = event.activity.category != "system" ? event.activity.category : "load"
+        setEventType(category)
+        setModalEvent(event)
+        setEventModalVisible(true)
+    }
+
     const renderItem = ({ item }: { item: Event }) => (
-        <EventCard event={item} onEdit={() => {}} onDelete={() => {}} />
+        <EventCard event={item} onEdit={onEditBtn} onDelete={() => {}} />
     )
 
     const renderDateItem = ({ item }: { item: Date; index: number }) => {
@@ -177,6 +192,15 @@ export const EventsList = () => {
                         colors={[colors.foreground]}
                     />
                 }
+            />
+
+            <EventModal
+                mode={eventModalMode.current}
+                refetch={() => refetchList(selectedDate)}
+                isOpen={eventModalVisible}
+                setIsOpen={setEventModalVisible}
+                event={modalEvent}
+                eventType={eventType}
             />
         </View>
     )

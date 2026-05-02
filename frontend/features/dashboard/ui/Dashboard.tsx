@@ -17,6 +17,7 @@ import { Event } from "@/entities/event/model/types"
 export const Dashboard = () => {
     const { data, isLoading, error, execute: refetchDashboard } = useDashboard()
     const { refetch: updateActivityTypes } = useActivityTypes()
+    const lastEvent = data?.lastEvent ?? null
 
     // Handling hooks
     // const { isLoading: deletingEvent, error: deleteError, refetch: deleteEvent } = useDeleteEvent()
@@ -32,6 +33,7 @@ export const Dashboard = () => {
     // Events handling
     const [eventModalVisible, setEventModalVisible] = useState<boolean>(false)
     const [eventModalMode, setEventModalMode] = useState<"create" | "edit">("create")
+    const [modalEvent, setModalEvent] = useState<Event | null>(null)
     const [eventType, setEventType] = useState<ActivityTypeCategoryWritable>("load")
 
     useEffect(() => {
@@ -55,7 +57,13 @@ export const Dashboard = () => {
         refetchDashboard()
     }
 
-    const onEditBtn = (event: Event) => {}
+    const onEditBtn = (event: Event) => {
+        const category = event.activity.category != "system" ? event.activity.category : "load"
+        setEventType(category)
+        setEventModalMode("edit")
+        setModalEvent(event)
+        setEventModalVisible(true)
+    }
 
     const onDeleteBtn = (id: number) => {}
 
@@ -153,6 +161,7 @@ export const Dashboard = () => {
                             onPress={() => {
                                 setEventType("load")
                                 setEventModalMode("create")
+                                setModalEvent(lastEvent)
                                 setEventModalVisible(true)
                             }}
                         >
@@ -163,7 +172,8 @@ export const Dashboard = () => {
                             style={styles.recoveryButton}
                             onPress={() => {
                                 setEventType("recovery")
-                                setEventModalMode("edit")
+                                setEventModalMode("create")
+                                setModalEvent(lastEvent)
                                 setEventModalVisible(true)
                             }}
                         >
@@ -178,7 +188,7 @@ export const Dashboard = () => {
                 refetch={refetchDashboard}
                 isOpen={eventModalVisible}
                 setIsOpen={setEventModalVisible}
-                event={data?.lastEvent ?? null}
+                event={modalEvent}
                 eventType={eventType}
             />
         </View>

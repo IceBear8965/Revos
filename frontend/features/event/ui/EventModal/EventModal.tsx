@@ -8,8 +8,6 @@ import { EventHeader } from "./EventHeader/CreateEventHeader"
 import { EventForm } from "./EventForm/EventForm"
 import { AppColors } from "@/theme/types"
 import { useTheme } from "@/context/ThemeContext"
-import { useActivityTypes } from "@/context/ActivityTypesContext"
-import { getActivityIdByName } from "@/shared/utils/getActivityId"
 
 export const EventModal = ({
     mode,
@@ -20,7 +18,6 @@ export const EventModal = ({
     eventType,
 }: EventModalProps) => {
     const { colors } = useTheme()
-    const { types } = useActivityTypes()
     const styles = createStyles(colors)
 
     const { execute: createEvent } = useCreateEvent()
@@ -45,11 +42,11 @@ export const EventModal = ({
             if (event) {
                 setStartedAt(event.startedAt)
                 setEndedAt(event.endedAt)
-                setActivity(getActivityIdByName(types, event.activityType))
+                setActivity(event.activity.id)
                 setSubjectiveCoef(event.subjectiveCoef)
             }
         }
-    }, [isOpen, types])
+    }, [isOpen, event])
 
     const handleSubmit = async () => {
         if (!activity) return

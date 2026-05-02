@@ -20,7 +20,7 @@ export const EventCard = ({ event, onDelete, onEdit }: EventCardProps) => {
     return (
         <View style={styles.eventCard}>
             <View style={styles.eventCardLeft}>
-                <Text style={styles.eventType}>{event.activityType}</Text>
+                <Text style={styles.eventType}>{event.activity.name}</Text>
                 <View>
                     <View>
                         <Text style={styles.eventDate}>

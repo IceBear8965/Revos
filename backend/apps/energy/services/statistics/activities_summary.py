@@ -27,6 +27,8 @@ def generate_activities_summary(*, user):
     activities = []
 
     for activity, activity_deltas in events_by_activity.items():
+        if activity == "initial state":
+            continue
         avg_delta = sum(activity_deltas) / len(activity_deltas)
 
         activities.append(

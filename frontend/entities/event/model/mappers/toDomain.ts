@@ -4,8 +4,11 @@ import { toDate } from "@/shared/utils/toDate"
 
 export const mapEvent = (dto: EventDTO): Event => ({
     id: dto.id,
-    type: dto.event_type,
-    activityType: dto.activity_type,
+    activity: {
+        id: dto.activity.id,
+        name: dto.activity.name,
+        category: dto.activity.category,
+    },
     startedAt: toDate(dto.started_at),
     endedAt: toDate(dto.ended_at),
     energyDelta: dto.energy_delta,
