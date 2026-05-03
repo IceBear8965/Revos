@@ -13,7 +13,8 @@ interface PendingRequest<T> {
 }
 
 class HttpClient {
-    private baseURL = "http://10.0.2.2:8000/api/"
+    private baseURL = "http://10.0.2.2:8000/api/" // localhost
+    // private baseURL = "http://10.70.113.245:8000/api/"
 
     private isRefreshing = false
     private pendingRequests: PendingRequest<any>[] = []

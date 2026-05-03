@@ -5,15 +5,16 @@ export const createStyles = (colors: AppColors) => {
     return StyleSheet.create({
         eventsListContainer: {
             backgroundColor: colors.background,
-            paddingBottom: 90,
+            paddingBottom: 160,
         },
 
         dateElement: {
-            width: 70,
-            margin: 5,
-            paddingVertical: 8,
             paddingHorizontal: 15,
+            paddingVertical: 10,
             borderRadius: 10,
+
+            alignItems: "center",
+            justifyContent: "center",
         },
         dateWeekday: {
             fontSize: 16,
