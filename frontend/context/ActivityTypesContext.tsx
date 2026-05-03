@@ -1,11 +1,9 @@
 import { createContext, useContext, useState, useEffect, PropsWithChildren } from "react"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { getActivityTypes } from "@/api/activityTypes"
-import { ACTIVITY_TYPES_KEY } from "@/shared/constants"
-import { ActivityTypeDTO } from "@/api/types"
+import { activityTypeService } from "@/entities/activity-type/model/activity-type.service"
+import { ActivityType } from "@/entities/activity-type/model/types"
 
 interface ActivityTypesContextType {
-    types: ActivityTypeDTO[]
+    types: ActivityType[]
     isLoading: boolean
     refetch: () => Promise<void>
 }
@@ -19,41 +17,37 @@ export const useActivityTypes = () => {
 const ActivityTypesContext = createContext<ActivityTypesContextType | null>(null)
 
 export const ActivityTypesProvider = ({ children }: PropsWithChildren) => {
-    const [types, setTypes] = useState<ActivityTypeDTO[]>([])
+    const [types, setTypes] = useState<ActivityType[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
-    const loadFromStorage = async () => {
-        const stored = await AsyncStorage.getItem(ACTIVITY_TYPES_KEY)
-
-        if (stored) {
-            setTypes(JSON.parse(stored))
-        }
-    }
-
-    const fetchFromAPI = async () => {
+    const refetch = async () => {
         try {
-            const data = await getActivityTypes()
-            if (data) {
-                setTypes(data)
-                await AsyncStorage.setItem(ACTIVITY_TYPES_KEY, JSON.stringify(data))
-            }
+            const fresh = await activityTypeService.fetch()
+            setTypes(fresh)
         } catch (e) {
-            console.log("Failed to fetch activity types", e)
+            console.log("Refetch failed", e)
         }
     }
 
     useEffect(() => {
         const init = async () => {
-            await loadFromStorage()
-            await fetchFromAPI()
-            setIsLoading(false)
+            const cached = await activityTypeService.getCached()
+            setTypes(cached)
+            try {
+                const fresh = await activityTypeService.fetch()
+                setTypes(fresh)
+            } catch (e) {
+                console.log("Failed to refresh", e)
+            } finally {
+                setIsLoading(false)
+            }
         }
 
         init()
     }, [])
 
     return (
-        <ActivityTypesContext.Provider value={{ types, isLoading, refetch: fetchFromAPI }}>
+        <ActivityTypesContext.Provider value={{ types, isLoading, refetch: refetch }}>
             {children}
         </ActivityTypesContext.Provider>
     )

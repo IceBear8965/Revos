@@ -1,13 +1,12 @@
 import { createContext, useState, useEffect, PropsWithChildren, useContext } from "react"
-import { httpClient } from "@/api/HttpClient"
-import { tokenStore } from "@/utils/TokenStore"
+import { authService } from "@/entities/auth/model/auth.service"
 
 interface AuthContextType {
     isAuth: boolean
     isLoading: boolean
     signIn: (email: string, password: string) => Promise<void>
     signOut: () => Promise<void>
-    authenticateFromTokens: () => Promise<void>
+    restoreSession: () => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -26,53 +25,32 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     useEffect(() => {
         const init = async () => {
             try {
-                const accessToken = await httpClient.refreshAccess()
-                if (accessToken) {
-                    setIsAuth(true)
-                } else {
-                    await signOut()
-                }
-            } catch {
-                await signOut()
+                const isRestored = await authService.restoreSession()
+                setIsAuth(isRestored)
             } finally {
                 setIsLoading(false)
             }
         }
+
         init()
     }, [])
 
-    // ----- signIn / signOut -----
     const signIn = async (email: string, password: string) => {
-        try {
-            const data = await httpClient.login(email, password)
-            if (data) {
-                setIsAuth(true)
-            }
-        } catch (error) {
-            console.log(`HTTP ${error}`)
-        }
+        await authService.login(email, password)
+        setIsAuth(true)
     }
 
     const signOut = async () => {
-        try {
-            tokenStore.clearTokens()
-            setIsAuth(false)
-        } catch (error) {
-            console.log("Can't sign out")
-        }
+        await authService.logout()
+        setIsAuth(false)
     }
 
-    const authenticateFromTokens = async () => {
-        const access = tokenStore.getAccess()
-        if (access) {
-            setIsAuth(true)
-        }
+    const restoreSession = async () => {
+        return authService.restoreSession()
     }
 
     return (
-        <AuthContext.Provider
-            value={{ isAuth, isLoading, signIn, signOut, authenticateFromTokens }}
-        >
+        <AuthContext.Provider value={{ isAuth, isLoading, signIn, signOut, restoreSession }}>
             {children}
         </AuthContext.Provider>
     )

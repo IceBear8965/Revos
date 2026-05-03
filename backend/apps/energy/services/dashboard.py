@@ -109,7 +109,7 @@ def generate_greeting(user):
 
 
 # Dashboard content
-def generate_dashboard_content(*, last_event):
+def generate_dashboard_content(*, last_event: EnergyEvent):
     current_energy = round(last_event.energy_after, 3)
 
     # --- energy state ---
@@ -125,7 +125,7 @@ def generate_dashboard_content(*, last_event):
     # --- context ---
     if last_event is None:
         context = CONTEXT_FIRST
-    elif last_event.event_type == "load":
+    elif last_event.activity_category == "load":
         context = CONTEXT_AFTER_LOAD
     else:
         context = CONTEXT_AFTER_RECOVERY
@@ -157,10 +157,17 @@ def generate_dashboard(*, user) -> dict:
 
     message, recommendation = generate_dashboard_content(last_event=last_event)
 
+    if last_event.activity:
+        activity_id = last_event.activity.id
+    else:
+        activity_id = None
     last_event_response = {
         "id": last_event.id,
-        "event_type": last_event.event_type,
-        "activity_type": last_event.activity_type,
+        "activity": {
+            "id": activity_id,
+            "category": last_event.activity_category,
+            "name": last_event.activity_name,
+        },
         "started_at": last_event.started_at,
         "ended_at": last_event.ended_at,
         "energy_delta": energy_delta(last_event),

@@ -30,16 +30,20 @@ class ActivityType(models.Model):
         ordering = ["category", "name"]
 
     def __str__(self):
-        return f"{self.name} ({self.category})"
+        return f"{self.name} ({self.category}) - ({self.id})"
 
 
 class EnergyEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="energy_events")
 
-    event_type = models.CharField(max_length=10, choices=EventTypeChoices.choices)
-    activity_type = models.CharField(max_length=32)
-
+    activity = models.ForeignKey(ActivityType, on_delete=models.PROTECT, null=True, blank=True)
+    activity_category = models.CharField(
+        max_length=10,
+        choices=EventTypeChoices.choices,
+    )
+    activity_name = models.CharField(max_length=32)
     activity_coef = models.FloatField()
+
     subjective_coef = models.FloatField()
     params_version = models.ForeignKey(ModelParams, on_delete=models.PROTECT)
 
@@ -62,7 +66,7 @@ class EnergyEvent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.activity_type} : {self.started_at} — {self.ended_at} ({self.id})"
+        return f"{self.activity_name} : {self.started_at} — {self.ended_at} ({self.id})"
 
     class Meta:
         ordering = ["-started_at"]
