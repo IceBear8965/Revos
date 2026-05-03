@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from .enums import EventType
+from .enums import ActivityCategory
 
 
 @dataclass
@@ -55,8 +55,8 @@ class EventDetails:
     initial_sleep_minutes: float
     initial_break_minutes: float
     initial_continuous_load_minutes: float
-    event_type: EventType
-    activity_type: str
+    activity_category: ActivityCategory
+    activity_name: str
     activity_coef: float
     started_at: datetime
     ended_at: datetime

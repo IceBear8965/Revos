@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { useFocusEffect } from "expo-router"
 import { View, ScrollView, RefreshControl } from "react-native"
 import { useFont } from "@shopify/react-native-skia"
-import { CartesianChart, Line, Bar } from "victory-native"
+import { CartesianChart, Bar } from "victory-native"
 import { useStatistics } from "./hooks/useStatistics"
 import { createStyles } from "./statistics.styles"
 import { Loader } from "@/shared/components/Loader"
@@ -13,7 +13,7 @@ import roboto from "@/assets/fonts/Roboto-VariableFont.ttf"
 import { mapActivitiesSummary } from "./utils/mapActivitiesSummary"
 
 export const Statistics = () => {
-    const { data, isLoading, error, refetch } = useStatistics()
+    const { data, isLoading, error, execute: getStatistics } = useStatistics()
     const { colors } = useTheme()
     const styles = createStyles(colors)
     const font = useFont(roboto, 12)
@@ -29,12 +29,12 @@ export const Statistics = () => {
     )
 
     const onRefresh = async () => {
-        await refetch()
+        await getStatistics()
     }
 
     useFocusEffect(
         useCallback(() => {
-            refetch()
+            getStatistics()
         }, [])
     )
 
@@ -88,13 +88,19 @@ export const Statistics = () => {
                                 data={activitiesSummaryData}
                                 xKey="activityType"
                                 yKeys={["positiveDelta", "negativeDelta"]}
-                                padding={20}
-                                domainPadding={20}
+                                padding={{
+                                    left: 20,
+                                    right: 20,
+                                    top: 20,
+                                    bottom: 50,
+                                }}
+                                domainPadding={{ left: 30, right: 30 }}
                                 xAxis={{
                                     tickCount: activitiesSummaryData.length,
-                                    formatXLabel: (label: string) => label,
+                                    formatXLabel: (label: unknown) => String(label ?? ""),
                                     font: font,
                                     labelColor: colors.textPrimary,
+                                    labelRotate: -45,
                                 }}
                                 domain={{
                                     y: [-maxAbsDelta, maxAbsDelta],

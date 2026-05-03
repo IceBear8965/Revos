@@ -14,9 +14,9 @@ export const ArrowsRenderer = ({ energyDelta }: ArrowsRendererProps) => {
 
     let arrowsCount = 0
 
-    if (absDelta < 0.1) {
+    if (absDelta < 0.01) {
         arrowsCount = 1
-    } else if (absDelta < 0.3) {
+    } else if (absDelta < 0.1) {
         arrowsCount = 2
     } else {
         arrowsCount = 3

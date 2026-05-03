@@ -14,6 +14,7 @@ from .models import ActivityType, EnergyEvent
 from .utils.energy_delta import energy_delta
 
 
+# !!! Energy Events !!!
 class EnergyEventCreateSerializer(serializers.Serializer):
     activity = serializers.PrimaryKeyRelatedField(queryset=ActivityType.objects.none())
     started_at = serializers.DateTimeField()
@@ -76,11 +77,33 @@ class EnergyEventEditSerializer(serializers.Serializer):
         return data
 
 
+class EnergyEventDeleteSerializer(serializers.Serializer):
+    def validate(self, data):
+        request = self.context["request"]
+        user = request.user
+        event_id = self.context["view"].kwargs["id"]
+
+        try:
+            event = EnergyEvent.objects.get(id=event_id, user=user)
+
+        except EnergyEvent.DoesNotExist:
+            raise serializers.ValidationError("Event not found")
+
+        if event.activity_category == "system":
+            raise serializers.ValidationError("System event cannot be deleted")
+
+        self.event = event
+
+        return data
+
+
+# !!! Activity Types !!!
 class ActivityTypeCollectionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     category = serializers.ChoiceField(choices=UserTypeChoices.choices)
     value = serializers.FloatField()
+    is_editable = serializers.BooleanField()
 
 
 class ActivityTypeCreateSerializer(serializers.Serializer):
@@ -112,20 +135,33 @@ class EnergyDashboardSerializer(serializers.Serializer):
     last_event = serializers.JSONField()
 
 
+class ActivitySnapshotSerializer(serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True)
+    category = serializers.CharField(allow_null=True)
+    name = serializers.CharField(allow_null=True)
+
+
 class EventItemSerializer(serializers.ModelSerializer):
     energy_delta = serializers.SerializerMethodField()
+    activity = serializers.SerializerMethodField()
 
     class Meta:
         model = EnergyEvent
         fields = [
             "id",
-            "event_type",
-            "activity_type",
+            "activity",
             "started_at",
             "ended_at",
             "energy_delta",
             "subjective_coef",
         ]
+
+    def get_activity(self, obj):
+        return {
+            "id": obj.activity.id if obj.activity else None,
+            "category": obj.activity_category,
+            "name": obj.activity_name,
+        }
 
     def get_energy_delta(self, obj):
         return energy_delta(obj)

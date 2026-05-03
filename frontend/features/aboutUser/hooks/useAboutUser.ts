@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from "react"
-import { UseAsyncGet } from "@/shared/types"
-import { AboutUserResponseType } from "../types"
-import { getAboutUser } from "@/api/aboutUser"
-import { AboutUserResponseDTO } from "@/api/types"
+import { useCallback, useState } from "react"
+import { UseAsync } from "@/shared/types"
+import { userService } from "@/entities/user/model/user.service"
+import { User } from "@/entities/user/model/types"
 
-export const useAboutUser = (): UseAsyncGet<AboutUserResponseType> => {
-    const [data, setData] = useState<AboutUserResponseType | null>(null)
+export const useAboutUser = (): UseAsync<User> => {
+    const [data, setData] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<Error | null>(null)
 
@@ -14,21 +13,8 @@ export const useAboutUser = (): UseAsyncGet<AboutUserResponseType> => {
         setError(null)
 
         try {
-            const data: AboutUserResponseDTO | null = await getAboutUser()
-            if (!data) {
-                setData(null)
-                return
-            }
-
-            const mappedData: AboutUserResponseType = {
-                userId: data.user_id,
-                email: data.email,
-                nickname: data.nickname,
-                timezone: data.timezone,
-                loadOrder: data.load_order,
-            }
-
-            setData(mappedData)
+            const user = await userService.getMe()
+            setData(user)
         } catch (error) {
             setError(error instanceof Error ? error : new Error("Unknown error"))
         } finally {
@@ -36,14 +22,10 @@ export const useAboutUser = (): UseAsyncGet<AboutUserResponseType> => {
         }
     }, [])
 
-    // useEffect(() => {
-    //     fetchAboutUser()
-    // }, [fetchAboutUser])
-
     return {
         data,
         isLoading,
         error,
-        refetch: fetchAboutUser,
+        execute: fetchAboutUser,
     }
 }

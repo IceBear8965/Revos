@@ -5,7 +5,7 @@ from django.db import transaction
 from apps.energy.domain.energy_engine import EnergyEngine
 from apps.energy.domain.engine_params import EngineParams, EventDetails
 from apps.energy.domain.errors import LastEventNotFound
-from apps.energy.models import EnergyEvent
+from apps.energy.models import ActivityType, EnergyEvent
 
 
 @transaction.atomic
@@ -13,7 +13,7 @@ def edit_energy_event(
     *,
     user,
     id,
-    activity,
+    activity: ActivityType,
     started_at: datetime,
     ended_at: datetime,
     subjective_coef: float,
@@ -24,8 +24,9 @@ def edit_energy_event(
         .get(user=user, id=id)
     )
 
-    editable_event.event_type = activity.category
-    editable_event.activity_type = activity.name
+    editable_event.activity = activity
+    editable_event.activity_category = activity.category
+    editable_event.activity_name = activity.name
     editable_event.activity_coef = activity.value
     editable_event.started_at = started_at
     editable_event.ended_at = ended_at
@@ -33,8 +34,9 @@ def edit_energy_event(
 
     editable_event.save(
         update_fields=[
-            "event_type",
-            "activity_type",
+            "activity",
+            "activity_category",
+            "activity_name",
             "activity_coef",
             "started_at",
             "ended_at",
@@ -69,7 +71,7 @@ def edit_energy_event(
     params_cache = {}
 
     for event in events_queue:
-        params_version_id = event.params_version_id
+        params_version_id = event.params_version.id
 
         if params_version_id not in params_cache:
             params_cache[params_version_id] = EngineParams(**event.params_version.params_json)
@@ -83,8 +85,8 @@ def edit_energy_event(
             initial_sleep_minutes=sleep_minutes,
             initial_break_minutes=break_minutes,
             initial_continuous_load_minutes=continuous_load_minutes,
-            event_type=event.event_type,
-            activity_type=event.activity_type,
+            activity_category=event.activity_category,
+            activity_name=event.activity_name,
             activity_coef=event.activity_coef,
             started_at=event.started_at,
             ended_at=event.ended_at,
