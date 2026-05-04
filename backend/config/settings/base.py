@@ -50,6 +50,7 @@ INSTALLED_APPS += ["corsheaders"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -58,6 +59,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 MIDDLEWARE = ["corsheaders.middleware.CorsMiddleware"] + MIDDLEWARE
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 ROOT_URLCONF = "config.urls"
 
@@ -158,11 +161,11 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "default",
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": os.path.join(LOG_DIR, "activity.log"),
-            "level": "INFO",
-        },
+        # "file": {
+        #     "class": "logging.FileHandler",
+        #     "filename": os.path.join(LOG_DIR, "activity.log"),
+        #     "level": "INFO",
+        # },
     },
     "loggers": {
         "activity": {

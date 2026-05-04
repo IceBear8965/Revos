@@ -21,4 +21,4 @@ ENV DJANGO_SETTINGS_MODULE=config.settings.prod
 ENV PYTHONUNBUFFERED=1
 
 # Run gunicorn
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8080"]
+CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"]

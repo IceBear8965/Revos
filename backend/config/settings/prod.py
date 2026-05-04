@@ -10,6 +10,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY must be set in environment!")
 
-DATABASES = {"default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))}
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=60,
+    )
+}
 
 ALLOWED_HOSTS = ["*"]
