@@ -36,7 +36,7 @@ class ActivityType(models.Model):
 class EnergyEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="energy_events")
 
-    activity = models.ForeignKey(ActivityType, on_delete=models.PROTECT, null=True, blank=True)
+    activity = models.ForeignKey(ActivityType, on_delete=models.SET_NULL, null=True, blank=True)
     activity_category = models.CharField(
         max_length=10,
         choices=EventTypeChoices.choices,
