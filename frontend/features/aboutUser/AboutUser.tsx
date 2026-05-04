@@ -10,30 +10,34 @@ import { Error } from "@/shared/components/Error"
 import { createStyles } from "./aboutUser.style"
 import { useAuth } from "@/context/AuthContext"
 import { useActivityTypes } from "@/context/ActivityTypesContext"
+import { useDeleteType } from "../activity-type/model/useDeleteType"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 import { ActivityTypeDTO } from "@/entities/activity-type/api/types"
+import { ActivityType } from "@/entities/activity-type/model/types"
 
 export const AboutUser = () => {
     const { data, isLoading, error, execute: fetchAboutUser } = useAboutUser()
     const { signOut } = useAuth()
     const { theme, toggleTheme, colors } = useTheme()
     const { types, isLoading: isTypesLoading, refetch: updateActivityTypes } = useActivityTypes()
-    // const { isLoading: isDeleting, refetch: deleteActivityType } = useDeleteType()
+    const { isLoading: isDeleting, execute: deleteActivityType } = useDeleteType()
     const styles = createStyles(colors)
     const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
     const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
     const [activityTypeEditModal, setActivityTypeEditModal] = useState<boolean>(false)
-    const [selectedActivityType, setSelectedActivityType] = useState<ActivityTypeDTO>({
+    const [selectedActivityType, setSelectedActivityType] = useState<ActivityType>({
         id: 0,
         name: "",
         category: "load",
         value: 1.0,
-        is_editable: false,
+        isEditable: false,
     })
+
     const [activityTypeCreateModal, setActivityTypeCreateModal] = useState<boolean>(false)
-    const [delteConfirmationModal, setDeleteConfirmationModal] = useState<boolean>(false)
+    const [deleteActivityTypeModal, setDeleteActivityTypeModal] = useState<boolean>(false)
     const [typeToDelete, setTypeToDelete] = useState<number | null>(null)
+
     const router = useRouter()
 
     useFocusEffect(
@@ -49,23 +53,23 @@ export const AboutUser = () => {
     const onDeleteConfirmed = async () => {
         if (typeToDelete) {
             try {
-                // await deleteActivityType({ id: typeToDelete })
+                await deleteActivityType(typeToDelete)
                 await updateActivityTypes()
                 refetchOnSuccess()
                 setTypeToDelete(null)
-                setDeleteConfirmationModal(false)
+                setDeleteActivityTypeModal(false)
             } catch (error) {
                 Alert.alert("Error", "Activity Type can't be deleted now", [
                     { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
                 ])
             }
         } else {
-            setDeleteConfirmationModal(false)
+            setDeleteActivityTypeModal(false)
         }
     }
     const onDeleteDenied = () => {
         setTypeToDelete(null)
-        setDeleteConfirmationModal(false)
+        setDeleteActivityTypeModal(false)
     }
 
     interface Choices {
@@ -88,12 +92,12 @@ export const AboutUser = () => {
     if (isTypesLoading) return <Loader message="Loading your activities" />
     if (error) return <Error error={error} />
 
-    const renderActivityCard = ({ item }: { item: ActivityTypeDTO }) => {
+    const renderActivityCard = ({ item }: { item: ActivityType }) => {
         const icons = item.category === "load" ? iconsLoad : iconsRecovery
         const activeIconColor = item.category === "load" ? colors.accentRed : colors.accentGreen
 
         return (
-            <View style={[{ opacity: item.is_editable ? 1 : 0.5 }, styles.activityTypeCard]}>
+            <View style={[{ opacity: item.isEditable ? 1 : 0.5 }, styles.activityTypeCard]}>
                 <View
                     style={{
                         flexDirection: "row",
@@ -105,7 +109,7 @@ export const AboutUser = () => {
                     <View style={{ flexDirection: "row" }}>
                         <Pressable
                             onPress={() => {
-                                if (item.is_editable) {
+                                if (item.isEditable) {
                                     setSelectedActivityType(item)
                                     setActivityTypeEditModal(true)
                                 }
@@ -120,9 +124,9 @@ export const AboutUser = () => {
                         </Pressable>
                         <Pressable
                             onPress={() => {
-                                if (item.is_editable) {
+                                if (item.isEditable) {
                                     setTypeToDelete(item.id)
-                                    setDeleteConfirmationModal(true)
+                                    setDeleteActivityTypeModal(true)
                                 }
                             }}
                         >
@@ -222,18 +226,18 @@ export const AboutUser = () => {
                         <AntDesign name="plus-circle" size={24} color={colors.textPrimary} />
                     </Pressable>
                 </View>
-                {/* <FlatList */}
-                {/*     data={types} */}
-                {/*     renderItem={renderActivityCard} */}
-                {/*     keyExtractor={(item) => item.id.toString()} */}
-                {/*     contentContainerStyle={{ */}
-                {/*         paddingHorizontal: 20, */}
-                {/*         paddingVertical: 10, */}
-                {/*     }} */}
-                {/*     ItemSeparatorComponent={() => <View style={{ height: 15 }} />} */}
-                {/*     ListFooterComponent={<View style={{ height: 10 }} />} */}
-                {/*     showsVerticalScrollIndicator={false} */}
-                {/* /> */}
+                <FlatList
+                    data={types}
+                    renderItem={renderActivityCard}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={{
+                        paddingHorizontal: 20,
+                        paddingVertical: 10,
+                    }}
+                    ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                    ListFooterComponent={<View style={{ height: 10 }} />}
+                    showsVerticalScrollIndicator={false}
+                />
             </View>
 
             <View style={styles.signOutContainer}>
@@ -243,6 +247,13 @@ export const AboutUser = () => {
             </View>
 
             {/* Modals */}
+            <ConfirmationModal
+                title="Are you sure you want to delete selected activity?"
+                onConfirm={onDeleteConfirmed}
+                onDeny={onDeleteDenied}
+                modalVisible={deleteActivityTypeModal}
+                setModalVisible={setDeleteActivityTypeModal}
+            />
         </View>
     )
 }

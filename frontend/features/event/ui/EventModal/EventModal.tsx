@@ -74,6 +74,7 @@ export const EventModal = ({
             <View style={styles.modalContentContainer}>
                 <View style={styles.modalContent}>
                     <EventForm
+                        mode={mode}
                         eventType={eventType}
                         activity={activity}
                         startedAt={startedAt}
