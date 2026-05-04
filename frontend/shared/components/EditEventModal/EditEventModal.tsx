@@ -73,7 +73,6 @@ export const EditEventModal = ({
     }, [modalVisible])
 
     useEffect(() => {
-        console.log(event)
         setDropDownValue(event.id)
         setStartedAt(event.startedAt)
         setEndedAt(event.endedAt)
