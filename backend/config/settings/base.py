@@ -161,15 +161,15 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "default",
         },
-        # "file": {
-        #     "class": "logging.FileHandler",
-        #     "filename": os.path.join(LOG_DIR, "activity.log"),
-        #     "level": "INFO",
-        # },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(LOG_DIR, "activity.log"),
+            "level": "INFO",
+        },
     },
     "loggers": {
         "activity": {
-            "handlers": ["console", "file"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },

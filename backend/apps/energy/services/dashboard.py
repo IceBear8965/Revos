@@ -81,8 +81,8 @@ MESSAGES = {
 RECOMMENDATIONS = {
     ENERGY_LOW: "Start with some rest",
     ENERGY_BELOW: "Consider a short pause",
-    ENERGY_OK: "You can continue your tasks",
     ENERGY_HIGH: "Great time for challenging tasks",
+    ENERGY_OK: "You can continue your tasks",
 }
 
 
@@ -176,7 +176,7 @@ def generate_dashboard(*, user) -> dict:
 
     return {
         "greeting": greeting,
-        "current_energy": last_event.energy_after,
+        "current_energy": round(last_event.energy_after, 4),
         "message": message,
         "recommendation": recommendation,
         "last_event": last_event_response,
