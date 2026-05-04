@@ -93,7 +93,7 @@ export const ConfirmationModal = ({
                 style={{
                     position: "absolute",
                     width: "80%",
-                    height: SCREEN_HEIGHT * 0.15,
+                    height: SCREEN_HEIGHT * 0.17,
                     backgroundColor: colors.background,
                     borderRadius: 20,
                     padding: 20,

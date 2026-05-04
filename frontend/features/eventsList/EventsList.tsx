@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import { useFocusEffect } from "expo-router"
-import { View, Text, FlatList, RefreshControl, Pressable } from "react-native"
+import { View, Text, FlatList, RefreshControl, Pressable, Alert } from "react-native"
 
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./eventsList.styles"
@@ -12,6 +12,8 @@ import { getWeekday, formatDateDDMM } from "@/shared/utils/formatDate"
 import { Event } from "@/entities/event/model/types"
 import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
 import { EventModal } from "../event/ui/EventModal/EventModal"
+import { useDeleteEvent } from "../event/model/useDeleteEvent"
+import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 
 const ITEM_WIDTH = 80
 const ITEM_MARGIN = 5
@@ -19,6 +21,7 @@ const ITEM_SIZE = ITEM_WIDTH + ITEM_MARGIN * 2
 
 export const EventsList = () => {
     const { data, isLoading, error, execute: refetchList } = useEventsList()
+    const { isLoading: deletingEvent, error: deleteError, execute: deleteEvent } = useDeleteEvent()
 
     const { colors } = useTheme()
     const styles = createStyles(colors)
@@ -35,6 +38,35 @@ export const EventsList = () => {
     const eventModalMode = useRef<"create" | "edit">("edit")
     const [modalEvent, setModalEvent] = useState<Event | null>(null)
     const [eventType, setEventType] = useState<ActivityTypeCategoryWritable>("load")
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false)
+    const [eventToDelete, setEventToDelete] = useState<number | null>(null)
+
+    const onDeleteBtn = (id: number) => {
+        setEventToDelete(id)
+        setDeleteModalVisible(true)
+    }
+
+    const onDeleteConfirmed = async () => {
+        if (eventToDelete) {
+            try {
+                await deleteEvent(eventToDelete)
+                refetchList(selectedDate)
+                setEventToDelete(null)
+                setDeleteModalVisible(false)
+            } catch (error) {
+                Alert.alert("Error", "Event can't be deleted now", [
+                    { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
+                ])
+            }
+        } else {
+            setDeleteModalVisible(false)
+        }
+    }
+    const onDeleteDenied = () => {
+        setEventToDelete(null)
+        setDeleteModalVisible(false)
+    }
 
     // --------------------------
     // DATE GENERATION
@@ -57,12 +89,9 @@ export const EventsList = () => {
 
     const dates = useMemo(() => generateDates(selectedDate), [selectedDate])
 
-    console.log(dates)
-
     // --------------------------
     // SCROLL
     // --------------------------
-
     const findIndex = (date: Date) =>
         dates.findIndex((d) => d.toDateString() === date.toDateString())
 
@@ -173,7 +202,7 @@ export const EventsList = () => {
     }
 
     const renderItem = ({ item }: { item: Event }) => (
-        <EventCard event={item} onEdit={onEditBtn} onDelete={() => {}} />
+        <EventCard event={item} onEdit={onEditBtn} onDelete={onDeleteBtn} />
     )
 
     if (isLoading) return <Loader message="Collecting your history" />
@@ -239,6 +268,14 @@ export const EventsList = () => {
                 setIsOpen={setEventModalVisible}
                 event={modalEvent}
                 eventType={eventType}
+            />
+
+            <ConfirmationModal
+                title="Are you sure you want to delete selected event?"
+                onConfirm={onDeleteConfirmed}
+                onDeny={onDeleteDenied}
+                modalVisible={deleteModalVisible}
+                setModalVisible={setDeleteModalVisible}
             />
         </View>
     )
