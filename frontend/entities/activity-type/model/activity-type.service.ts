@@ -2,7 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { ACTIVITY_TYPES_KEY } from "@/shared/constants"
 import { activityTypeApi } from "../api/activity-type.api"
 import { ActivityType } from "./types"
-import { mapActivityType } from "./mappers"
+import { mapActivityType } from "./mappers/toDomain"
+import { httpClient } from "@/shared/api/HttpClient"
+import { CreateActivityTypeRequest, EditActivityTypeRequest } from "../api/types"
 
 export const activityTypeService = {
     async getCached(): Promise<ActivityType[]> {
@@ -23,5 +25,17 @@ export const activityTypeService = {
         await AsyncStorage.setItem(ACTIVITY_TYPES_KEY, JSON.stringify(mapped))
 
         return mapped
+    },
+
+    create: async (body: CreateActivityTypeRequest): Promise<void> => {
+        await httpClient.post("energy/activity_types/", body)
+    },
+
+    edit: async (id: number, body: EditActivityTypeRequest): Promise<void> => {
+        await httpClient.patch(`energy/activity_type/${id}/`, body)
+    },
+
+    delete: async (id: number): Promise<void> => {
+        await httpClient.delete(`energy/activity_type/${id}/`)
     },
 }

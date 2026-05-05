@@ -7,6 +7,7 @@ import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { EventFormProps } from "./types"
 
 export const EventForm = ({
+    mode,
     eventType,
     activity,
     startedAt,
@@ -16,19 +17,20 @@ export const EventForm = ({
     setStartedAt,
     setEndedAt,
     setSubjectiveCoef,
-}: EventFormProps) => {
+}: EventFormProps<number>) => {
     const { types } = useActivityTypes()
 
-    const [isActivityOpen, setActivityOpen] = useState(false)
+    const [isActivitySelectorOpen, setActivityOpen] = useState(false)
 
-    const dropDownItems = types.filter((el) => el.category === eventType)
+    const dropDownItems =
+        mode === "create" ? types.filter((el) => el.category === eventType) : types
     return (
         <View style={{ flex: 1 }}>
             <ActivityTypePicker
                 dropDownValues={dropDownItems}
                 dropDownValue={activity}
                 setDropDownValue={setActivity}
-                isDropDownOpen={isActivityOpen}
+                isDropDownOpen={isActivitySelectorOpen}
                 setIsDropDownOpen={setActivityOpen}
             />
 

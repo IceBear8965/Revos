@@ -11,8 +11,6 @@ export const createStyles = (colors: AppColors) => {
             paddingVertical: 10,
             backgroundColor: colors.foreground,
             marginBottom: 20,
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
         },
         headerTitle: {
             color: colors.textPrimary,
@@ -29,18 +27,6 @@ export const createStyles = (colors: AppColors) => {
             color: colors.textPrimary,
             fontSize: 20,
             fontWeight: 600,
-        },
-
-        modalContentContainer: {
-            flex: 1,
-            alignItems: "center",
-        },
-        modalContent: {
-            flex: 1,
-            width: "80%",
-            maxHeight: "60%",
-            justifyContent: "space-between",
-            paddingHorizontal: 20,
         },
     })
 }
