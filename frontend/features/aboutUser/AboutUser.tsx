@@ -13,8 +13,9 @@ import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { useDeleteType } from "../activity-type/model/useDeleteType"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
-import { ActivityTypeDTO } from "@/entities/activity-type/api/types"
 import { ActivityType } from "@/entities/activity-type/model/types"
+import { useCreateType } from "../activity-type/model/useCreateType"
+import { ActivityTypeModal } from "../activity-type/ui/ActivityTypeModal/ActivityTypeModal"
 
 export const AboutUser = () => {
     const { data, isLoading, error, execute: fetchAboutUser } = useAboutUser()
@@ -23,9 +24,14 @@ export const AboutUser = () => {
     const { types, isLoading: isTypesLoading, refetch: updateActivityTypes } = useActivityTypes()
     const { isLoading: isDeleting, execute: deleteActivityType } = useDeleteType()
     const styles = createStyles(colors)
+
+    // Modals
     const [nicknameModalVisible, setNicknameModalVisible] = useState<boolean>(false)
     const [timezoneModalVisible, setTimezoneModalVisible] = useState<boolean>(false)
-    const [activityTypeEditModal, setActivityTypeEditModal] = useState<boolean>(false)
+
+    // Activity types modals
+    const [activityTypeModalVisible, setActivityTypeModalVisible] = useState<boolean>(false)
+    const [activityTypeModalMode, setActivityTypeModalMode] = useState<"create" | "edit">("create")
     const [selectedActivityType, setSelectedActivityType] = useState<ActivityType>({
         id: 0,
         name: "",
@@ -34,7 +40,6 @@ export const AboutUser = () => {
         isEditable: false,
     })
 
-    const [activityTypeCreateModal, setActivityTypeCreateModal] = useState<boolean>(false)
     const [deleteActivityTypeModal, setDeleteActivityTypeModal] = useState<boolean>(false)
     const [typeToDelete, setTypeToDelete] = useState<number | null>(null)
 
@@ -46,15 +51,15 @@ export const AboutUser = () => {
         }, [])
     )
 
-    const refetchOnSuccess = () => {
-        fetchAboutUser()
+    const refetchOnSuccess = async (): Promise<void> => {
+        await fetchAboutUser()
+        await updateActivityTypes()
     }
 
     const onDeleteConfirmed = async () => {
         if (typeToDelete) {
             try {
                 await deleteActivityType(typeToDelete)
-                await updateActivityTypes()
                 refetchOnSuccess()
                 setTypeToDelete(null)
                 setDeleteActivityTypeModal(false)
@@ -111,15 +116,16 @@ export const AboutUser = () => {
                             onPress={() => {
                                 if (item.isEditable) {
                                     setSelectedActivityType(item)
-                                    setActivityTypeEditModal(true)
+                                    setActivityTypeModalMode("edit")
+                                    setActivityTypeModalVisible(true)
                                 }
                             }}
                             style={{ marginRight: 10 }}
                         >
                             <FontAwesome6
                                 name="pen-to-square"
-                                size={24}
                                 color={colors.textPrimary}
+                                size={24}
                             />
                         </Pressable>
                         <Pressable
@@ -219,7 +225,8 @@ export const AboutUser = () => {
                     <Pressable
                         style={styles.addTypeBtn}
                         onPress={() => {
-                            setActivityTypeCreateModal(true)
+                            setActivityTypeModalMode("create")
+                            setActivityTypeModalVisible(true)
                         }}
                     >
                         <Text style={styles.addTypeBtnText}>Add Activity Type</Text>
@@ -247,6 +254,14 @@ export const AboutUser = () => {
             </View>
 
             {/* Modals */}
+            <ActivityTypeModal
+                mode={activityTypeModalMode}
+                refetch={refetchOnSuccess}
+                isOpen={activityTypeModalVisible}
+                setIsOpen={setActivityTypeModalVisible}
+                activity={selectedActivityType}
+            />
+
             <ConfirmationModal
                 title="Are you sure you want to delete selected activity?"
                 onConfirm={onDeleteConfirmed}

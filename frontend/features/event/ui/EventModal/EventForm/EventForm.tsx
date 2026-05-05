@@ -17,10 +17,10 @@ export const EventForm = ({
     setStartedAt,
     setEndedAt,
     setSubjectiveCoef,
-}: EventFormProps) => {
+}: EventFormProps<number>) => {
     const { types } = useActivityTypes()
 
-    const [isActivityOpen, setActivityOpen] = useState(false)
+    const [isActivitySelectorOpen, setActivityOpen] = useState(false)
 
     const dropDownItems =
         mode === "create" ? types.filter((el) => el.category === eventType) : types
@@ -30,7 +30,7 @@ export const EventForm = ({
                 dropDownValues={dropDownItems}
                 dropDownValue={activity}
                 setDropDownValue={setActivity}
-                isDropDownOpen={isActivityOpen}
+                isDropDownOpen={isActivitySelectorOpen}
                 setIsDropDownOpen={setActivityOpen}
             />
 

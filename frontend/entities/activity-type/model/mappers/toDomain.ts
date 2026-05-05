@@ -1,5 +1,5 @@
-import { ActivityTypeDTO } from "../api/types"
-import { ActivityType } from "./types"
+import { ActivityTypeDTO } from "../../api/types"
+import { ActivityType } from "../types"
 
 export const mapActivityType = (dto: ActivityTypeDTO): ActivityType => ({
     id: dto.id,

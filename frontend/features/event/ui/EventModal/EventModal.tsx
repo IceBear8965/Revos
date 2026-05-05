@@ -4,7 +4,7 @@ import { useCreateEvent } from "../../model/useCreateEvent"
 import { useEditEvent } from "../../model/useEditType"
 import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet"
 import { EventModalProps } from "./types"
-import { EventHeader } from "./EventHeader/CreateEventHeader"
+import { EventHeader } from "./EventHeader/EventHeader"
 import { EventForm } from "./EventForm/EventForm"
 import { AppColors } from "@/theme/types"
 import { useTheme } from "@/context/ThemeContext"
@@ -46,7 +46,7 @@ export const EventModal = ({
                 setSubjectiveCoef(event.subjectiveCoef)
             }
         }
-    }, [isOpen, event])
+    }, [isOpen, mode, event])
 
     const handleSubmit = async () => {
         if (!activity) return
@@ -70,7 +70,7 @@ export const EventModal = ({
 
     return (
         <BottomSheet visible={isOpen} setVisible={close}>
-            <EventHeader onSubmit={handleSubmit} />
+            <EventHeader mode={mode} onSubmit={handleSubmit} />
             <View style={styles.modalContentContainer}>
                 <View style={styles.modalContent}>
                     <EventForm

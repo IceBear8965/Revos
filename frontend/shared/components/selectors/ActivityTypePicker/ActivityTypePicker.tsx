@@ -11,7 +11,7 @@ export const ActivityTypePicker = ({
     dropDownValue,
     setIsDropDownOpen,
     setDropDownValue,
-}: ActivityTypePickerProps) => {
+}: ActivityTypePickerProps<number>) => {
     const { colors } = useTheme()
 
     const styles = createStyles(colors)
