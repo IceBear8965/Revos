@@ -14,8 +14,8 @@ import { useDeleteType } from "../activity-type/model/useDeleteType"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 import { ActivityType } from "@/entities/activity-type/model/types"
-import { useCreateType } from "../activity-type/model/useCreateType"
 import { ActivityTypeModal } from "../activity-type/ui/ActivityTypeModal/ActivityTypeModal"
+import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
 
 export const AboutUser = () => {
     const { data, isLoading, error, execute: fetchAboutUser } = useAboutUser()
@@ -268,6 +268,11 @@ export const AboutUser = () => {
                 onDeny={onDeleteDenied}
                 modalVisible={deleteActivityTypeModal}
                 setModalVisible={setDeleteActivityTypeModal}
+            />
+
+            <ChangeNicknameModal
+                modalVisible={nicknameModalVisible}
+                setModalVisible={setNicknameModalVisible}
             />
         </View>
     )

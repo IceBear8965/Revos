@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     # ======== #
     "rest_framework",
-    "corsheaders",
     "apps.users",
     "apps.energy",
     "apps.common",
@@ -49,9 +48,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -141,13 +139,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 AUTH_USER_MODEL = "users.User"
 
 # Logging
-LOG_DIR = os.path.join(BASE_DIR, "logs")
-os.makedirs(LOG_DIR, exist_ok=True)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -161,22 +157,9 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "default",
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": os.path.join(LOG_DIR, "activity.log"),
-            "level": "INFO",
-        },
     },
-    "loggers": {
-        "activity": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
     },
 }
-
-# CORS
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ["*"]

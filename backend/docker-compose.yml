@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: django_app
+    depends_on:
+      - db
+    environment:
+      DEBUG: "False"
+      SECRET_KEY: "dev-secret-key"
+      DATABASE_URL: postgresql://app:app@db:5432/app
+      ALLOWED_HOSTS: localhost,127.0.0.1
+    ports:
+      - "8000:8000"

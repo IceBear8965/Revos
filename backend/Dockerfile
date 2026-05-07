@@ -1,24 +1,24 @@
-# Tiny python image
 FROM python:3.12-slim
 
-# Libs to build postgres
+# system deps (одним слоем)
 RUN apt-get update && \
-    apt-get install -y build-essential libpq-dev && \
+    apt-get install -y build-essential libpq-dev netcat-openbsd && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# === Work dir inside of container ===
 WORKDIR /app
 
-# Requirements
+# dependencies first (cache layer)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend from local machine into container
+# app code
 COPY . .
-ENV DJANGO_SETTINGS_MODULE=config.settings.prod
 
-# Print logs in console and not in file(to reduce space usage)
+ENV DJANGO_SETTINGS_MODULE=config.settings.prod
 ENV PYTHONUNBUFFERED=1
 
-# Run gunicorn
-CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"]
+# entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
