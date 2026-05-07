@@ -14,8 +14,7 @@ import { LOAD_ACTIVITIES } from "@/shared/constants"
 import { InitialEnergyType, LoadOrderElementType } from "./types"
 import { useAuth } from "@/context/AuthContext"
 import { Error } from "@/shared/components/Error"
-
-const initialLoadOrder = mapToLoadOrder([...LOAD_ACTIVITIES])
+import { userService } from "@/entities/user/model/user.service"
 
 const initialEnergyState: InitialEnergyType = { icon: "emoticon-neutral-outline", state: "normal" }
 
@@ -27,12 +26,11 @@ export const Registration = () => {
         password: "",
         nickname: "",
         timezone: getTimeZone(),
-        loadOrder: initialLoadOrder,
         initialEnergyState: initialEnergyState,
     })
     const [step, setStep] = useState<number>(0)
     const nextStep = () => {
-        setStep(Math.min(step + 1, 2))
+        setStep(Math.min(step + 1, 1))
     }
     const prevStep = () => setStep(Math.max(step - 1, 0))
 
@@ -56,12 +54,6 @@ export const Registration = () => {
             password: password,
         })
     }
-    const setLoadOrder = (loadOrder: LoadOrderElementType[]) => {
-        setPayload({
-            ...payload,
-            loadOrder: loadOrder,
-        })
-    }
     const setInitialState = (currentState: InitialEnergyType) => {
         setPayload({
             ...payload,
@@ -70,6 +62,15 @@ export const Registration = () => {
     }
 
     const register = async () => {
+        if (
+            !payload.email ||
+            !payload.password ||
+            !payload.nickname ||
+            !payload.timezone ||
+            !payload.initialEnergyState
+        )
+            return null
+        await userService.register(payload)
         try {
             const ok = await restoreSession()
             if (ok) {
@@ -106,7 +107,7 @@ export const Registration = () => {
             }}
         >
             <Animated.View
-                style={[{ flex: 1, flexDirection: "row", width: SCREEN_WIDTH * 3 }, animatedStyle]}
+                style={[{ flex: 1, flexDirection: "row", width: SCREEN_WIDTH * 2 }, animatedStyle]}
             >
                 <CredentialsStep
                     nickname={payload.nickname}
@@ -116,12 +117,6 @@ export const Registration = () => {
                     setEmail={setEmail}
                     setPassword={setPassword}
                     nextStep={nextStep}
-                />
-                <LoadsOrderStep
-                    loadOrder={payload.loadOrder}
-                    prevStep={prevStep}
-                    nextStep={nextStep}
-                    setLoadOrder={setLoadOrder}
                 />
                 <CurrentStateStep
                     initialState={payload.initialEnergyState}

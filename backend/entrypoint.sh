@@ -1,6 +1,7 @@
 #!/bin/sh
-
 set -e
+
+echo "DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE"
 
 echo "Waiting for postgres..."
 
@@ -13,8 +14,15 @@ done
 
 echo "PostgreSQL started"
 
+echo "Running migrations..."
 python manage.py migrate --noinput
+
+echo "Creating superuser (if needed)..."
+python manage.py create_admin
+
+echo "Collecting static..."
 python manage.py collectstatic --noinput
 
+echo "Starting server..."
 exec gunicorn config.wsgi:application \
     --bind 0.0.0.0:${PORT:-8000}
