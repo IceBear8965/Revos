@@ -20,17 +20,23 @@ from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+
+def api_404(request, exception):
+    return JsonResponse({"detail": "Not found"}, status=404)
+
+
+def health(request):
+    return JsonResponse({"status": "ok"})
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/energy/", include("apps.energy.urls")),
     path("api/user/", include("apps.users.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("health/", health),
 ]
-
-
-def api_404(request, exception):
-    return JsonResponse({"detail": "Not found"}, status=404)
 
 
 handler404 = api_404
