@@ -8,6 +8,8 @@ import { EventHeader } from "./EventHeader/EventHeader"
 import { EventForm } from "./EventForm/EventForm"
 import { AppColors } from "@/theme/types"
 import { useTheme } from "@/context/ThemeContext"
+import { Loader } from "@/shared/components/Loader"
+import { Error } from "@/shared/components/Error"
 
 export const EventModal = ({
     mode,
@@ -20,8 +22,8 @@ export const EventModal = ({
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
-    const { execute: createEvent } = useCreateEvent()
-    const { execute: editEvent } = useEditEvent()
+    const { isLoading: isCreating, error: creationError, execute: createEvent } = useCreateEvent()
+    const { isLoading: isEditing, error: editingError, execute: editEvent } = useEditEvent()
 
     const [activity, setActivity] = useState<number | null>(null)
     const [startedAt, setStartedAt] = useState(new Date())
@@ -51,22 +53,32 @@ export const EventModal = ({
     const handleSubmit = async () => {
         if (!activity) return
 
-        if (mode === "create") {
-            await createEvent({
-                activity,
-                startedAt,
-                endedAt,
-                subjectiveCoef: subjectiveCoef,
-            })
-        } else {
-            if (event) {
-                await editEvent(event.id, { activity, startedAt, endedAt, subjectiveCoef })
+        try {
+            if (mode === "create") {
+                await createEvent({
+                    activity,
+                    startedAt,
+                    endedAt,
+                    subjectiveCoef: subjectiveCoef,
+                })
+            } else {
+                if (event) {
+                    await editEvent(event.id, { activity, startedAt, endedAt, subjectiveCoef })
+                }
             }
+        } finally {
+            close()
         }
 
         refetch()
         close()
     }
+
+    if (isCreating) return <Loader message="Saving your activity" />
+    if (isEditing) return <Loader message="Updating your activity" />
+
+    if (creationError) return <Error error={creationError} />
+    if (editingError) return <Error error={editingError} />
 
     return (
         <BottomSheet visible={isOpen} setVisible={close}>

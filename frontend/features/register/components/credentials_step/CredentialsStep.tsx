@@ -78,7 +78,7 @@ export const CredentialsStep = ({
                     </Pressable>
                 </View>
                 <View style={{ marginTop: 10 }}>
-                    <Link style={styles.signInText} href="/(auth)/Login">
+                    <Link style={styles.signInText} href="/(auth)/login">
                         Already have an account? Sign In
                     </Link>
                 </View>

@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from django.db.models import CharField, Q
@@ -8,10 +9,13 @@ from apps.energy.utils.event_validation import (
     validate_event_edit,
     validate_event_time,
 )
+from apps.energy.utils.normalize_dt import normalize_dt
 
 from .enums import UserTypeChoices
 from .models import ActivityType, EnergyEvent
 from .utils.energy_delta import energy_delta
+
+logger = logging.getLogger(__name__)
 
 
 # !!! Energy Events !!!
@@ -30,8 +34,8 @@ class EnergyEventCreateSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = self.context["request"].user
-        started_at = data["started_at"]
-        ended_at = data["ended_at"]
+        started_at = normalize_dt(data["started_at"])
+        ended_at = normalize_dt(data["ended_at"])
 
         validate_event_time(started_at, ended_at)
 

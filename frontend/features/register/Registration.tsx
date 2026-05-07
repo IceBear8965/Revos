@@ -15,6 +15,7 @@ import { InitialEnergyType, LoadOrderElementType } from "./types"
 import { useAuth } from "@/context/AuthContext"
 import { Error } from "@/shared/components/Error"
 import { userService } from "@/entities/user/model/user.service"
+import { tokenStore } from "@/utils/TokenStore"
 
 const initialEnergyState: InitialEnergyType = { icon: "emoticon-neutral-outline", state: "normal" }
 

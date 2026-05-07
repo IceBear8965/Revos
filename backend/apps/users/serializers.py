@@ -1,11 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytz
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 
 from apps.energy.enums import EventTypeChoices
 from apps.energy.models import ActivityType, EnergyEvent, ModelParams
+from apps.energy.utils.normalize_dt import normalize_dt
 
 from .constants import INITIAL_ENERGY_CHOICES, INITIAL_ENERGY_MAP
 from .models import User
@@ -41,6 +43,7 @@ class RegisterUserSerializer(serializers.Serializer):
 
             params_version = ModelParams.objects.latest("created_at")
 
+            now = timezone.now()
             EnergyEvent.objects.create(
                 user=user,
                 activity=None,
@@ -49,9 +52,9 @@ class RegisterUserSerializer(serializers.Serializer):
                 activity_coef=1.0,
                 subjective_coef=1.0,
                 params_version=params_version,
-                started_at=datetime.now(),
-                ended_at=datetime.now() + timedelta(minutes=1),
-                energy_before=0,
+                started_at=normalize_dt(now - timedelta(milliseconds=2)),
+                ended_at=normalize_dt(now - timedelta(milliseconds=1)),
+                energy_before=current_energy,
                 energy_after=current_energy,
                 acute_before=0.0,
                 acute_after=0.0,
