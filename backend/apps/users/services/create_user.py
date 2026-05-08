@@ -50,6 +50,7 @@ def create_user_with_initial_state(*, email, password, nickname, initial_energy_
             category=EventTypeChoices.RECOVERY,
             name="sleep",
             value=1.0,
+            is_editable=False,
         )
 
         return user

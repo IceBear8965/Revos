@@ -28,7 +28,6 @@ class RegisterUserSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        print(validated_data)
         user = create_user_with_initial_state(
             email=validated_data["email"],
             password=validated_data["password"],
