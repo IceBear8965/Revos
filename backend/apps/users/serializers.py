@@ -8,6 +8,7 @@ from rest_framework import serializers
 from apps.energy.enums import EventTypeChoices
 from apps.energy.models import ActivityType, EnergyEvent, ModelParams
 from apps.energy.utils.normalize_dt import normalize_dt
+from apps.users.services.create_user import create_user_with_initial_state
 
 from .constants import INITIAL_ENERGY_CHOICES, INITIAL_ENERGY_MAP
 from .models import User
@@ -28,48 +29,13 @@ class RegisterUserSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         print(validated_data)
-        with transaction.atomic():
-            user = User.objects.create(
-                email=validated_data["email"],
-                nickname=validated_data["nickname"],
-                timezone=validated_data.get("timezone", "UTC"),
-            )
-
-            user.set_password(validated_data["password"])
-
-            user.save()
-
-            current_energy = INITIAL_ENERGY_MAP[validated_data["initial_energy_state"]]
-
-            params_version = ModelParams.objects.latest("created_at")
-
-            now = timezone.now()
-            EnergyEvent.objects.create(
-                user=user,
-                activity=None,
-                activity_category=EventTypeChoices.SYSTEM,
-                activity_name="initial state",
-                activity_coef=1.0,
-                subjective_coef=1.0,
-                params_version=params_version,
-                started_at=normalize_dt(now - timedelta(milliseconds=2)),
-                ended_at=normalize_dt(now - timedelta(milliseconds=1)),
-                energy_before=current_energy,
-                energy_after=current_energy,
-                acute_before=0.0,
-                acute_after=0.0,
-                chronic_before=0.0,
-                chronic_after=0.0,
-                sleep_minutes=0,
-                break_minutes=0,
-                continuous_load_minutes=0,
-            )
-
-            ActivityType.objects.create(
-                user=user, category=EventTypeChoices.RECOVERY, name="sleep", value=1.0
-            )
-
-            return user
+        user = create_user_with_initial_state(
+            email=validated_data["email"],
+            password=validated_data["password"],
+            nickname=validated_data["nickname"],
+            initial_energy_state=validated_data["initial_energy_state"],
+        )
+        return user
 
 
 class MeSerializer(serializers.Serializer):

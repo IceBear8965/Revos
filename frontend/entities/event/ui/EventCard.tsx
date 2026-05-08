@@ -33,23 +33,29 @@ export const EventCard = ({ event, onDelete, onEdit }: EventCardProps) => {
                 </View>
             </View>
             <View style={styles.eventRight}>
-                <View style={styles.rightControls}>
-                    <Pressable
-                        onPress={() => {
-                            onEdit(event)
-                        }}
-                        style={{ marginRight: 10 }}
-                    >
-                        <FontAwesome6 name="pen-to-square" size={24} color={colors.textPrimary} />
-                    </Pressable>
-                    <Pressable
-                        onPress={() => {
-                            onDelete(event.id)
-                        }}
-                    >
-                        <FontAwesome6 name="trash-can" size={24} color={colors.textPrimary} />
-                    </Pressable>
-                </View>
+                {event.activity.category != "system" && (
+                    <View style={styles.rightControls}>
+                        <Pressable
+                            onPress={() => {
+                                onEdit(event)
+                            }}
+                            style={{ marginRight: 10 }}
+                        >
+                            <FontAwesome6
+                                name="pen-to-square"
+                                size={24}
+                                color={colors.textPrimary}
+                            />
+                        </Pressable>
+                        <Pressable
+                            onPress={() => {
+                                onDelete(event.id)
+                            }}
+                        >
+                            <FontAwesome6 name="trash-can" size={24} color={colors.textPrimary} />
+                        </Pressable>
+                    </View>
+                )}
                 <View style={styles.rightArrowsContainer}>
                     <ArrowsRenderer energyDelta={event.energyDelta} />
                 </View>

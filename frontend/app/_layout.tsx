@@ -7,6 +7,7 @@ import * as SplashScreen from "expo-splash-screen"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ActivityTypesProvider } from "@/context/ActivityTypesContext"
+import { tokenStore } from "@/utils/TokenStore"
 
 SplashScreen.preventAutoHideAsync()
 

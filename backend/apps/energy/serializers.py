@@ -39,12 +39,15 @@ class EnergyEventCreateSerializer(serializers.Serializer):
 
         validate_event_time(started_at, ended_at)
 
-        last_event = EnergyEvent.objects.filter(user=user).order_by("-ended_at").first()
+        last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
 
         if last_event and started_at < last_event.ended_at:
             raise serializers.ValidationError(
                 {"started_at": "New event must start after the last event ends"}
             )
+
+        data["started_at"] = started_at
+        data["ended_at"] = ended_at
 
         return data
 
@@ -66,9 +69,8 @@ class EnergyEventEditSerializer(serializers.Serializer):
         user = self.context["request"].user
         event_id = self.context["view"].kwargs["id"]
 
-        started_at = data["started_at"]
-        ended_at = data["ended_at"]
-
+        started_at = normalize_dt(data["started_at"])
+        ended_at = normalize_dt(data["ended_at"])
         validate_event_time(started_at, ended_at)
 
         validate_event_edit(
@@ -77,6 +79,9 @@ class EnergyEventEditSerializer(serializers.Serializer):
             started_at=started_at,
             ended_at=ended_at,
         )
+
+        data["started_at"] = started_at
+        data["ended_at"] = ended_at
 
         return data
 
