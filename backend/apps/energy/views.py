@@ -63,8 +63,8 @@ class EnergyEventCreateView(APIView):
                 "user_id": request.user.id,
                 "name": event.activity_name,
                 "category": event.activity_category,
-                "started_at": event.started_at,
-                "ended_at": event.ended_at,
+                "started_at": event.started_at.isoformat(),
+                "ended_at": event.ended_at.isoformat(),
             },
         )
         return Response(status=HTTP_201_CREATED)
@@ -95,13 +95,7 @@ class EnergyEventEditView(APIView):
         log_event(
             action="event_edited",
             user_id=request.user.id,
-            extra={
-                "user_id": request.user.id,
-                "name": event.activity_name,
-                "category": event.activity_category,
-                "started_at": event.started_at,
-                "ended_at": event.ended_at,
-            },
+            extra={},
         )
         return Response(status=HTTP_200_OK)
 
