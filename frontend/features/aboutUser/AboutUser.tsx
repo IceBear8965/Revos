@@ -111,34 +111,40 @@ export const AboutUser = () => {
                     }}
                 >
                     <Text style={styles.activityTypeName}>{item.name}</Text>
-                    <View style={{ flexDirection: "row" }}>
-                        <Pressable
-                            onPress={() => {
-                                if (item.isEditable) {
-                                    setSelectedActivityType(item)
-                                    setActivityTypeModalMode("edit")
-                                    setActivityTypeModalVisible(true)
-                                }
-                            }}
-                            style={{ marginRight: 10 }}
-                        >
-                            <FontAwesome6
-                                name="pen-to-square"
-                                color={colors.textPrimary}
-                                size={24}
-                            />
-                        </Pressable>
-                        <Pressable
-                            onPress={() => {
-                                if (item.isEditable) {
-                                    setTypeToDelete(item.id)
-                                    setDeleteActivityTypeModal(true)
-                                }
-                            }}
-                        >
-                            <FontAwesome6 name="trash-can" size={24} color={colors.textPrimary} />
-                        </Pressable>
-                    </View>
+                    {item.isEditable && (
+                        <View style={{ flexDirection: "row" }}>
+                            <Pressable
+                                onPress={() => {
+                                    if (item.isEditable) {
+                                        setSelectedActivityType(item)
+                                        setActivityTypeModalMode("edit")
+                                        setActivityTypeModalVisible(true)
+                                    }
+                                }}
+                                style={{ marginRight: 10 }}
+                            >
+                                <FontAwesome6
+                                    name="pen-to-square"
+                                    color={colors.textPrimary}
+                                    size={24}
+                                />
+                            </Pressable>
+                            <Pressable
+                                onPress={() => {
+                                    if (item.isEditable) {
+                                        setTypeToDelete(item.id)
+                                        setDeleteActivityTypeModal(true)
+                                    }
+                                }}
+                            >
+                                <FontAwesome6
+                                    name="trash-can"
+                                    size={24}
+                                    color={colors.textPrimary}
+                                />
+                            </Pressable>
+                        </View>
+                    )}
                 </View>
                 <View style={{ justifyContent: "flex-start", flexDirection: "row" }}>
                     <Text
