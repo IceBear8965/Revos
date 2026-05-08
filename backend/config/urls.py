@@ -15,10 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+import os
+
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+
+def api_404(request, exception):
+    return JsonResponse({"detail": "Not found"}, status=404)
+
+
+def health(request):
+    return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,11 +37,8 @@ urlpatterns = [
     path("api/user/", include("apps.users.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("health/", health),
 ]
-
-
-def api_404(request, exception):
-    return JsonResponse({"detail": "Not found"}, status=404)
 
 
 handler404 = api_404

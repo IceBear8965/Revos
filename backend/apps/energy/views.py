@@ -54,12 +54,18 @@ class EnergyEventCreateView(APIView):
         serializer = EnergyEventCreateSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
-        create_energy_event(user=request.user, **serializer.validated_data)
+        event = create_energy_event(user=request.user, **serializer.validated_data)
 
         log_event(
             action="event_created",
             user_id=request.user.id,
-            extra={},
+            extra={
+                "user_id": request.user.id,
+                "name": event.activity_name,
+                "category": event.activity_category,
+                "started_at": event.started_at,
+                "ended_at": event.ended_at,
+            },
         )
         return Response(status=HTTP_201_CREATED)
 
@@ -89,7 +95,13 @@ class EnergyEventEditView(APIView):
         log_event(
             action="event_edited",
             user_id=request.user.id,
-            extra={},
+            extra={
+                "user_id": request.user.id,
+                "name": event.activity_name,
+                "category": event.activity_category,
+                "started_at": event.started_at,
+                "ended_at": event.ended_at,
+            },
         )
         return Response(status=HTTP_200_OK)
 

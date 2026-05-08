@@ -13,6 +13,8 @@ import { useActivityTypes } from "@/context/ActivityTypesContext"
 import { EventModal } from "@/features/event/ui/EventModal/EventModal"
 import { ActivityTypeCategoryWritable } from "@/entities/activity-type/model/types"
 import { Event } from "@/entities/event/model/types"
+import { useDeleteEvent } from "@/features/event/model/useDeleteEvent"
+import { ConfirmationModal } from "@/shared/components/ConfirmationModal/ConfirmationModal"
 
 export const Dashboard = () => {
     const { data, isLoading, error, execute: refetchDashboard } = useDashboard()
@@ -20,7 +22,7 @@ export const Dashboard = () => {
     const lastEvent = data?.lastEvent ?? null
 
     // Handling hooks
-    // const { isLoading: deletingEvent, error: deleteError, refetch: deleteEvent } = useDeleteEvent()
+    const { isLoading: deletingEvent, error: deleteError, execute: deleteEvent } = useDeleteEvent()
 
     const { colors } = useTheme()
     const styles = createStyles(colors)
@@ -35,6 +37,9 @@ export const Dashboard = () => {
     const [eventModalMode, setEventModalMode] = useState<"create" | "edit">("create")
     const [modalEvent, setModalEvent] = useState<Event | null>(null)
     const [eventType, setEventType] = useState<ActivityTypeCategoryWritable>("load")
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false)
+    const [eventToDelete, setEventToDelete] = useState<number | null>(null)
 
     useEffect(() => {
         if (currentEnergy == null) return
@@ -65,28 +70,31 @@ export const Dashboard = () => {
         setEventModalVisible(true)
     }
 
-    const onDeleteBtn = (id: number) => {}
+    const onDeleteBtn = (id: number) => {
+        setEventToDelete(id)
+        setDeleteModalVisible(true)
+    }
 
-    // const onDeleteConfirmed = async () => {
-    //     if (eventToDelete) {
-    //         try {
-    //             // await deleteEvent({ id: eventToDelete })
-    //             refetchDashboard()
-    //             setEventToDelete(null)
-    //             setDeleteModalVisible(false)
-    //         } catch (error) {
-    //             Alert.alert("Error", "Event can't be deleted now", [
-    //                 { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
-    //             ])
-    //         }
-    //     } else {
-    //         setDeleteModalVisible(false)
-    //     }
-    // }
-    // const onDeleteDenied = () => {
-    //     setEventToDelete(null)
-    //     setDeleteModalVisible(false)
-    // }
+    const onDeleteConfirmed = async () => {
+        if (eventToDelete) {
+            try {
+                await deleteEvent(eventToDelete)
+                refetchDashboard()
+                setEventToDelete(null)
+                setDeleteModalVisible(false)
+            } catch (error) {
+                Alert.alert("Error", "Event can't be deleted now", [
+                    { text: "Close", onPress: () => onDeleteDenied(), style: "default" },
+                ])
+            }
+        } else {
+            setDeleteModalVisible(false)
+        }
+    }
+    const onDeleteDenied = () => {
+        setEventToDelete(null)
+        setDeleteModalVisible(false)
+    }
 
     if (isLoading) {
         return <Loader />
@@ -190,6 +198,14 @@ export const Dashboard = () => {
                 setIsOpen={setEventModalVisible}
                 event={modalEvent}
                 eventType={eventType}
+            />
+
+            <ConfirmationModal
+                title="Are you sure you want to delete selected event?"
+                onConfirm={onDeleteConfirmed}
+                onDeny={onDeleteDenied}
+                modalVisible={deleteModalVisible}
+                setModalVisible={setDeleteModalVisible}
             />
         </View>
     )

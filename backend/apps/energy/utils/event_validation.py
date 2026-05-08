@@ -3,6 +3,8 @@ from datetime import timedelta
 from apps.energy.models import EnergyEvent
 from rest_framework import serializers
 
+from ..enums import EventTypeChoices
+
 
 def validate_event_time(started_at, ended_at):
     if started_at >= ended_at:

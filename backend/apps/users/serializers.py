@@ -1,8 +1,16 @@
+from datetime import timedelta
+
 import pytz
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 
-from .constants import INITIAL_ENERGY_MAP
+from apps.energy.enums import EventTypeChoices
+from apps.energy.models import ActivityType, EnergyEvent, ModelParams
+from apps.energy.utils.normalize_dt import normalize_dt
+from apps.users.services.create_user import create_user_with_initial_state
+
+from .constants import INITIAL_ENERGY_CHOICES, INITIAL_ENERGY_MAP
 from .models import User
 
 
@@ -10,6 +18,7 @@ class RegisterUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=16)
     nickname = serializers.CharField(max_length=32)
+    initial_energy_state = serializers.ChoiceField(INITIAL_ENERGY_CHOICES)
 
     def validate(self, data):
         if len(data.get("password")) < 8:
@@ -19,19 +28,13 @@ class RegisterUserSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        with transaction.atomic():
-            user = User.objects.create(
-                email=validated_data["email"],
-                nickname=validated_data["nickname"],
-                timezone=validated_data["timezone"],
-            )
-            user.set_password(validated_data["password"])
-            user.save()
-
-            current_energy = INITIAL_ENERGY_MAP[validated_data["initial_energy_state"]]
-            # Current energy must be saved in initial system event
-
-            return user
+        user = create_user_with_initial_state(
+            email=validated_data["email"],
+            password=validated_data["password"],
+            nickname=validated_data["nickname"],
+            initial_energy_state=validated_data["initial_energy_state"],
+        )
+        return user
 
 
 class MeSerializer(serializers.Serializer):

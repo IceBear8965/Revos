@@ -6,7 +6,10 @@ export const createStyles = (colors: AppColors) => {
         header: {
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
+
+            marginBottom: 10,
+            paddingHorizontal: 10,
         },
         title: {
             fontSize: 16,

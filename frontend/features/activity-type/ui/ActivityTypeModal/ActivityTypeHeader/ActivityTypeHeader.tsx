@@ -1,15 +1,17 @@
 import { View, Text, Pressable } from "react-native"
 import { createStyles } from "./styles"
 import { useTheme } from "@/context/ThemeContext"
-import { EventHeaderProps } from "./types"
+import { ActivityTypeHeaderProps } from "./types"
 
-export const EventHeader = ({ onSubmit }: EventHeaderProps) => {
+export const ActivityTypeHeader = ({ mode, onSubmit }: ActivityTypeHeaderProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
     return (
         <View style={styles.header}>
-            <Text style={styles.headerTitle}>New Event</Text>
+            <Text style={styles.headerTitle}>
+                {mode === "create" ? "Create Activity" : "Edit Activit"}
+            </Text>
             <Pressable style={styles.saveButton} onPress={onSubmit}>
                 <Text style={styles.saveButtonText}>Save</Text>
             </Pressable>

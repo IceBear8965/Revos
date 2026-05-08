@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from django.db.models import CharField, Q
@@ -8,10 +9,13 @@ from apps.energy.utils.event_validation import (
     validate_event_edit,
     validate_event_time,
 )
+from apps.energy.utils.normalize_dt import normalize_dt
 
 from .enums import UserTypeChoices
 from .models import ActivityType, EnergyEvent
 from .utils.energy_delta import energy_delta
+
+logger = logging.getLogger(__name__)
 
 
 # !!! Energy Events !!!
@@ -30,17 +34,20 @@ class EnergyEventCreateSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = self.context["request"].user
-        started_at = data["started_at"]
-        ended_at = data["ended_at"]
+        started_at = normalize_dt(data["started_at"])
+        ended_at = normalize_dt(data["ended_at"])
 
         validate_event_time(started_at, ended_at)
 
-        last_event = EnergyEvent.objects.filter(user=user).order_by("-ended_at").first()
+        last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
 
         if last_event and started_at < last_event.ended_at:
             raise serializers.ValidationError(
                 {"started_at": "New event must start after the last event ends"}
             )
+
+        data["started_at"] = started_at
+        data["ended_at"] = ended_at
 
         return data
 
@@ -62,9 +69,8 @@ class EnergyEventEditSerializer(serializers.Serializer):
         user = self.context["request"].user
         event_id = self.context["view"].kwargs["id"]
 
-        started_at = data["started_at"]
-        ended_at = data["ended_at"]
-
+        started_at = normalize_dt(data["started_at"])
+        ended_at = normalize_dt(data["ended_at"])
         validate_event_time(started_at, ended_at)
 
         validate_event_edit(
@@ -73,6 +79,9 @@ class EnergyEventEditSerializer(serializers.Serializer):
             started_at=started_at,
             ended_at=ended_at,
         )
+
+        data["started_at"] = started_at
+        data["ended_at"] = ended_at
 
         return data
 

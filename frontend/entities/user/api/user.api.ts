@@ -1,7 +1,16 @@
 import { httpClient } from "@/shared/api/HttpClient"
-import { AboutUserResponse, ChangeNicknameRequest, ChangeTimezoneRequest } from "./types"
+import {
+    AboutUserResponse,
+    ChangeNicknameRequest,
+    ChangeTimezoneRequest,
+    RegisterRequestDTO,
+    RegisterResponseDTO,
+} from "./types"
 
 export const userApi = {
+    register: async (body: RegisterRequestDTO): Promise<RegisterResponseDTO> => {
+        return httpClient.post("user/register/", body)
+    },
     about: async (): Promise<AboutUserResponse> => {
         return httpClient.get("user/me/")
     },

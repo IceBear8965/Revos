@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import CheckConstraint, F, Q
 
 from .enums import EventTypeChoices
+from .utils.normalize_dt import normalize_dt
 
 User = settings.AUTH_USER_MODEL
 
@@ -36,7 +37,7 @@ class ActivityType(models.Model):
 class EnergyEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="energy_events")
 
-    activity = models.ForeignKey(ActivityType, on_delete=models.PROTECT, null=True, blank=True)
+    activity = models.ForeignKey(ActivityType, on_delete=models.SET_NULL, null=True, blank=True)
     activity_category = models.CharField(
         max_length=10,
         choices=EventTypeChoices.choices,
@@ -67,6 +68,12 @@ class EnergyEvent(models.Model):
 
     def __str__(self):
         return f"{self.activity_name} : {self.started_at} — {self.ended_at} ({self.id})"
+
+    def save(self, *args, **kwargs):
+        self.started_at = normalize_dt(self.started_at)
+        self.ended_at = normalize_dt(self.ended_at)
+
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-started_at"]

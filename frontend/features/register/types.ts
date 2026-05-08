@@ -15,7 +15,6 @@ interface RegisterPayloadType {
     password: string
     nickname: string
     timezone: string
-    loadOrder: LoadOrderElementType[]
     initialEnergyState: InitialEnergyType
 }
 

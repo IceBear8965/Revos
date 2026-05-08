@@ -17,7 +17,7 @@ def create_energy_event(
     ended_at: datetime,
     subjective_coef: float,
 ):
-    params = ModelParams.objects.order_by("-version").last()
+    params = ModelParams.objects.order_by("version").last()
     last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
     if not last_event:
         raise LastEventNotFound()
@@ -57,7 +57,7 @@ def create_energy_event(
     model = EnergyEngine(params=engine_params, event_details=event_details)
     new_state = model.apply()
 
-    EnergyEvent.objects.create(
+    return EnergyEvent.objects.create(
         user=user,
         activity=activity,
         activity_category=activity.category,
