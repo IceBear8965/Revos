@@ -61,7 +61,8 @@ class EnergyEngine:
                 * subjective_coef
             )
 
-            self.energy -= energy_cost * (self.energy - min_energy)
+            # self.energy -= energy_cost * (self.energy - min_energy)
+            self.energy -= energy_cost * (0.3 + self.energy)
 
             target_acute = self.acute_strain + self.params.strain_growth_coef * activity_coef
             self.acute_strain += self.params.acute_smoothing * (target_acute - self.acute_strain)
@@ -135,7 +136,8 @@ class EnergyEngine:
                 )
             )
 
-            strain_factor = 1 / (1 + self.acute_strain)
+            strain_factor = 1 / (1 + 0.3 * self.acute_strain)
+            # strain_factor = 1 / (1 + self.acute_strain)
 
             self.energy += (
                 self.params.recovery_energy_multiplier

@@ -13,7 +13,8 @@ interface PendingRequest<T> {
 }
 
 class HttpClient {
-    private baseURL = "https://backend-production-5f49d.up.railway.app/api/"
+    private baseURL = "http://127.0.0.1:8000/api/"
+    // private baseURL = "https://backend-production-5f49d.up.railway.app/api/"
     // private baseURL = "http://10.0.2.2:8000/api/" // localhost
 
     private isRefreshing = false
