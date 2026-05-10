@@ -16,6 +16,7 @@ import { ConfirmationModal } from "@/shared/components/ConfirmationModal/Confirm
 import { ActivityType } from "@/entities/activity-type/model/types"
 import { ActivityTypeModal } from "../activity-type/ui/ActivityTypeModal/ActivityTypeModal"
 import { ChangeNicknameModal } from "./modals/ChangeNicknameModal/ChangeNicknameModal"
+import { ChangeTimezoneModal } from "./modals/ChangeTimezoneModal/ChangeTimezoneModal"
 
 export const AboutUser = () => {
     const { data, isLoading, error, execute: fetchAboutUser } = useAboutUser()
@@ -280,6 +281,11 @@ export const AboutUser = () => {
                 refetch={fetchAboutUser}
                 modalVisible={nicknameModalVisible}
                 setModalVisible={setNicknameModalVisible}
+            />
+            <ChangeTimezoneModal
+                refetch={fetchAboutUser}
+                modalVisible={timezoneModalVisible}
+                setModalVisible={setTimezoneModalVisible}
             />
         </View>
     )

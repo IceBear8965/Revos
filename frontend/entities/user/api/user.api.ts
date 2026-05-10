@@ -2,7 +2,7 @@ import { httpClient } from "@/shared/api/HttpClient"
 import {
     AboutUserResponse,
     ChangeNicknameRequestDTO,
-    ChangeTimezoneRequest,
+    ChangeTimezoneRequestDTO,
     RegisterRequestDTO,
     RegisterResponseDTO,
 } from "./types"
@@ -19,7 +19,7 @@ export const userApi = {
         await httpClient.patch("user/change_nickname/", body)
     },
 
-    changeTimezone: async (body: ChangeTimezoneRequest): Promise<void> => {
+    changeTimezone: async (body: ChangeTimezoneRequestDTO): Promise<void> => {
         await httpClient.patch("user/change_timezone/", body)
     },
 }

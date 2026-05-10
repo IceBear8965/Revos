@@ -1,7 +1,13 @@
 import { userApi } from "../api/user.api"
 import { mapRegisterResponse, mapUser } from "./mappers/toDomain"
-import { mapChangeNickname, mapRegisterRequest } from "./mappers/toDto"
-import { ChangeNicknameRequest, RegisterRequest, RegisterResponse, User } from "./types"
+import { mapChangeNickname, mapChangeTimezone, mapRegisterRequest } from "./mappers/toDto"
+import {
+    ChangeNicknameRequest,
+    ChangeTimezoneRequest,
+    RegisterRequest,
+    RegisterResponse,
+    User,
+} from "./types"
 
 export const userService = {
     async register(body: RegisterRequest): Promise<RegisterResponse> {
@@ -17,5 +23,9 @@ export const userService = {
     async changeNickname(body: ChangeNicknameRequest): Promise<void> {
         const dto = mapChangeNickname(body)
         await userApi.changeNickname(dto)
+    },
+    async changeTimezone(body: ChangeTimezoneRequest): Promise<void> {
+        const dto = mapChangeTimezone(body)
+        await userApi.changeTimezone(dto)
     },
 }

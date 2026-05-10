@@ -24,6 +24,6 @@ export interface ChangeNicknameRequestDTO {
     nickname: string
 }
 
-export interface ChangeTimezoneRequest {
+export interface ChangeTimezoneRequestDTO {
     timezone: string
 }

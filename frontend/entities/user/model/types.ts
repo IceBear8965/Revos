@@ -23,3 +23,7 @@ export interface User {
 export interface ChangeNicknameRequest {
     new_nickname: string
 }
+
+export interface ChangeTimezoneRequest {
+    new_timezone: string
+}
