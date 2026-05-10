@@ -1,42 +1,40 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef } from "react"
-import { FlatList, Pressable, Text } from "react-native"
+import { FlatList, Pressable, Text, InteractionManager } from "react-native"
 
 import { useTheme } from "@/context/ThemeContext"
 import { createStyles } from "./styles"
 import { getWeekday, formatDateDDMM } from "@/shared/utils/formatDate"
+import { DatesCarouselProps } from "./types"
 
 const ITEM_WIDTH = 80
 const ITEM_MARGIN = 5
 const ITEM_SIZE = ITEM_WIDTH + ITEM_MARGIN * 2
 
-type Props = {
-    selectedDate: Date
-    onSelectDate: (date: Date) => void
-}
-
-export const DatesCarousel = memo(({ selectedDate, onSelectDate }: Props) => {
+export const DatesCarousel = memo(({ selectedDate, onSelectDate }: DatesCarouselProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
     const listRef = useRef<FlatList>(null)
+    const interactionTask = useRef<{ cancel: () => void } | null>(null)
 
     const dates = useMemo(() => {
         const result: Date[] = []
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
-        for (let i = -7; i <= 7; i++) {
-            const d = new Date()
-            d.setHours(0, 0, 0, 0)
+        const base = new Date(selectedDate)
+        base.setHours(0, 0, 0, 0)
 
-            d.setDate(d.getDate() + i)
+        for (let i = -7; i <= 7; i++) {
+            const d = new Date(base)
+            d.setDate(base.getDate() + i)
 
             if (d > today) continue
             result.push(d)
         }
 
         return result
-    }, [])
+    }, [selectedDate])
 
     const findIndex = useCallback(
         (date: Date) => dates.findIndex((d) => d.toDateString() === date.toDateString()),
@@ -45,17 +43,34 @@ export const DatesCarousel = memo(({ selectedDate, onSelectDate }: Props) => {
 
     const handlePress = useCallback(
         (date: Date) => {
-            const index = findIndex(date)
+            onSelectDate(date)
+        },
+        [onSelectDate]
+    )
 
+    useEffect(() => {
+        const index = findIndex(selectedDate)
+
+        if (index === -1) return
+
+        if (interactionTask.current) {
+            interactionTask.current.cancel()
+        }
+
+        interactionTask.current = InteractionManager.runAfterInteractions(() => {
             listRef.current?.scrollToIndex({
                 index,
                 animated: true,
                 viewPosition: 0.5,
             })
-            onSelectDate(date)
-        },
-        [onSelectDate]
-    )
+        })
+
+        return () => {
+            if (interactionTask.current) {
+                interactionTask.current.cancel()
+            }
+        }
+    }, [selectedDate, dates, findIndex])
 
     const renderItem = useCallback(
         ({ item }: { item: Date }) => {

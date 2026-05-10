@@ -37,6 +37,14 @@ export const EventsList = () => {
     const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false)
     const [eventToDelete, setEventToDelete] = useState<number | null>(null)
 
+    const onEditBtn = (event: Event) => {
+        const category = event.activity.category !== "system" ? event.activity.category : "load"
+
+        setEventType(category)
+        setModalEvent(event)
+        setEventModalVisible(true)
+    }
+
     const onDeleteBtn = (id: number) => {
         setEventToDelete(id)
         setDeleteModalVisible(true)
@@ -69,27 +77,6 @@ export const EventsList = () => {
         }, [])
     )
 
-    const onRefresh = async () => {
-        setIsRefreshing(true)
-        try {
-            await refetchList(selectedDate)
-        } finally {
-            setIsRefreshing(false)
-        }
-    }
-
-    const onEditBtn = (event: Event) => {
-        const category = event.activity.category !== "system" ? event.activity.category : "load"
-
-        setEventType(category)
-        setModalEvent(event)
-        setEventModalVisible(true)
-    }
-
-    const renderItem = ({ item }: { item: Event }) => (
-        <EventCard event={item} onEdit={onEditBtn} onDelete={onDeleteBtn} />
-    )
-
     if (isLoading) return <Loader message="Collecting your history" />
     if (error) return <Error error={error} />
 
@@ -100,7 +87,11 @@ export const EventsList = () => {
             </View>
 
             <View style={{ flex: 1 }}>
-                <EventsFlatList selectedDate={selectedDate} />
+                <EventsFlatList
+                    selectedDate={selectedDate}
+                    onEdit={onEditBtn}
+                    onDelete={onDeleteBtn}
+                />
             </View>
 
             <EventModal

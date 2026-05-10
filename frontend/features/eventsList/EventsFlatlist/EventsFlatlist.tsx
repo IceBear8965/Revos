@@ -5,12 +5,9 @@ import { useEventsList } from "../hooks/useEventsList"
 import { EventCard } from "@/entities/event/ui/EventCard"
 import { useTheme } from "@/context/ThemeContext"
 import { Event } from "@/entities/event/model/types"
+import { EventsFlatlistProps } from "./types"
 
-type Props = {
-    selectedDate: Date
-}
-
-export const EventsFlatList = ({ selectedDate }: Props) => {
+export const EventsFlatList = ({ selectedDate, onEdit, onDelete }: EventsFlatlistProps) => {
     const { colors } = useTheme()
 
     const { data, isLoading, error, execute: refetchList } = useEventsList()
@@ -31,7 +28,7 @@ export const EventsFlatList = ({ selectedDate }: Props) => {
     }, [selectedDate])
 
     const renderItem = useCallback(({ item }: { item: Event }) => {
-        return <EventCard event={item} onEdit={() => {}} onDelete={() => {}} />
+        return <EventCard event={item} onEdit={onEdit} onDelete={onDelete} />
     }, [])
 
     if (isLoading) return null
