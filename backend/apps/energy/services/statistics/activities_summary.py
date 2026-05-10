@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from apps.common.loggers import log_event
+
 from ...models import EnergyEvent
 from ...utils.energy_delta import energy_delta
 from ...utils.statistics_period import get_week_period
@@ -29,7 +31,8 @@ def generate_activities_summary(*, user):
     for activity, activity_deltas in events_by_activity.items():
         if activity == "initial state":
             continue
-        avg_delta = sum(activity_deltas) / len(activity_deltas)
+
+        avg_delta = sum(activity_deltas)
 
         activities.append(
             {
