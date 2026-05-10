@@ -56,20 +56,26 @@ class EnergyEngine:
             energy_cost = (
                 self.params.load_energy_rate
                 * activity_coef
-                * (1 + self.chronic_strain)
+                * (1 + 0.5 * self.chronic_strain)
+                # * (1 + self.chronic_strain)
                 * circadian_factor
                 * subjective_coef
             )
 
             # self.energy -= energy_cost * (self.energy - min_energy)
-            self.energy -= energy_cost * (0.3 + self.energy)
+            # self.energy -= energy_cost * (0.3 + self.energy)
+            energy_scale = 0.15 + 0.85 * self.energy
+            self.energy -= energy_cost * energy_scale
 
             target_acute = self.acute_strain + self.params.strain_growth_coef * activity_coef
             self.acute_strain += self.params.acute_smoothing * (target_acute - self.acute_strain)
 
             continuous_factor = 1 + (
-                self.params.load_continuous_factor * self.continuous_load_minutes
+                self.params.load_continuous_factor * math.sqrt(self.continuous_load_minutes)
             )
+            # continuous_factor = 1 + (
+            #     self.params.load_continuous_factor * self.continuous_load_minutes
+            # )
 
             self.chronic_strain += (
                 self.params.load_chronic_growth
