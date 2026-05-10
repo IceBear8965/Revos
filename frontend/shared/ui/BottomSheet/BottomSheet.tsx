@@ -1,5 +1,14 @@
-import { useEffect, useRef } from "react"
-import { Pressable, View, Animated, PanResponder, Dimensions } from "react-native"
+import { useEffect, useRef, useCallback } from "react"
+import {
+    Pressable,
+    View,
+    Animated,
+    PanResponder,
+    Dimensions,
+    Keyboard,
+    Platform,
+    KeyboardAvoidingView,
+} from "react-native"
 
 import { useTheme } from "@/context/ThemeContext"
 import { useTabBar } from "@/context/TabBarContext"
@@ -12,41 +21,76 @@ export const BottomSheet = ({ children, visible, setVisible, height = 0.4 }: Bot
     const { setVisible: setTabBarVisible } = useTabBar()
 
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current
-    const isOpen = useRef(false)
+    const keyboardOffset = useRef(new Animated.Value(0)).current
 
-    const animateTo = (toValue: number, callback?: () => void) => {
+    const isAnimating = useRef(false)
+
+    const totalTranslateY = Animated.add(translateY, Animated.multiply(keyboardOffset, -1))
+
+    const open = useCallback(() => {
+        setTabBarVisible(false)
+        isAnimating.current = true
+
         Animated.timing(translateY, {
-            toValue,
+            toValue: 0,
             duration: 250,
             useNativeDriver: true,
-        }).start(callback)
-    }
+        }).start(() => {
+            isAnimating.current = false
+        })
+    }, [])
 
-    const open = () => {
-        setTabBarVisible(false)
-        isOpen.current = true
-        animateTo(0)
-    }
+    const close = useCallback(() => {
+        isAnimating.current = true
 
-    const close = () => {
-        animateTo(SCREEN_HEIGHT, () => {
-            isOpen.current = false
+        Keyboard.dismiss()
+
+        Animated.timing(translateY, {
+            toValue: SCREEN_HEIGHT,
+            duration: 250,
+            useNativeDriver: true,
+        }).start(() => {
+            isAnimating.current = false
             setTabBarVisible(true)
             setVisible(false)
         })
-    }
+    }, [])
 
     useEffect(() => {
-        if (visible) {
-            open()
-        } else {
-            close()
-        }
+        if (visible) open()
+        else if (!isAnimating.current) close()
     }, [visible])
+
+    useEffect(() => {
+        const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow"
+
+        const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide"
+
+        const showSub = Keyboard.addListener(showEvent, (e) => {
+            Animated.timing(keyboardOffset, {
+                toValue: e.endCoordinates.height,
+                duration: 250,
+                useNativeDriver: true,
+            }).start()
+        })
+
+        const hideSub = Keyboard.addListener(hideEvent, () => {
+            Animated.timing(keyboardOffset, {
+                toValue: 0,
+                duration: 250,
+                useNativeDriver: true,
+            }).start()
+        })
+
+        return () => {
+            showSub.remove()
+            hideSub.remove()
+        }
+    }, [])
 
     const panResponder = useRef(
         PanResponder.create({
-            onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
+            onMoveShouldSetPanResponder: (_, g) => g.dy > 8,
 
             onPanResponderMove: (_, g) => {
                 if (g.dy > 0) {
@@ -64,7 +108,7 @@ export const BottomSheet = ({ children, visible, setVisible, height = 0.4 }: Bot
         })
     ).current
 
-    if (!visible && !isOpen.current) return null
+    if (!visible) return null
 
     return (
         <View
@@ -77,53 +121,64 @@ export const BottomSheet = ({ children, visible, setVisible, height = 0.4 }: Bot
                 zIndex: 999,
             }}
         >
-            {/* backdrop */}
+            {/* BACKDROP */}
             <Pressable
                 onPress={close}
                 style={{
                     position: "absolute",
-                    width: "100%",
-                    height: "100%",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     backgroundColor: "rgba(0,0,0,0.5)",
+                    zIndex: 1,
                 }}
             />
 
-            {/* sheet */}
+            {/* SHEET */}
             <Animated.View
                 style={{
                     position: "absolute",
                     bottom: 0,
-                    width: "100%",
+                    left: 0,
+                    right: 0,
+
                     height: SCREEN_HEIGHT * height,
                     backgroundColor: colors.background,
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
-                    transform: [{ translateY }],
+
+                    transform: [{ translateY: totalTranslateY }],
+
+                    zIndex: 2,
                 }}
             >
-                <View style={{ flex: 1 }}>
-                    {/* handle */}
+                {/* HANDLE */}
+                <View
+                    {...panResponder.panHandlers}
+                    style={{
+                        height: 30,
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
                     <View
-                        {...panResponder.panHandlers}
                         style={{
-                            height: 30,
-                            alignItems: "center",
-                            justifyContent: "center",
+                            width: 40,
+                            height: 5,
+                            borderRadius: 3,
+                            backgroundColor: colors.textPrimary,
                         }}
-                    >
-                        <View
-                            style={{
-                                width: 40,
-                                height: 5,
-                                borderRadius: 3,
-                                backgroundColor: colors.textPrimary,
-                            }}
-                        />
-                    </View>
-
-                    {/* content */}
-                    <View style={{ flex: 1 }}>{children}</View>
+                    />
                 </View>
+
+                {/* CONTENT */}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : undefined}
+                    style={{ flex: 1 }}
+                >
+                    {children}
+                </KeyboardAvoidingView>
             </Animated.View>
         </View>
     )

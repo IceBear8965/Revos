@@ -10,7 +10,7 @@ export const ActivityTypeHeader = ({ mode, onSubmit }: ActivityTypeHeaderProps) 
     return (
         <View style={styles.header}>
             <Text style={styles.headerTitle}>
-                {mode === "create" ? "Create Activity" : "Edit Activit"}
+                {mode === "create" ? "Create Activity" : "Edit Activity"}
             </Text>
             <Pressable style={styles.saveButton} onPress={onSubmit}>
                 <Text style={styles.saveButtonText}>Save</Text>

@@ -81,7 +81,7 @@ export const EventModal = ({
     if (editingError) return <Error error={editingError} />
 
     return (
-        <BottomSheet visible={isOpen} setVisible={close}>
+        <BottomSheet visible={isOpen} setVisible={close} height={0.35}>
             <EventHeader mode={mode} onSubmit={handleSubmit} />
             <View style={styles.modalContentContainer}>
                 <View style={styles.modalContent}>

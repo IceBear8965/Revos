@@ -34,7 +34,7 @@ export const ChangeNicknameModal = ({
     if (error) return <Error error={error} />
 
     return (
-        <BottomSheet visible={modalVisible} setVisible={setModalVisible} height={0.3}>
+        <BottomSheet visible={modalVisible} setVisible={setModalVisible} height={0.2}>
             <ChangeNicknameHeader onSubmit={handleSubmit} />
             <View style={styles.modalContentContainer}>
                 <View style={styles.modalContent}>

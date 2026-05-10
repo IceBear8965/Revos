@@ -210,56 +210,60 @@ export const EventsList = () => {
 
     return (
         <View style={styles.eventsListContainer}>
-            <FlatList
-                ref={listRef}
-                data={dates}
-                horizontal
-                renderItem={renderDateItem}
-                keyExtractor={(item) => item.toISOString()}
-                showsHorizontalScrollIndicator={false}
-                getItemLayout={(_, index) => ({
-                    length: ITEM_SIZE,
-                    offset: ITEM_SIZE * index,
-                    index,
-                })}
-                contentContainerStyle={{
-                    paddingVertical: 10,
-                }}
-                onScrollToIndexFailed={(info) => {
-                    setTimeout(() => {
-                        listRef.current?.scrollToIndex({
-                            index: info.index,
+            <View>
+                <FlatList
+                    ref={listRef}
+                    data={dates}
+                    horizontal
+                    renderItem={renderDateItem}
+                    keyExtractor={(item) => item.toISOString()}
+                    showsHorizontalScrollIndicator={false}
+                    getItemLayout={(_, index) => ({
+                        length: ITEM_SIZE,
+                        offset: ITEM_SIZE * index,
+                        index,
+                    })}
+                    contentContainerStyle={{
+                        paddingVertical: 10,
+                    }}
+                    onScrollToIndexFailed={(info) => {
+                        setTimeout(() => {
+                            listRef.current?.scrollToIndex({
+                                index: info.index,
 
-                            animated: true,
+                                animated: true,
 
-                            viewPosition: 0.5,
-                        })
-                    }, 50)
-                }}
-            />
+                                viewPosition: 0.5,
+                            })
+                        }, 50)
+                    }}
+                />
+            </View>
 
-            <FlatList
-                key={dates[0]?.toISOString()}
-                data={data?.results}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={{
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                }}
-                onLayout={() => setListReady(true)}
-                ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
-                ListFooterComponent={<View style={{ height: 10 }} />}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={isRefreshing}
-                        onRefresh={onRefresh}
-                        tintColor={colors.foreground}
-                        colors={[colors.foreground]}
-                    />
-                }
-            />
+            <View style={{ flex: 1 }}>
+                <FlatList
+                    key={dates[0]?.toISOString()}
+                    data={data?.results}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={{
+                        paddingHorizontal: 20,
+                        paddingVertical: 10,
+                    }}
+                    onLayout={() => setListReady(true)}
+                    ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                    ListFooterComponent={<View style={{ height: 10 }} />}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={onRefresh}
+                            tintColor={colors.foreground}
+                            colors={[colors.foreground]}
+                        />
+                    }
+                />
+            </View>
 
             <EventModal
                 mode={eventModalMode.current}
