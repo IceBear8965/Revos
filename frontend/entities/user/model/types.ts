@@ -1,5 +1,4 @@
 import { InitialEnergyType } from "@/features/register/types"
-import { initial_energy_state } from "../api/types"
 
 export interface RegisterRequest {
     email: string
@@ -19,4 +18,8 @@ export interface User {
     nickname: string
     email: string
     timezone: string
+}
+
+export interface ChangeNicknameRequest {
+    new_nickname: string
 }

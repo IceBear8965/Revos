@@ -277,6 +277,7 @@ export const AboutUser = () => {
             />
 
             <ChangeNicknameModal
+                refetch={fetchAboutUser}
                 modalVisible={nicknameModalVisible}
                 setModalVisible={setNicknameModalVisible}
             />

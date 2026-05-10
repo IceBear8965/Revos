@@ -1,7 +1,7 @@
 import { httpClient } from "@/shared/api/HttpClient"
 import {
     AboutUserResponse,
-    ChangeNicknameRequest,
+    ChangeNicknameRequestDTO,
     ChangeTimezoneRequest,
     RegisterRequestDTO,
     RegisterResponseDTO,
@@ -15,7 +15,7 @@ export const userApi = {
         return httpClient.get("user/me/")
     },
 
-    changeNickname: async (body: ChangeNicknameRequest): Promise<void> => {
+    changeNickname: async (body: ChangeNicknameRequestDTO): Promise<void> => {
         await httpClient.patch("user/change_nickname/", body)
     },
 

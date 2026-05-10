@@ -20,7 +20,7 @@ export interface AboutUserResponse {
     timezone: string
 }
 
-export interface ChangeNicknameRequest {
+export interface ChangeNicknameRequestDTO {
     nickname: string
 }
 

@@ -5,17 +5,33 @@ import { AppColors } from "@/theme/types"
 import { ChangeNicknameModalProps } from "./types"
 import { ChangeNicknameHeader } from "./ChangeNicknameHeader/ChangeNicknameHeader"
 import { useTheme } from "@/context/ThemeContext"
+import { useChangeNickname } from "@/features/user/model/useChangeNickname"
+import { Loader } from "@/shared/components/Loader"
+import { Error } from "@/shared/components/Error"
 
 export const ChangeNicknameModal = ({
+    refetch,
     modalVisible,
     setModalVisible,
 }: ChangeNicknameModalProps) => {
     const { colors } = useTheme()
     const styles = createStyles(colors)
 
+    const { isLoading, error, execute: changeNickname } = useChangeNickname()
+
     const [updatedNickname, setUpdatedNickname] = useState<string | null>(null)
 
-    const handleSubmit = () => {}
+    const handleSubmit = async () => {
+        if (!updatedNickname) return
+
+        await changeNickname({ new_nickname: updatedNickname })
+
+        refetch()
+        setModalVisible(false)
+    }
+
+    if (isLoading) return <Loader message="Updating your nickname" />
+    if (error) return <Error error={error} />
 
     return (
         <BottomSheet visible={modalVisible} setVisible={setModalVisible} height={0.3}>

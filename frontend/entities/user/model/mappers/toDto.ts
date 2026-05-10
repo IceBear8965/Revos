@@ -1,5 +1,5 @@
-import { RegisterRequest } from "../types"
-import { RegisterRequestDTO } from "../../api/types"
+import { ChangeNicknameRequest, RegisterRequest } from "../types"
+import { ChangeNicknameRequestDTO, RegisterRequestDTO } from "../../api/types"
 
 export const mapRegisterRequest = (domain: RegisterRequest): RegisterRequestDTO => {
     return {
@@ -9,4 +9,8 @@ export const mapRegisterRequest = (domain: RegisterRequest): RegisterRequestDTO 
         timezone: domain.timezone,
         initial_energy_state: domain.initialEnergyState.state,
     }
+}
+
+export const mapChangeNickname = (domain: ChangeNicknameRequest): ChangeNicknameRequestDTO => {
+    return { nickname: domain.new_nickname }
 }
