@@ -144,3 +144,5 @@ class ChangeTimezoneView(APIView):
             user_id=user.id,
             extra={"previous_timezone": previous_timezone, "current_timezone": user.timezone},
         )
+
+        return Response(status=HTTP_202_ACCEPTED)
