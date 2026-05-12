@@ -12,7 +12,7 @@ export const createStyles = (colors: AppColors) => {
             justifyContent: "space-between",
             alignItems: "center",
             backgroundColor: colors.card,
-            padding: 25,
+            padding: 20,
             borderRadius: 20,
         },
         userIcon: {
@@ -25,10 +25,26 @@ export const createStyles = (colors: AppColors) => {
             alignItems: "center",
         },
         nickname: {
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: 500,
             color: colors.textPrimary,
             marginRight: 25,
+        },
+
+        changeTimezoneContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: colors.card,
+            padding: 20,
+            borderRadius: 20,
+            marginTop: 20,
+        },
+        timezoneSelectorText: {
+            fontSize: 20,
+            fontWeight: 500,
+            color: colors.textPrimary,
+            textTransform: "capitalize",
         },
 
         toggleThemeCard: {
@@ -36,39 +52,76 @@ export const createStyles = (colors: AppColors) => {
             justifyContent: "space-between",
             alignItems: "center",
             backgroundColor: colors.card,
-            padding: 25,
+            padding: 20,
             borderRadius: 20,
-            marginTop: 30,
+            marginTop: 20,
         },
         themeSwitcherText: {
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: 500,
             color: colors.textPrimary,
             textTransform: "capitalize",
         },
         themeSwitcher: {},
 
-        loadOrderSelectorContainer: {
+        // Activity Type list
+        activityTypesContainer: {
+            flex: 1,
             backgroundColor: colors.card,
-            padding: 20,
-            marginTop: 30,
+            paddingVertical: 20,
+            marginHorizontal: 30,
             borderRadius: 20,
+            marginTop: 20,
         },
-        saveLoadOrderButtonContainer: {
+        addTypeContainer: {
             alignItems: "center",
         },
-        saveLoadOrderButton: {
-            paddingHorizontal: 30,
-            paddingVertical: 15,
-            borderRadius: 10,
+        addTypeBtn: {
+            width: "70%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 20,
+            paddingHorizontal: 15,
             backgroundColor: colors.foreground,
+
+            borderRadius: 20,
         },
-        saveLoadOrderText: {
-            fontSize: 16,
-            fontWeight: 600,
+        addTypeBtnText: {
+            fontSize: 20,
+            fontWeight: 500,
             color: colors.textPrimary,
+            marginRight: 20,
+        },
+        activityTypeCard: {
+            backgroundColor: colors.background,
+            padding: 25,
+            borderRadius: 20,
+        },
+        activityTypeName: {
+            color: colors.textPrimary,
+            fontSize: 20,
+            fontWeight: 500,
+            textTransform: "capitalize",
+            marginBottom: 10,
+        },
+        activityTypeCategory: {
+            color: colors.textPrimary,
+            fontSize: 16,
+            fontWeight: 400,
+            textTransform: "capitalize",
+            paddingHorizontal: 20,
+            paddingVertical: 5,
+            borderRadius: 10,
+            marginBottom: 10,
+        },
+        valueIndicatorContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
         },
 
+        // Sign Out Btn
         signOutContainer: {
             marginTop: 30,
             alignItems: "center",
@@ -81,7 +134,7 @@ export const createStyles = (colors: AppColors) => {
         },
         signOutButtonText: {
             fontSize: 16,
-            fontWeight: 600,
+            fontWeight: 500,
             color: colors.textPrimary,
         },
     })

@@ -12,29 +12,26 @@ import { RegisterPayloadType } from "./types"
 import { mapToLoadOrder } from "@/shared/utils/mapActivityTypes"
 import { LOAD_ACTIVITIES } from "@/shared/constants"
 import { InitialEnergyType, LoadOrderElementType } from "./types"
-import { useRegistration } from "./hooks/useRegistration"
 import { useAuth } from "@/context/AuthContext"
 import { Error } from "@/shared/components/Error"
-
-const initialLoadOrder = mapToLoadOrder([...LOAD_ACTIVITIES])
+import { userService } from "@/entities/user/model/user.service"
+import { tokenStore } from "@/utils/TokenStore"
 
 const initialEnergyState: InitialEnergyType = { icon: "emoticon-neutral-outline", state: "normal" }
 
 export const Registration = () => {
-    const { isLoading, error, refetch } = useRegistration()
-    const { isAuth, authenticateFromTokens } = useAuth()
+    const { isAuth, restoreSession } = useAuth()
     const router = useRouter()
     const [payload, setPayload] = useState<RegisterPayloadType>({
         email: "",
         password: "",
         nickname: "",
         timezone: getTimeZone(),
-        loadOrder: initialLoadOrder,
         initialEnergyState: initialEnergyState,
     })
     const [step, setStep] = useState<number>(0)
     const nextStep = () => {
-        setStep(Math.min(step + 1, 2))
+        setStep(Math.min(step + 1, 1))
     }
     const prevStep = () => setStep(Math.max(step - 1, 0))
 
@@ -58,12 +55,6 @@ export const Registration = () => {
             password: password,
         })
     }
-    const setLoadOrder = (loadOrder: LoadOrderElementType[]) => {
-        setPayload({
-            ...payload,
-            loadOrder: loadOrder,
-        })
-    }
     const setInitialState = (currentState: InitialEnergyType) => {
         setPayload({
             ...payload,
@@ -72,16 +63,21 @@ export const Registration = () => {
     }
 
     const register = async () => {
+        if (
+            !payload.email ||
+            !payload.password ||
+            !payload.nickname ||
+            !payload.timezone ||
+            !payload.initialEnergyState
+        )
+            return null
+        await userService.register(payload)
         try {
-            await refetch(payload)
-
-            await authenticateFromTokens()
-            if (!isLoading) {
-                if (isAuth) {
-                    router.replace("/(tabs)")
-                } else {
-                    router.replace("/(auth)/login")
-                }
+            const ok = await restoreSession()
+            if (ok) {
+                router.replace("/(tabs)")
+            } else {
+                router.replace("/(auth)/login")
             }
         } catch (err) {
             const message =
@@ -104,8 +100,6 @@ export const Registration = () => {
         transform: [{ translateX: translateX.value }],
     }))
 
-    if (error) return <Error error={error} />
-
     return (
         <SafeAreaView
             style={{
@@ -114,7 +108,7 @@ export const Registration = () => {
             }}
         >
             <Animated.View
-                style={[{ flex: 1, flexDirection: "row", width: SCREEN_WIDTH * 3 }, animatedStyle]}
+                style={[{ flex: 1, flexDirection: "row", width: SCREEN_WIDTH * 2 }, animatedStyle]}
             >
                 <CredentialsStep
                     nickname={payload.nickname}
@@ -124,12 +118,6 @@ export const Registration = () => {
                     setEmail={setEmail}
                     setPassword={setPassword}
                     nextStep={nextStep}
-                />
-                <LoadsOrderStep
-                    loadOrder={payload.loadOrder}
-                    prevStep={prevStep}
-                    nextStep={nextStep}
-                    setLoadOrder={setLoadOrder}
                 />
                 <CurrentStateStep
                     initialState={payload.initialEnergyState}

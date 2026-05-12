@@ -1,13 +1,12 @@
+import random
 from datetime import datetime
-from random import randint
 
 import pytz
 
-from ..models import EnergyEvent, EnergyProfile
+from apps.energy.domain.errors import LastEventNotFound
 
-# =========================
-# Constants (bounded sets)
-# =========================
+from ..models import EnergyEvent
+from ..utils.energy_delta import energy_delta
 
 ENERGY_LOW = "low"
 ENERGY_BELOW = "below"
@@ -19,10 +18,7 @@ CONTEXT_AFTER_LOAD = "after_load"
 CONTEXT_AFTER_RECOVERY = "after_recovery"
 
 
-# =========================
 # Messages & recommendations
-# =========================
-
 MESSAGES = {
     ENERGY_LOW: {
         CONTEXT_FIRST: {
@@ -85,18 +81,14 @@ MESSAGES = {
 RECOMMENDATIONS = {
     ENERGY_LOW: "Start with some rest",
     ENERGY_BELOW: "Consider a short pause",
-    ENERGY_OK: "You can continue your tasks",
     ENERGY_HIGH: "Great time for challenging tasks",
+    ENERGY_OK: "You can continue your tasks",
 }
 
 
-# =========================
 # Greeting
-# =========================
-
-
-def generate_greeting(timezone, user):
-    tz = pytz.timezone(timezone)
+def generate_greeting(user):
+    tz = pytz.timezone(user.timezone)
     hour = datetime.now(tz).hour
     name = user.nickname or "there"
 
@@ -113,17 +105,12 @@ def generate_greeting(timezone, user):
         f"Hi, {name}!",
     ]
 
-    return greetings[randint(0, len(greetings) - 1)]
+    return random.choice(greetings)
 
 
-# =========================
-# Dashboard content logic
-# =========================
-
-
-def generate_dashboard_content(*, user, last_event):
-    energy_profile = user.energy_profile
-    current_energy = round(energy_profile.current_energy, 3)
+# Dashboard content
+def generate_dashboard_content(*, last_event: EnergyEvent):
+    current_energy = round(last_event.energy_after, 3)
 
     # --- energy state ---
     if current_energy < 0.25:
@@ -138,7 +125,7 @@ def generate_dashboard_content(*, user, last_event):
     # --- context ---
     if last_event is None:
         context = CONTEXT_FIRST
-    elif last_event.event_type == "load":
+    elif last_event.activity_category == "load":
         context = CONTEXT_AFTER_LOAD
     else:
         context = CONTEXT_AFTER_RECOVERY
@@ -160,43 +147,37 @@ def generate_dashboard_content(*, user, last_event):
     return message, recommendation
 
 
-# =========================
-# Public dashboard generator
-# =========================
-
-
+# Dashboard generator
 def generate_dashboard(*, user) -> dict:
-    greeting = generate_greeting(user.timezone, user)
+    greeting = generate_greeting(user)
 
-    energy_profile, _ = EnergyProfile.objects.get_or_create(user=user)
-    current_energy = energy_profile.current_energy
+    last_event = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
+    if not last_event:
+        raise LastEventNotFound()
 
-    last_event_obj = EnergyEvent.objects.filter(user=user).order_by("-started_at").first()
+    message, recommendation = generate_dashboard_content(last_event=last_event)
 
-    message, recommendation = generate_dashboard_content(
-        user=user,
-        last_event=last_event_obj,
-    )
-
-    last_event = None
-    if last_event_obj:
-        user_timezone = pytz.timezone(user.timezone)
-        started_at_local = last_event_obj.started_at.astimezone(user_timezone).isoformat()
-        ended_at_local = last_event_obj.ended_at.astimezone(user_timezone).isoformat()
-        last_event = {
-            "id": last_event_obj.id,
-            "event_type": last_event_obj.event_type,
-            "activity_type": last_event_obj.activity_type,
-            "started_at": started_at_local,
-            "ended_at": ended_at_local,
-            "energy_delta": last_event_obj.energy_delta,
-            "subjective_coef": last_event_obj.subjective_coef,
-        }
+    if last_event.activity:
+        activity_id = last_event.activity.id
+    else:
+        activity_id = None
+    last_event_response = {
+        "id": last_event.id,
+        "activity": {
+            "id": activity_id,
+            "category": last_event.activity_category,
+            "name": last_event.activity_name,
+        },
+        "started_at": last_event.started_at,
+        "ended_at": last_event.ended_at,
+        "energy_delta": energy_delta(last_event),
+        "subjective_coef": last_event.subjective_coef,
+    }
 
     return {
         "greeting": greeting,
-        "current_energy": current_energy,
+        "current_energy": round(last_event.energy_after, 4),
         "message": message,
         "recommendation": recommendation,
-        "last_event": last_event,
+        "last_event": last_event_response,
     }

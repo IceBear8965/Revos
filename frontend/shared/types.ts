@@ -1,33 +1,30 @@
-import { ActivityTypeKey } from "./constants"
+import { ActivityTypeDTO } from "@/api/types"
 
 interface EventType {
     id: number
-    eventType: string
-    activityType: ActivityTypeKey
+    eventType: EventOptionsType
+    activityType: ActivityTypeDTO
     startedAt: Date
     endedAt: Date
     energyDelta: number
     subjectiveCoef: number
 }
 
-interface EventCardProps {
-    event: EventType
+interface EditEventProps {
+    id: number // Passed to url as param
+    activity: number
+    startedAt: Date
+    endedAt: Date
+    subjeciveCoef: number
 }
 
-interface UseAsyncGet<T> {
-    data: T | null
+export interface UseAsync<TData, TArgs extends unknown[] = []> {
+    data: TData | null
     isLoading: boolean
     error: Error | null
-    refetch: () => Promise<void>
+    execute: (...args: TArgs) => Promise<void>
 }
 
-interface UseAsyncPost<T, P> {
-    data: T | null
-    isLoading: boolean
-    error: Error | null
-    refetch: (body: P) => Promise<void>
-}
+type EventOptionsType = "load" | "recovery" | "system"
 
-type EventOptionsType = "load" | "recovery"
-
-export { EventType, EventCardProps, UseAsyncGet, UseAsyncPost, EventOptionsType }
+export { EventType, EditEventProps, EventOptionsType }

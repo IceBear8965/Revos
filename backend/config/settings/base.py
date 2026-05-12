@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     # ======== #
     "rest_framework",
     "apps.users",
@@ -45,9 +46,9 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_spectacular",
 ]
-INSTALLED_APPS += ["corsheaders"]
 
 MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -56,9 +57,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-MIDDLEWARE = ["corsheaders.middleware.CorsMiddleware"] + MIDDLEWARE
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
 
 TEMPLATES = [
     {
@@ -74,8 +78,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
@@ -102,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "config.exceptions.custom_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -116,7 +119,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(weeks=4),
 }
 
@@ -136,13 +139,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 AUTH_USER_MODEL = "users.User"
 
 # Logging
-LOG_DIR = os.path.join(BASE_DIR, "logs")
-os.makedirs(LOG_DIR, exist_ok=True)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -156,21 +157,9 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "default",
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": os.path.join(LOG_DIR, "activity.log"),
-            "level": "INFO",
-        },
     },
-    "loggers": {
-        "activity": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
     },
 }
-
-# CORS
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
